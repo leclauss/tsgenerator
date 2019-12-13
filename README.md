@@ -4,7 +4,7 @@ Generator of synthetic time series specialized for evaluation purposes of motif 
 
 ## Introduction
 
-This generator of synthetic time series is the result of a student research project. The idea was born, since the range of implementations generating time series specialized for evaluation of motif discovery algorithms was non-existing. This project is intended as a cross platform implementation. Therefore, the TSGenerator was tested on Kubuntu 17.10, Windows 10 and macOS 10.13 High Sierra. Installation guides for each platform follow in the sections **Prerequisites** and **Installion**.
+This generator of synthetic time series is the result of a student research project. The idea was born, since the range of implementations generating time series specialized for evaluation of motif discovery algorithms was non-existing. This project is intended as a cross platform implementation. Therefore, the TSGenerator was tested on Kubuntu 17.10, Windows 10 and macOS 10.14.3 Mojave. Installation guides for each platform follow in the sections **Prerequisites** and **Installion**.
 
 ### Prerequisites
 
@@ -62,8 +62,8 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
  ```bash
  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
  brew install llvm gcc
- ln -s /usr/local/opt/gcc/bin/gcc-8 /usr/local/bin/gcc
- ln -s /usr/local/opt/gcc/bin/c++-8 /usr/local/bin/c++
+ ln -s /usr/local/opt/gcc/bin/gcc-9 /usr/local/bin/gcc
+ ln -s /usr/local/opt/gcc/bin/c++-9 /usr/local/bin/c++
  ln -s /usr/local/opt/lvm/bin/clang /usr/local/bin/clang
  ```
 
