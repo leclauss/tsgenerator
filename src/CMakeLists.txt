@@ -9,6 +9,7 @@ ExternalProject_Add(project_fftw
   CONFIGURE_COMMAND
 ${CMAKE_CURRENT_BINARY_DIR}/fftw/src/project_fftw/configure
 --prefix=${CMAKE_CURRENT_BINARY_DIR}/fftw/install
+--libdir=${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib
   INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/fftw/install
   )
 
@@ -27,16 +28,9 @@ add_dependencies(${PROJECT_NAME} project_fftw)
 if (WIN32)
   target_link_libraries(${PROJECT_NAME} fftw)
 else ()
-  if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib/${lib_fftw_name})
-    set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
-      ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib/${lib_fftw_name})
-  elseif (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib64/${lib_fftw_name})
-    set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
-      ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib64/${lib_fftw_name})
-  else ()
-    message(SEND_ERROR "cannot find fftw3 lib folder")
-  endif()
-  target_link_libraries(${PROJECT_NAME})
+  set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib/${lib_fftw_name})
+  target_link_libraries(${PROJECT_NAME} PUBLIC stdc++fs fftw)
 endif ()
 
 add_executable(unittests unittests.cpp global.cpp motifsetcollection.cpp
@@ -46,14 +40,7 @@ add_dependencies(unittests project_fftw)
 if (WIN32)
   target_link_libraries(unittests fftw)
 else ()
-  if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib/${lib_fftw_name})
-    set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
-      ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib/${lib_fftw_name})
-  elseif (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib64/${lib_fftw_name})
-    set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
-      ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib64/${lib_fftw_name})
-  else ()
-    message(SEND_ERROR "cannot find fftw3 lib folder")
-  endif()
+  set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib/${lib_fftw_name})
   target_link_libraries(unittests PUBLIC stdc++fs fftw)
 endif ()
