@@ -1,0 +1,44 @@
+cmake_minimum_required(VERSION 3.8)
+project(TSGenerator VERSION 1.0.0.0 LANGUAGES CXX)
+subdirs(src)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
+    string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/bin)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib)
+endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
+
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc/man)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/man/TSGenerator.3
+  ${CMAKE_CURRENT_BINARY_DIR}/doc/man/TSGenerator.3 COPYONLY)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+
+option(BUILD_DOC "Build documentation" ON)
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+    set(DOXYGEN_CONF ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxygen.conf)
+    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    configure_file(${DOXYGEN_CONF} ${DOXYGEN_OUT} @ONLY)
+    message("Documentation build started")
+
+    add_custom_target(doc COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMENT "Doxygen started"
+      VERBATIM)
+else(DOXYGEN_FOUND)
+  message("Doxygen missing for documentation build")
+endif(DOXYGEN_FOUND)
+
+enable_testing()
+
+add_test(NAME "Unit_tests" COMMAND unittests)
+add_test(NAME "Help_text" COMMAND ${PROJECT_NAME} -h)
+add_test(NAME "Version_text" COMMAND ${PROJECT_NAME} -v)

@@ -1,0 +1,240 @@
+.TH TSGENERATOR 1
+.SH NAME
+TSGenerator \- generates synthetic time series containing time series motifs
+.SH SYNOPSIS
+.B TSGenerator
+\fB\-l\fR INTEGER \fB\-w\fR INTEGER \fB\-rd\fR FLOAT [\fBOPTIONS\fR]
+.SH DESCRIPTION
+The \fITSGenerator\fR is a generator of synthetic time series and the result of a student research project. The idea was born, since the range of implementations generating synthetic time series specialized for evaluation of time series motif discovery algorithms was non-existing. This project is intended as a cross platform implementation. Therefore, the \fITSGenerator\fR was tested on Kubuntu 17.10, Windows 10 and macOS 10.13 High Sierra.
+.TP
+.BR \-l ", " \-\-length " INTEGER"
+Sets the length of the synthetic time series.
+.TP
+.BR \-w ", " \-\-windowSize " INTEGER"
+Sets the window size for the generation of the synthetic time series motif sets.
+.TP
+.BR \-rd ", " \-\-randomness " FLOAT"
+Sets the randomization factor for the value calculation.
+.SH OPTIONS
+.TP
+.BR \-db ", " \-\-database
+Sets the operating mode to data base.
+.TP
+.BR \-pm ", " \-\-pairMotif " STRING FLOAT"
+Sets the operating mode to pair motif and the subsequences type as well as height. The default operating mode is the pair motif mode, the default type is BOX and the default height is 200.
+.TP
+.BR \-lm ", " \-\-latentMotif " STRING INTEGER FLOAT"
+Sets the operating mode to latent motif and the time series latent motif attributes. The time series latent motif attributes are \fITYPE\fR, \fICOUNT\fR and \fIHEIGHT\fR.
+.TP
+\fITYPE:\fR
+Sets the shape of the subsequences of the synthetic time series latent motif. The available types are \fBbox\fR, \fBtriangle\fR, \fBsemicircle\fR, \fBtrapezoid\fR, \fBpositiveflank\fR, \fBnegativeflank\fR, \fBsine\fR and \fBcosine\fR.
+.TP
+\fBbox\fR:
+.br
+
+.br
+^
+.br
+|
+.br
+|      .........
+.br
+|
+.br
+|
+.br
+|
+.br
+| .....         .....
+.br
+O---------------------->
+.TP
+\fBtriangle\fR:
+.br
+
+.br
+^
+.br
+|
+.br
+|          .
+.br
+|        .   .
+.br
+|      .       .
+.br
+|    .           .
+.br
+| ..               ..
+.br
+O---------------------->
+.TP
+\fBsemicircle\fR:
+.br
+
+.br
+^
+.br
+|
+.br
+|       .......
+.br
+|    .           .
+.br
+|   .             .
+.br
+|
+.br
+| ..               ..
+.br
+O---------------------->
+.TP
+\fBtrapezoid\fR:
+.br
+
+.br
+^
+.br
+|
+.br
+|      .........
+.br
+|     .         .
+.br
+|    .           .
+.br
+|   .             .
+.br
+| ..               ..
+.br
+O---------------------->
+.TP
+\fBpositiveflank\fR:
+.br
+
+.br
+^
+.br
+|
+.br
+|                 .
+.br
+|             .
+.br
+|         .
+.br
+|     .
+.br
+| ..               ..
+.br
+O---------------------->
+.TP
+\fBnegativeflank\fR:
+.br
+
+.br
+^
+.br
+|
+.br
+|   .
+.br
+|       .
+.br
+|           .
+.br
+|               .
+.br
+| ..               ..
+.br
+O---------------------->
+.TP
+\fBsine\fR:
+.br
+
+.br
+^
+.br
+|     . .
+.br
+|   .     .
+.br
+|  .       
+.br
+O-.--------.--------.-->
+.br
+|                  .
+.br
+|           .     .
+.br
+|             . .
+.TP
+\fBcosine\fR:
+.br
+
+.br
+^
+.br
+O--.---------------.--->
+.br
+|    .           .
+.br
+|              
+.br
+|     .         .
+.br
+|              
+.br
+|       .     .
+.br
+|         . .
+.TP
+\fICOUNT:\fR
+Sets the number of subsequences in the synthetic time series matching the latent motif.
+.TP
+\fIHEIGHT:\fR
+Sets the range of the values used to generate the subsequences of the synthetic time series matching the latent motif.
+.TP
+.BR \-v ", " \-\-version
+Prints the version information of TSGenerator.
+.TP
+.BR \-h ", " \-\-help
+Prints a short help text for TSGenerator usage.
+.TP
+.BR \-o ", " \-\-out " STRING"
+Sets the name of the output files.
+.TP
+.BR \-r ", " \-\-range " FLOAT FLOAT"
+Sets the range of the synthetic time series values.
+.TP
+.BR \-tsn ", " \-\-timeSeriesName " STRING"
+Sets the synthetic time series name.
+.TP
+.BR \-ho ", " \-\-horizontalOutput
+Sets the CSV files alignment to horizontal mode. A line in the CSV files is now one data set like the time series values.
+.SH OUTPUT
+The TSGenerator creates an output folder called output and four files. A \fBtime_series.csv\fR file, a \fBtime_series_meta.csv\fR file and a \fBtime_series_plot.plt\fR file. 
+.TP
+.B time_series.csv
+Contains the synthetic time series values.
+.TP
+.B time_series_meta.csv
+Contains the synthetic time series motif meta data. Each data set first value is the similarity of the synthetic time series top pair motif or the range of the synthetic time series top latent motif. The second value is the window size of the synthetic time series top pair motif or the synthetic time series top latent motif followed by all the positions of the subsequences in the synthetic time series top pair motif or the synthetic time series top latent motif matching subseqeunces positions in the synthetic time series.
+.TP
+.B time_series_plot.plt
+Contains a
+.de URL
+\\$2 \(la\\$1\(ra\\$3
+..
+.URL "http://www.gnuplot.info/" "Gnuplot" " script file that plots the \fBtime_series.csv\fR file."
+.SH AUTHOR
+Written by Rafael Moczalla.
+.SH COPYRIGHT
+Copyright \[co] 2018
+.de URL
+\\$2 \(la\\$1\(ra \\$3
+..
+We distribute this software under the
+.URL "http://creativecommons.org/licenses/by-nc-sa/3.0/" "Creative Commons - Attribution - Non-Commercial - Share Alike" "license."
+.SH SEE ALSO
+.BR gnuplot(1)
