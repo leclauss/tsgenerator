@@ -64,7 +64,7 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
  brew install llvm gcc
  ln -s /usr/local/opt/gcc/bin/gcc-9 /usr/local/bin/gcc
  ln -s /usr/local/opt/gcc/bin/c++-9 /usr/local/bin/c++
- ln -s /usr/local/opt/lvm/bin/clang /usr/local/bin/clang
+ ln -s /usr/local/opt/llvm/bin/clang /usr/local/bin/clang
  ```
 
 2. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website").
