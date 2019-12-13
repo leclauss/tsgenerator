@@ -18,7 +18,8 @@ set(lib_fftw_name
 ${CMAKE_STATIC_LIBRARY_PREFIX}fftw3${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 
-include_directories(${PROJECT_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/include)
+include_directories(${PROJECT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/include)
 link_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_executable(${PROJECT_NAME} main.cpp global.cpp motifsetcollection.cpp
