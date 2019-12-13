@@ -39,7 +39,7 @@ using namespace std;
 ///This function checks if the string is a float. Float representation of form
 ///[-](123456789)+[.(123456789)+] are accepted.
 // ----------------------------------------------------------------------------
-extern bool check_if_float(const string string_in);
+bool check_if_float(const string string_in);
 
 // ----------------------------------------------------------------------------
 ///\brief Parses arguments into a vector.
@@ -51,7 +51,7 @@ extern bool check_if_float(const string string_in);
 ///This is a argument parser function that parses arguments into a string
 ///vector.
 // ----------------------------------------------------------------------------
-extern void parseArgs(int argc, char **argv, vector<string> &argTokens);
+void parseArgs(int argc, char **argv, vector<string> &argTokens);
 
 // ----------------------------------------------------------------------------
 ///\brief Checks whether argument is contained in argument vector or not.
@@ -67,8 +67,8 @@ extern void parseArgs(int argc, char **argv, vector<string> &argTokens);
 ///true, if the argument was found and sets the payload string. Otherwise the
 ///function returns false.
 // ----------------------------------------------------------------------------
-extern bool checkArg(vector<string> &argTokens, const string arg_in,
-    vector<string> &payload_out);
+bool checkArg(vector<string> &argTokens, const string arg_in, vector<string>
+    &payload_out);
 
 // ----------------------------------------------------------------------------
 ///\brief Prints out the version text.
@@ -76,7 +76,7 @@ extern bool checkArg(vector<string> &argTokens, const string arg_in,
 ///A text containing the program name and version as well as additional
 ///informations like the authors name.
 // ----------------------------------------------------------------------------
-extern void print_version();
+void print_version();
 
 // ----------------------------------------------------------------------------
 ///\brief Prints out the help text.
@@ -84,6 +84,6 @@ extern void print_version();
 ///A text containing the information about the use and the arguments of the
 ///TSGenerator.
 // ----------------------------------------------------------------------------
-extern void print_help();
+void print_help();
 
 #endif

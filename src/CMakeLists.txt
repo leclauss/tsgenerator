@@ -23,7 +23,8 @@ include_directories(${PROJECT_SOURCE_DIR}/include
 link_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_executable(${PROJECT_NAME} main.cpp global.cpp motifsetcollection.cpp
-  outputgenerator.cpp freepositions.cpp basets.cpp tsgenerator.cpp fftw)
+  outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
+  tsgenerator.cpp fftw)
 add_dependencies(${PROJECT_NAME} project_fftw)
 
 if (WIN32)
@@ -35,7 +36,8 @@ else ()
 endif ()
 
 add_executable(unittests unittests.cpp global.cpp motifsetcollection.cpp
-  outputgenerator.cpp freepositions.cpp basets.cpp tsgenerator.cpp fftw)
+  outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
+  tsgenerator.cpp fftw)
 
 add_dependencies(unittests project_fftw)
 if (WIN32)

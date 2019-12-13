@@ -27,12 +27,11 @@
 #include <freepositions.hpp>
 #include <basets.hpp>
 #include <global.hpp>
+#include <scrimpplusplus.hpp>
 
 
 using namespace std;
 
-
-//extern bool check_if_float(const string string_in);
 
 // --------------------------------------------------------------------------
 ///\brief This class represents the TSGenerator.
@@ -100,18 +99,6 @@ protected:
   double noise = 0.1;
 
   // --------------------------------------------------------------------------
-  ///\brief This list contains all motif types.
-  ///
-  ///This variable stores the names of all motifs available in this
-  ///implementation. To add a motif one has to declare the motif in the
-  ///motifcollection.hpp file and define the motif in the motifcollection.cpp
-  ///file as well. Also, one has to modify the addMotif() function in the file
-  ///tsgenerator.cpp.
-  // --------------------------------------------------------------------------
-  vector<string> motifTypes{"box", "triangle", "semicircle", "trapezoid",
-    "positiveflank", "negativeflank", "sine", "cosine"};
-
-  // --------------------------------------------------------------------------
   ///\brief This variable contains the motif type.
   ///
   ///This variable stores the motif type, i.e., the shape of the motif.
@@ -135,12 +122,27 @@ protected:
   double height = 10.0;
 
   // --------------------------------------------------------------------------
+  ///\brief This variable contains the first value.
+  ///
+  ///This variable stores the first value of the time series.
+  // --------------------------------------------------------------------------
+  double start = 0.0;
+
+  // --------------------------------------------------------------------------
+  ///\brief This variable contains the base time series generation method.
+  ///
+  ///This variable stores the method for the generation of the base times
+  ///series.
+  // --------------------------------------------------------------------------
+  int method = 5;
+
+  // --------------------------------------------------------------------------
   ///\brief This variable contains the time series maximum absolute value.
   ///
   ///This variable stores the maximum absolute value a base time serise may
   ///have.
   // --------------------------------------------------------------------------
-  double maxi = 100.0;
+  double maxi = 20.0;
 
   // --------------------------------------------------------------------------
   ///\brief This variable contains the free positions.
@@ -180,6 +182,32 @@ protected:
   ///database time series.
   // --------------------------------------------------------------------------
   vector<tuple<double, double>> meansStds;
+
+  // --------------------------------------------------------------------------
+  ///\brief This list contains all motif types.
+  ///
+  ///This variable stores the names of all motifs available in this
+  ///implementation. To add a motif one has to declare the motif in the
+  ///motifcollection.hpp file and define the motif in the motifcollection.cpp
+  ///file as well. Also, one has to modify the addMotif() function in the file
+  ///tsgenerator.cpp.
+  // --------------------------------------------------------------------------
+  vector<string> motifTypes{"box", "triangle", "semicircle", "trapezoid",
+    "positiveflank", "negativeflank", "sine", "cosine"};
+
+  // --------------------------------------------------------------------------
+  ///\brief This list contains all methods for generating base time series.
+  ///
+  ///This variable stores the names of all mehtods available in this
+  ///implementation. To add a method one has to declare the function in the
+  ///basets.hpp file and define the function in the basets.cpp file as well.
+  ///Also, one has to modify the base time series method chooser in the file
+  ///tsgenerator.cpp.
+  // --------------------------------------------------------------------------
+  vector<string> methods{"simpleRandomWalk", "realRandomWalk",
+    "normalRandomWalk", "boundedSimpleRandomWalk", "boundedRealRandomWalk",
+    "boundedNormalRandomWalk", "uniformRandom", "normalRandom",
+    "piecewiseLinearRandom"};
 
 
   // --------------------------------------------------------------------------
@@ -287,6 +315,16 @@ protected:
       double height_in);
 
   // --------------------------------------------------------------------------
+  ///\brief Calculates a base time series.
+  ///
+  ///\param [out] timeSeries_out Hands over the computed time series.
+  ///
+  ///This function computes a base times series according to the length, start,
+  ///delta, maxi and noise values.
+  // --------------------------------------------------------------------------
+  void generateBaseTimeSeries(vector<double> &timeSeries_out);
+
+  // --------------------------------------------------------------------------
   ///\brief Search for unintentional matches in the time series with new
   ///injected subsequence.
   ///
@@ -342,6 +380,9 @@ public:
   ///by the motif.
   ///\param [in] height_in Hands over the maximum difference between two values
   ///of the motif.
+  ///\param [in] start_in Hands over the first value of the time sieres.
+  ///\param [in] method_in Hands over the method for base time series
+  ///generation.
   ///\param [in] max_in Hands over the maximum absolute value of the time
   ///series.
   ///
@@ -349,7 +390,8 @@ public:
   ///stores the result in the trueRandomEngineAvailable variable.
   // --------------------------------------------------------------------------
   TSGenerator(int length_in, int window_in, double delta_in, double noise_in,
-      int type_in, int size_in, double height_in, double maxi_in = 100.0);
+      int type_in, int size_in, double height_in, double start_in = 5, int
+      method_in = 5, double maxi_in = 100.0);
 
   // --------------------------------------------------------------------------
   ///\brief The constructor initializes the TSGenerator.
@@ -365,6 +407,9 @@ public:
   ///by the motif.
   ///\param [in] height_in Hands over the maximum difference between two values
   ///of the motif.
+  ///\param [in] start_in Hands over the first value of the time sieres.
+  ///\param [in] method_in Hands over the method for base time series
+  ///generation.
   ///\param [in] maxi_in Hands over the maximum absolute value of the time
   ///series.
   ///
@@ -372,7 +417,8 @@ public:
   ///stores the result in the trueRandomEngineAvailable variable.
   // --------------------------------------------------------------------------
   TSGenerator(int length_in, int window_in, double delta_in, double noise_in,
-      string type_in, int size_in, double height_in, double maxi_in = 100.0);
+      string type_in, int size_in, double height_in, double start_in = 5,
+      string method_in = "boundedNormalRandomWalk", double maxi_in = 100.0);
 
   // --------------------------------------------------------------------------
   ///\brief Frees the memory allocated by the TSGenerator.

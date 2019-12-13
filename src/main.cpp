@@ -56,6 +56,9 @@ int main(int argc, char *argv[]) {
   string type = "box";
   int size = 3;
   double height = 10.0;
+  double start = 0.0;
+  double maxi = 20.0;
+  string method = "boundedNormalRandomWalk";
 
   try {
 
@@ -163,7 +166,7 @@ int main(int argc, char *argv[]) {
       size = stoi(payload[0]);
     }
 
-    if (checkArg(argTokens, "-height", payload) || checkArg(argTokens,
+    if (checkArg(argTokens, "-h", payload) || checkArg(argTokens,
           "--height", payload)) {
 
       if (payload.empty()) {
@@ -181,13 +184,62 @@ int main(int argc, char *argv[]) {
       height = stoll(payload[0]);
     }
 
+    if (checkArg(argTokens, "-st", payload) || checkArg(argTokens,
+          "--start", payload)) {
+
+      if (payload.empty()) {
+
+        cerr << "ERROR: Start is missing an argument." << endl;
+        exit(EXIT_FAILURE);
+      }
+
+      if (!check_if_float(payload[0])) {
+
+        cerr << "ERROR: " << payload[0] << " is not a valid float!" << endl;
+        throw(EXIT_FAILURE);
+      }
+
+      start = stoll(payload[0]);
+    }
+
+    if (checkArg(argTokens, "-ma", payload) || checkArg(argTokens,
+          "--maximum", payload)) {
+
+      if (payload.empty()) {
+
+        cerr << "ERROR: Maximum is missing an argument." << endl;
+        exit(EXIT_FAILURE);
+      }
+
+      if (!check_if_float(payload[0])) {
+
+        cerr << "ERROR: " << payload[0] << " is not a valid float!" << endl;
+        throw(EXIT_FAILURE);
+      }
+
+      maxi = stoll(payload[0]);
+    }
+
+    if (checkArg(argTokens, "-me", payload) || checkArg(argTokens,
+          "--Method", payload)) {
+
+      if (payload.empty()) {
+
+        cerr << "ERROR: Type is missing an argument." << endl;
+        exit(EXIT_FAILURE);
+      }
+
+      method = payload[0];
+    }
+
 
     //generate the time series
     vector<double> timeSeries;
     vector<double> dVector;
     vector<int> windows;
     vector<vector<int>> motifPositions;
-    TSGenerator tSGenerator(length, window, delta, noise, type, size, height);
+    TSGenerator tSGenerator(length, window, delta, noise, type, size, height,
+        start, method, maxi);
     tSGenerator.run(timeSeries, dVector, windows, motifPositions);
 
     //output stuff

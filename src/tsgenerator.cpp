@@ -9,23 +9,29 @@
 
 
 #include <tsgenerator.hpp>
-#include <scrimpplusplus.hpp>
 
 
 TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
     double noise_in, int type_in, int size_in, double height_in, double
-    maxi_in)
+    start_in, int method_in, double maxi_in)
   : length(abs(length_in)), window(window_in), delta(delta_in),
   noise(noise_in), type(abs(type_in)), size(abs(size_in)), height(height_in),
-  maxi(abs(maxi_in)), freePositions(length, window),
-  randomEngine(random_device().entropy()
+  start(start_in), method(method_in), maxi(abs(maxi_in)), freePositions(length,
+      window), randomEngine(random_device().entropy()
     ? random_device()()
     : chrono::system_clock::now().time_since_epoch().count()) {
 
-  // check if type exists
+  //check if type exists
   if (type >= (int) motifTypes.size()) {
 
     cerr << "ERROR: Wrong motif set type: " << type_in << endl;
+    throw(EXIT_FAILURE);
+  }
+
+  //check if method exists
+  if (method >= (int) methods.size()) {
+
+    cerr << "ERROR: Unknown method: " << method_in << endl;
     throw(EXIT_FAILURE);
   }
 
@@ -47,10 +53,11 @@ TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
 
 TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
     double noise_in, string type_in, int size_in, double height_in, double
-    maxi_in)
+    start_in, string method_in, double maxi_in)
   : length(abs(length_in)), window(window_in), delta(delta_in),
-  noise(noise_in), size(abs(size_in)), height(height_in), maxi(abs(maxi_in)),
-  freePositions(length, window), randomEngine(random_device().entropy()
+  noise(noise_in), size(abs(size_in)), height(height_in), start(start_in),
+  maxi(abs(maxi_in)), freePositions(length, window),
+  randomEngine(random_device().entropy()
     ? random_device()()
     : chrono::system_clock::now().time_since_epoch().count()) {
 
@@ -62,6 +69,17 @@ TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
   if (type >= (int) motifTypes.size()) {
 
     cerr << "ERROR: Wrong motif set type: " << type_in << endl;
+    throw(EXIT_FAILURE);
+  }
+
+  // get the method
+  method = distance(methods.begin(), find(methods.begin(), methods.end(),
+        method_in));
+
+  // check if type exists
+  if (method >= (int) methods.size()) {
+
+    cerr << "ERROR: Unknown method: " << method_in << endl;
     throw(EXIT_FAILURE);
   }
 
@@ -362,6 +380,53 @@ void TSGenerator::calculateSubsequence(vector<double> &subsequence_out, int
   }
 }
 
+void TSGenerator::generateBaseTimeSeries(vector<double> &timeSeries_out) {
+
+  if (!timeSeries_out.empty()) {
+
+    timeSeries_out.clear();
+    timeSeries_out.resize(0);
+  }
+
+  switch (method) {
+
+    case 0:
+      baseTS.simpleRandomWalk(timeSeries_out, length, start, delta, noise);
+      break;
+    case 1:
+      baseTS.realRandomWalk(timeSeries_out, length, start, delta, noise);
+      break;
+    case 2:
+      baseTS.normalRandomWalk(timeSeries_out, length, start, delta, noise);
+      break;
+    case 3:
+      baseTS.simpleRandomWalk(timeSeries_out, length, start, delta, maxi,
+          noise);
+      break;
+    case 4:
+      baseTS.realRandomWalk(timeSeries_out, length, start, delta, maxi,
+          noise);
+      break;
+    case 5:
+      baseTS.normalRandomWalk(timeSeries_out, length, start, delta, maxi,
+          noise);
+      break;
+    case 6:
+      baseTS.uniformRandom(timeSeries_out, length, start, delta, noise);
+      break;
+    case 7:
+      baseTS.normalRandom(timeSeries_out, length, start, delta, noise);
+      break;
+    case 8:
+      baseTS.piecewiseLinearRandom(timeSeries_out, length, start, delta,
+          noise);
+      break;
+    default:
+      cerr << "ERROR: Unknown method: " << method << endl;
+      throw(EXIT_FAILURE);
+  }
+}
+
 bool TSGenerator::searchForUnintentionalMatches(const vector<double>
     &timeSeries_in, const vector<int> &motifPositions_in, const
     vector<double> &means_in, const vector<double> &stds_in, double
@@ -551,12 +616,6 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
     &motifPositions_out) {
 
   //clear the buffers
-  if (!timeSeries_out.empty()) {
-
-    timeSeries_out.clear();
-    timeSeries_out.resize(0);
-  }
-
   if (!timeSeriesBackup.empty()) {
 
     timeSeriesBackup.clear();
@@ -615,7 +674,7 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
     repeatLoop = false;
 
     //generate a base time series
-    baseTS.normalRandomWalk(timeSeries_out, length, 0.0, delta, noise);
+    generateBaseTimeSeries(timeSeries_out);
 
     //backup time series
     for (int timeSeriesItr = 0; timeSeriesItr < length; timeSeriesItr++)
