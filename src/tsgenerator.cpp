@@ -13,10 +13,12 @@
 
 
 TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
-    double noise_in, int type_in, int size_in, double height_in)
+    double noise_in, int type_in, int size_in, double height_in, double
+    maxi_in)
   : length(abs(length_in)), window(window_in), delta(delta_in),
   noise(noise_in), type(abs(type_in)), size(abs(size_in)), height(height_in),
-  freePositions(length, window), randomEngine(random_device().entropy()
+  maxi(abs(maxi_in)), freePositions(length, window),
+  randomEngine(random_device().entropy()
     ? random_device()()
     : chrono::system_clock::now().time_since_epoch().count()) {
 
@@ -44,10 +46,11 @@ TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
 }
 
 TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
-    double noise_in, string type_in, int size_in, double height_in)
+    double noise_in, string type_in, int size_in, double height_in, double
+    maxi_in)
   : length(abs(length_in)), window(window_in), delta(delta_in),
-  noise(noise_in), size(abs(size_in)), height(height_in), freePositions(length,
-      window), randomEngine(random_device().entropy()
+  noise(noise_in), size(abs(size_in)), height(height_in), maxi(abs(maxi_in)),
+  freePositions(length, window), randomEngine(random_device().entropy()
     ? random_device()()
     : chrono::system_clock::now().time_since_epoch().count()) {
 

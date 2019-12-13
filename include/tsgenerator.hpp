@@ -10,9 +10,7 @@
 #ifndef TSGENERATOR_HPP
 #define TSGENERATOR_HPP
 
-#include <fstream>
 #include <iostream>
-#include <sstream>
 #include <algorithm>
 #include <numeric>
 #include <string>
@@ -135,6 +133,14 @@ protected:
   ///between two motif values.
   // --------------------------------------------------------------------------
   double height = 10.0;
+
+  // --------------------------------------------------------------------------
+  ///\brief This variable contains the time series maximum absolute value.
+  ///
+  ///This variable stores the maximum absolute value a base time serise may
+  ///have.
+  // --------------------------------------------------------------------------
+  double maxi = 100.0;
 
   // --------------------------------------------------------------------------
   ///\brief This variable contains the free positions.
@@ -336,12 +342,14 @@ public:
   ///by the motif.
   ///\param [in] height_in Hands over the maximum difference between two values
   ///of the motif.
+  ///\param [in] max_in Hands over the maximum absolute value of the time
+  ///series.
   ///
   ///The constructor checks whether a true random engine is available and
   ///stores the result in the trueRandomEngineAvailable variable.
   // --------------------------------------------------------------------------
   TSGenerator(int length_in, int window_in, double delta_in, double noise_in,
-      int type_in, int size_in, double height_in);
+      int type_in, int size_in, double height_in, double maxi_in = 100.0);
 
   // --------------------------------------------------------------------------
   ///\brief The constructor initializes the TSGenerator.
@@ -357,12 +365,14 @@ public:
   ///by the motif.
   ///\param [in] height_in Hands over the maximum difference between two values
   ///of the motif.
+  ///\param [in] maxi_in Hands over the maximum absolute value of the time
+  ///series.
   ///
   ///The constructor checks whether a true random engine is available and
   ///stores the result in the trueRandomEngineAvailable variable.
   // --------------------------------------------------------------------------
   TSGenerator(int length_in, int window_in, double delta_in, double noise_in,
-      string type_in, int size_in, double height_in);
+      string type_in, int size_in, double height_in, double maxi_in = 100.0);
 
   // --------------------------------------------------------------------------
   ///\brief Frees the memory allocated by the TSGenerator.

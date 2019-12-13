@@ -30,7 +30,7 @@ void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
 
   //initialize the distributions for the random walk
   normal_distribution<double> distributionNoise(0.0, noise_in / 2.0);
-  uniform_int_distribution<int> distributionRandomWalk(0, 1);
+  uniform_int_distribution<int> distribution(0, 1);
 
   //add the first value
   double value = start_in;
@@ -38,9 +38,9 @@ void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
   timeSeries_out.push_back(value);
 
   //add the remaining values
-  for (int itr = 1; itr < length_in; itr++) {
+  for (int i = 1; i < length_in; i++) {
 
-    value += delta_in * distributionRandomWalk(randomEngine) - 2 * delta_in
+    value += delta_in * distribution(randomEngine) - 2 * delta_in
       + distributionNoise(randomEngine);
 
     timeSeries_out.push_back(value);
@@ -60,9 +60,8 @@ void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
     return;
 
   //initialize the distributions for the random walk
-  normal_distribution<double> distributionNoise(0.0, delta_in / 2.0);
-  uniform_real_distribution<double> distributionRandomWalk(-delta_in,
-      delta_in);
+  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0);
+  uniform_real_distribution<double> distribution(-delta_in, delta_in);
 
   //add the first value
   double value = start_in;
@@ -70,10 +69,9 @@ void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
   timeSeries_out.push_back(value);
 
   //add the remaining values
-  for (int itr = 1; itr < length_in; itr++) {
+  for (int i = 1; i < length_in; i++) {
 
-    value += distributionRandomWalk(randomEngine)
-      + distributionNoise(randomEngine);
+    value += distribution(randomEngine) + distributionNoise(randomEngine);
 
     timeSeries_out.push_back(value);
   }
@@ -92,8 +90,8 @@ void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
     return;
 
   //initialize the distributions for noise and the random walk
-  normal_distribution<double> distributionNoise(0.0, delta_in / 2.0);
-  normal_distribution<double> distributionRandomWalk(0.0, delta_in);
+  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0);
+  normal_distribution<double> distribution(0.0, delta_in);
 
   //add the first value
   double value = start_in;
@@ -101,10 +99,232 @@ void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
   timeSeries_out.push_back(value);
 
   //add the remaining values
-  for (int itr = 1; itr < length_in; itr++) {
+  for (int i = 1; i < length_in; i++) {
 
-    value += distributionRandomWalk(randomEngine)
+    value += distribution(randomEngine) + distributionNoise(randomEngine);
+
+    timeSeries_out.push_back(value);
+  }
+}
+
+void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
+    double start_in, double delta_in, double maxi_in, double noise_in) {
+
+  if (maxi_in - delta_in < 0.0) {
+
+    cerr << "ERROR: Border " << maxi_in << " is to tied for delta " <<
+      delta_in << endl;
+    throw(EXIT_FAILURE);
+  }
+
+  if (!(timeSeries_out.empty())) {
+
+    timeSeries_out.clear();
+    timeSeries_out.resize(0);
+  }
+
+  if (length_in < 1)
+    return;
+
+  //initialize the distributions for the random walk
+  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0);
+  uniform_int_distribution<int> distribution(0, 1);
+
+  //add the first value
+  double value = start_in;
+
+  timeSeries_out.push_back(value);
+
+  //add the remaining values
+  for (int i = 1; i < length_in; i++) {
+
+    value = delta_in * distribution(randomEngine) - 2 * delta_in
       + distributionNoise(randomEngine);
+
+    //check if border was crossed
+    if (timeSeries_out[i - 1] + value < start_in - maxi_in ||
+        timeSeries_out[i - 1] + value > start_in + maxi_in)
+      value = -value;
+
+    timeSeries_out.push_back(timeSeries_out[i - 1] + value);
+  }
+}
+
+void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
+    double start_in, double delta_in, double maxi_in, double noise_in) {
+
+  if (maxi_in - delta_in < 0.0) {
+
+    cerr << "ERROR: Border " << maxi_in << " is to tied for delta " <<
+      delta_in << endl;
+    throw(EXIT_FAILURE);
+  }
+
+  if (!(timeSeries_out.empty())) {
+
+    timeSeries_out.clear();
+    timeSeries_out.resize(0);
+  }
+
+  if (length_in < 1)
+    return;
+
+  //initialize the distributions for the random walk
+  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0);
+  uniform_real_distribution<double> distribution(-delta_in, delta_in);
+
+  //add the first value
+  double value = start_in;
+
+  timeSeries_out.push_back(value);
+
+  //add the remaining values
+  for (int i = 1; i < length_in; i++) {
+
+    value = distribution(randomEngine) + distributionNoise(randomEngine);
+
+    //check if border was crossed
+    if (timeSeries_out[i - 1] + value < start_in - maxi_in ||
+        timeSeries_out[i - 1] + value > start_in + maxi_in)
+      value = -value;
+
+    timeSeries_out.push_back(timeSeries_out[i - 1] + value);
+  }
+}
+
+void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
+    double start_in, double delta_in, double maxi_in, double noise_in) {
+
+  if (maxi_in - delta_in < 0.0) {
+
+    cerr << "ERROR: Border " << maxi_in << " is to tied for delta " <<
+      delta_in << endl;
+    throw(EXIT_FAILURE);
+  }
+
+  if (!(timeSeries_out.empty())) {
+
+    timeSeries_out.clear();
+    timeSeries_out.resize(0);
+  }
+
+  if (length_in < 1)
+    return;
+
+  //initialize the distributions for noise and the random walk
+  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0);
+  normal_distribution<double> distribution(0.0, delta_in);
+
+  //add the first value
+  double value = start_in;
+
+  timeSeries_out.push_back(value);
+
+  //add the remaining values
+  for (int i = 1; i < length_in; i++) {
+
+    value = distribution(randomEngine) + distributionNoise(randomEngine);
+
+    //check if border was crossed
+    if (timeSeries_out[i - 1] + value < start_in - maxi_in ||
+        timeSeries_out[i - 1] + value > start_in + maxi_in)
+      value = -value;
+
+    timeSeries_out.push_back(timeSeries_out[i - 1] + value);
+  }
+}
+
+void BaseTS::uniformRandom(vector<double> &timeSeries_out, int length_in,
+    double start_in, double delta_in, double noise_in) {
+
+  if (!(timeSeries_out.empty())) {
+
+    timeSeries_out.clear();
+    timeSeries_out.resize(0);
+  }
+
+  if (length_in < 1)
+    return;
+
+  //initialize the distributions for noise and the random walk
+  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0);
+  uniform_real_distribution<double> distribution(-delta_in / 2.0, delta_in
+      / 2.0);
+
+  //add the first value
+  double value = start_in;
+
+  timeSeries_out.push_back(value);
+
+  //add the remaining values
+  for (int i = 1; i < length_in; i++) {
+
+    value = distribution(randomEngine) + distributionNoise(randomEngine);
+
+    timeSeries_out.push_back(value);
+  }
+}
+
+void BaseTS::normalRandom(vector<double> &timeSeries_out, int length_in,
+    double start_in, double delta_in, double noise_in) {
+
+  if (!(timeSeries_out.empty())) {
+
+    timeSeries_out.clear();
+    timeSeries_out.resize(0);
+  }
+
+  if (length_in < 1)
+    return;
+
+  //initialize the distributions for noise and the random walk
+  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0);
+  normal_distribution<double> distribution(0.0, delta_in / 2.0);
+
+  //add the first value
+  double value = start_in;
+
+  timeSeries_out.push_back(value);
+
+  //add the remaining values
+  for (int i = 1; i < length_in; i++) {
+
+    value = distribution(randomEngine) + distributionNoise(randomEngine);
+
+    timeSeries_out.push_back(value);
+  }
+}
+
+void BaseTS::piecewiseLinearRandom(vector<double> &timeSeries_out, int
+    length_in, double start_in, double delta_in, double noise_in) {
+
+  if (!(timeSeries_out.empty())) {
+
+    timeSeries_out.clear();
+    timeSeries_out.resize(0);
+  }
+
+  if (length_in < 1)
+    return;
+
+  //initialize the distributions for noise and the random walk
+  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0);
+
+  vector<double> intervals {-delta_in / 2.0, -delta_in / 4.0, 0.0, delta_in
+    / 4.0, delta_in / 2.0};
+  vector<double> weights {0.0, 10.0, 0.0, 10.0, 0.0};
+  piecewise_linear_distribution<double> distribution(intervals.begin(),
+      intervals.end(), weights.begin());
+
+  //add the first value
+  double value = start_in;
+
+  timeSeries_out.push_back(value);
+
+  //add the remaining values
+  for (int i = 1; i < length_in; i++) {
+
+    value = distribution(randomEngine) + distributionNoise(randomEngine);
 
     timeSeries_out.push_back(value);
   }
