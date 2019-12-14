@@ -1,32 +1,32 @@
-if (WIN32)
-  add_library(fftw3 MODULE IMPORTED)
+include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
+if (WIN32)
   if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set_target_properties(fftw3 PROPERTIES IMPORTED_LOCATION
+    find_path(FFTW_INCLUDE fftw3.h HINTS
       ${PROJECT_SOURCE_DIR}/libs/win64/fftw3)
-    include_directories(${PROJECT_SOURCE_DIR}/include
-      ${CMAKE_CURRENT_BINARY_DIR}/libs/win64/fftw3)
+
+    find_library(FFTW fftw HINTS ${PROJECT_SOURCE_DIR}/libs/win64/fftw3)
   else ()
-    set_target_properties(fftw3 PROPERTIES IMPORTED_LOCATION
+    find_path(FFTW_INCLUDE fftw3.h HINTS
       ${PROJECT_SOURCE_DIR}/libs/win32/fftw3)
-    include_directories(${PROJECT_SOURCE_DIR}/include
-      ${CMAKE_CURRENT_BINARY_DIR}/libs/win32/fftw3)
+
+    find_library(FFTW fftw HINTS ${PROJECT_SOURCE_DIR}/libs/win32/fftw3)
   endif()
+
+  include_directories(${PROJECT_SOURCE_DIR}/include ${FFTW_INCLUDE})
   link_directories(${PROJECT_SOURCE_DIR}/src)
 
   add_executable(${PROJECT_NAME} main.cpp global.cpp motifsetcollection.cpp
     outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
     tsgenerator.cpp)
-  target_link_libraries(${PROJECT_NAME} fftw3)
+  target_link_libraries(${PROJECT_NAME} ${FFTW})
 
   add_executable(unittests unittests.cpp global.cpp motifsetcollection.cpp
     outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
     tsgenerator.cpp)
-  target_link_libraries(unittests fftw3)
+  target_link_libraries(unittests ${FFTW})
 else ()
   MESSAGE(STATUS "Installing fftw3")
-
-  include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
   ExternalProject_Add(project_fftw
     #GIT_REPOSITORY  https://github.com/FFTW/fftw3
