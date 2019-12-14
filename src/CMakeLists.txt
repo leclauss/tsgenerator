@@ -6,24 +6,23 @@ if (WIN32)
     set(ARCH win64)
   endif()
 
-  find_path(FFTW_INCLUDE fftw3.h HINTS
-    ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3)
+  add_library(fftw STATIC IMPORTED)
+  set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
+    ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3/libfftw3-3.lib)
 
-  find_library(FFTW NAMES fftw fftw3 fftw3-3 HINTS
-    ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3)
-
-  include_directories(${PROJECT_SOURCE_DIR}/include ${FFTW_INCLUDE})
+  include_directories(${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3.h)
   link_directories(${PROJECT_SOURCE_DIR}/src)
 
   add_executable(${PROJECT_NAME} main.cpp global.cpp motifsetcollection.cpp
     outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
     tsgenerator.cpp)
-  target_link_libraries(${PROJECT_NAME} ${FFTW})
+  target_link_libraries(${PROJECT_NAME} fftw)
 
   add_executable(unittests unittests.cpp global.cpp motifsetcollection.cpp
     outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
     tsgenerator.cpp)
-  target_link_libraries(unittests ${FFTW})
+  target_link_libraries(unittests fftw)
 else ()
   MESSAGE(STATUS "Installing fftw3")
 
@@ -39,10 +38,10 @@ else ()
     )
 
   add_library(fftw STATIC IMPORTED)
-  set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
-    ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib/${lib_fftw_name})
   set(lib_fftw_name
   ${CMAKE_STATIC_LIBRARY_PREFIX}fftw3${CMAKE_STATIC_LIBRARY_SUFFIX})
+  set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/lib/${lib_fftw_name})
 
   include_directories(${PROJECT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/include)
