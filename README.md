@@ -4,7 +4,7 @@ Generator of synthetic time series specialized for evaluation purposes of motif 
 
 ## Introduction
 
-This generator of synthetic time series is the result of a student research project. The idea was born, since the range of implementations generating time series specialized for evaluation of motif discovery algorithms was non-existing. This project is intended as a cross platform implementation. Therefore, the TSGenerator was tested on Kubuntu 17.10, Windows 10 and macOS 10.14.3 Mojave. Installation guides for each platform follow in the sections **Prerequisites** and **Installion**.
+This generator of synthetic time series is the result of a student research project. The idea was born, since the range of implementations generating time series specialized for evaluation of motif discovery algorithms was non-existing. This project is intended as a cross platform implementation. Therefore, the TSGenerator was tested on Ubuntu 18.04.3 LTS, Windows 10 and macOS 10.14.3 Mojave. Installation guides for each platform follow in the sections **Prerequisites** and **Installion**.
 
 ### Prerequisites
 
@@ -50,7 +50,8 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
 
 3. Download and install [CMake](https://cmake.org/ "CMake website"). Choose the option **Add to system path** during the installation.
 
-4. Download and install [Visual Studio-IDE](https://www.visualstudio.com/ "Microsoft Visual Studio website"). Make sure you download an IDE like Visual Studio Community, Visual Studio Professional or Visual Studio Enterprise. Visual Studio Code is an editor and not an IDE. Choose the option **C++ Toolset** during the installation.
+4. Download and install [Visual Studio-IDE](https://www.visualstudio.com/
+   "Microsoft Visual Studio website"). Make sure you download an IDE like Visual Studio Community, Visual Studio Professional or Visual Studio Enterprise. Visual Studio Code is an editor and not an IDE. Choose the option **Desktop development with C++** option and in the second tab the **C++ Clang Compiler for Windows**, **C++ Clang-cl for ... build tools (x64/x86)** as well as **CMake** during the installation.
 
 5. Download and install [Git](https://git-scm.com/ "open source Website maintained by members of the Git community"). Choose the option **Use Git from Git Bash only** as well as the option **MinTTY** during installation.
 
@@ -99,46 +100,31 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
 
 **Linux:**
 
-1. Open a terminal window. Create a new project directory and make the created folder the current folder.
+1. Open a terminal window. Clone the [TSGenerator](https://gitlab.com/r.moczalla/TSGenerator.git "TSGenerator project website") project directory and make the created folder the current folder.
  ```bash
- mkdir "TSGenerator"
+ git clone "https://gitlab.com/r.moczalla/TSGenerator.git"
  cd "TSGenerator"
  ```
- 
-2. Moreover, Git needs to configure the user. Add a user name and a user email.
- ```bash
- git config --global user.name "your name"
- git config --global user.email "your email"
- ```
- 
-3. Once done, initialize an empty git respository, add the origin and pull the [TSGenerator](https://gitlab.com/r.moczalla/TSGenerator.git "TSGenerator project website") project. At least set appropriate the upstream.
- ```bash
- git init
- git remote add origin "https://gitlab.com/r.moczalla/TSGenerator.git"
- git pull origin master
- git push --set-upstream "https://gitlab.com/r.moczalla/TSGenerator.git"
- git branch --set-upstream-to=origin/master master
- ```
 
-4. Create a build directory and make the created folder the current folder.
+2. Create a build directory and make the created folder the current folder.
  ```bash
  mkdir "build"
  cd "build"
  ```
 
-5. Create the TSGenerator project with CMake and build the project by executing [GNU Make](https://www.gnu.org/software/make/ "GNU Make website").
+3. Create the TSGenerator project with CMake and build the project by executing [GNU Make](https://www.gnu.org/software/make/ "GNU Make website").
  ```bash
  cmake ..
  make
  ```
 
-6. TSGenerator is located in the subfolder **bin**. Make the created subfolder the current folder in the Git Bash and run the TSGenerator.
+4. TSGenerator is located in the subfolder **bin**. Make the created subfolder the current folder in the Git Bash and run the TSGenerator.
  ```bash
  cd "bin"
  ./TSGenerator [Options]
  ```
 
-7. Optionally: Create the documentation by executing the **doc** target with GNU Make. The documentation is located in the subfolder **build/doc/**.
+5. Optionally: Create the documentation by executing the **doc** target with GNU Make. The documentation is located in the subfolder **build/doc/**.
  ```bash
  make doc
  ```
@@ -149,87 +135,56 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
 
 **Windows:**
 
-1. Open the Git Bash after the Git installation. Create a new project directory and make the created folder the current folder.
+1. Open a terminal window. Clone the [TSGenerator](https://gitlab.com/r.moczalla/TSGenerator.git "TSGenerator project website") project directory and make the created folder the current folder.
  ```bash
- mkdir "TSGenerator"
+ git clone "https://gitlab.com/r.moczalla/TSGenerator.git"
  cd "TSGenerator"
  ```
- 
-2. Moreover, Git needs to configure the user. Add a user name and a user email.
- ```bash
- git config --global user.name "your name"
- git config --global user.email "your email"
- ```
- 
-3. Once done, initialize an empty git respository, add the origin and pull the [TSGenerator](https://gitlab.com/r.moczalla/TSGenerator.git "TSGenerator project website") project. At least set appropriate the upstream.
- ```bash
- git init
- git remote add origin "https://gitlab.com/r.moczalla/TSGenerator.git"
- git pull origin master
- git push --set-upstream "https://gitlab.com/r.moczalla/TSGenerator.git"
- git branch --set-upstream-to=origin/master master
- ```
 
-4. Create a build directory, make the created folder the current folder and build the visual studio project of TSGenerator project.
+2. Create a build directory, make the created folder the current folder and build the visual studio project of TSGenerator project.
  ```bash
  mkdir "build"
  cd "build"
  cmake ..
  ```
 
-5. Open the **TSGenerator.sln** file with Visual Studio and rightclick on the target TSGenerator in the projectmap explorer. Hit the option **Select as Startproject** and press the f5 key to build the project.
+3. Open the **TSGenerator.sln** file with Visual Studio and rightclick on the target TSGenerator in the projectmap explorer. Hit the option **Select as Startproject** and press the f5 key to build the project.
 
-6. TSGenerator is located in the subfolder **bin**. Make the created subfolder the current folder in the Git Bash and run the TSGenerator.
+4. TSGenerator is located in the subfolder **bin**. Make the created subfolder the current folder in the Git Bash and run the TSGenerator.
  ```bash
  cd "bin"
  ./TSGenerator [Options]
  ```
 
-7. Optionally: Create the documentation by building the target **doc** in the Visual Studio IDE. The documentation is located in the subfolder **build/doc/**.
+5. Optionally: Create the documentation by building the target **doc** in the Visual Studio IDE. The documentation is located in the subfolder **build/doc/**.
 
 **Mac:**
 
-1. Open the Git Bash after the Git installation. Create a new project directory and make the created folder the current folder.
+1. Open a terminal window. Clone the [TSGenerator](https://gitlab.com/r.moczalla/TSGenerator.git "TSGenerator project website") project directory and make the created folder the current folder.
  ```bash
- mkdir "TSGenerator"
+ git clone "https://gitlab.com/r.moczalla/TSGenerator.git"
  cd "TSGenerator"
  ```
- 
-2. Moreover, Git needs to configure the user. Add a user name and a user email.
- ```bash
- git config --global user.name "your name"
- git config --global user.email "your email"
- ```
- 
-3. Once done, initialize an empty git respository, add the origin and pull the [TSGenerator](https://gitlab.com/r.moczalla/TSGenerator.git "TSGenerator project website") project. At least set appropriate the upstream.
- ```bash
- git init
- git remote add origin "https://gitlab.com/r.moczalla/TSGenerator.git"
- git pull origin master
- 
- git push --set-upstream "https://gitlab.com/r.moczalla/TSGenerator.git"
- git branch --set-upstream-to=origin/master master
- ```
 
-4. Create a build directory and make the created folder the current folder.
+2. Create a build directory and make the created folder the current folder.
  ```bash
  mkdir "build"
  cd "build"
  ```
 
-5. Create the TSGenerator project with CMake and build the project by executing make.
+3. Create the TSGenerator project with CMake and build the project by executing make.
  ```bash
  cmake ..
  make
  ```
 
-6. TSGenerator is located in the subfolder **bin**. Make the created subfolder the current folder in the Git Bash and run the TSGenerator.
+4. TSGenerator is located in the subfolder **bin**. Make the created subfolder the current folder in the Git Bash and run the TSGenerator.
  ```bash
  cd "bin"
  ./TSGenerator [Options]
  ```
 
-7. Optionally: Create the documentation by executing the **doc** target with make. The documentation is located in the subfolder **build/doc/**.
+5. Optionally: Create the documentation by executing the **doc** target with make. The documentation is located in the subfolder **build/doc/**.
  ```bash
  make doc
  ```
