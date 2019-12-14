@@ -9,7 +9,8 @@ if (WIN32)
   find_path(FFTW_INCLUDE fftw3.h HINTS
     ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3)
 
-  find_library(FFTW fftw3 HINTS ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3)
+  find_library(FFTW NAMES fftw fftw3 fftw3-3 HINTS
+    ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3)
 
   include_directories(${PROJECT_SOURCE_DIR}/include ${FFTW_INCLUDE})
   link_directories(${PROJECT_SOURCE_DIR}/src)
