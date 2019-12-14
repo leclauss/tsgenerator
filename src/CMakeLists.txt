@@ -11,7 +11,7 @@ if (WIN32)
     ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3/libfftw3-3.lib)
 
   include_directories(${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3.h)
+    ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3)
   link_directories(${PROJECT_SOURCE_DIR}/src)
 
   add_executable(${PROJECT_NAME} main.cpp global.cpp motifsetcollection.cpp
