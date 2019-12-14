@@ -1,17 +1,15 @@
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
 if (WIN32)
+  set(ARCH win32)
   if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    find_path(FFTW_INCLUDE fftw3.h HINTS
-      ${PROJECT_SOURCE_DIR}/libs/win64/fftw3)
-
-    find_library(FFTW fftw HINTS ${PROJECT_SOURCE_DIR}/libs/win64/fftw3)
-  else ()
-    find_path(FFTW_INCLUDE fftw3.h HINTS
-      ${PROJECT_SOURCE_DIR}/libs/win32/fftw3)
-
-    find_library(FFTW fftw HINTS ${PROJECT_SOURCE_DIR}/libs/win32/fftw3)
+    set(ARCH win64)
   endif()
+
+  find_path(FFTW_INCLUDE fftw3.h HINTS
+    ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3)
+
+  find_library(FFTW fftw3 HINTS ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3)
 
   include_directories(${PROJECT_SOURCE_DIR}/include ${FFTW_INCLUDE})
   link_directories(${PROJECT_SOURCE_DIR}/src)
