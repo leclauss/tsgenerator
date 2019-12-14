@@ -26,6 +26,9 @@ if (WIN32)
     outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
     tsgenerator.cpp)
   target_link_libraries(unittests fftw)
+  add_custom_command(TARGET unittests POST_BUILD COMMAND ${CMAKE_COMMAND} -E
+    copy "${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3/libfftw3-3.dll"
+    $<TARGET_FILE_DIR:unittests>)
 else ()
   MESSAGE(STATUS "Installing fftw3")
 
