@@ -1,6 +1,8 @@
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
 if (WIN32)
+  set(VS_STARTUP_PROJECT ${PROJECT_NAME})
+
   set(ARCH win32)
   if (CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(ARCH win64)
