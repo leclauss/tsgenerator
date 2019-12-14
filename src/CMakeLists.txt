@@ -1,12 +1,14 @@
 if (WIN32)
   add_library(fftw3 MODULE IMPORTED)
-  set_target_properties(fftw3 PROPERTIES IMPORTED_LOCATION
-    ${CMAKE_CURRENT_BINARY_DIR}/fftw)
 
   if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set_target_properties(fftw3 PROPERTIES IMPORTED_LOCATION
+      ${PROJECT_SOURCE_DIR}/libs/win64/fftw3)
     include_directories(${PROJECT_SOURCE_DIR}/include
       ${CMAKE_CURRENT_BINARY_DIR}/libs/win64/fftw3)
   else ()
+    set_target_properties(fftw3 PROPERTIES IMPORTED_LOCATION
+      ${PROJECT_SOURCE_DIR}/libs/win32/fftw3)
     include_directories(${PROJECT_SOURCE_DIR}/include
       ${CMAKE_CURRENT_BINARY_DIR}/libs/win32/fftw3)
   endif()
@@ -14,7 +16,7 @@ if (WIN32)
 
   add_executable(${PROJECT_NAME} main.cpp global.cpp motifsetcollection.cpp
     outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
-    tsgenerator.cpp fftw3)
+    tsgenerator.cpp)
   target_link_libraries(${PROJECT_NAME} fftw3)
 
   add_executable(unittests unittests.cpp global.cpp motifsetcollection.cpp
