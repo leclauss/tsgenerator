@@ -18,6 +18,9 @@ if (WIN32)
     outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
     tsgenerator.cpp)
   target_link_libraries(${PROJECT_NAME} fftw)
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
+    -E copy "${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3/libfftw3-3.dll"
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
   add_executable(unittests unittests.cpp global.cpp motifsetcollection.cpp
     outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
