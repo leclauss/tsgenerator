@@ -17,7 +17,7 @@
 void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     &pos1_out, int windowSize_in, double stepSize_in)
 {
-  std::mt19937 g(random_device()());
+  std::mt19937 g((random_device())());
 
   int windowSize = windowSize_in;
 
