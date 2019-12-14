@@ -17,6 +17,8 @@
 void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     &pos1_out, int windowSize_in, double stepSize_in)
 {
+  std::mt19937 g(random_device()());
+
   int windowSize = windowSize_in;
 
   int stepSize = floor(stepSize_in*windowSize);
@@ -114,7 +116,7 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
   std::vector<int> idx;
   for (int i = 0; i < timeSeriesLength - windowSize + 1; i += stepSize)
     idx.push_back(i);
-  std::random_shuffle(idx.begin(), idx.end());
+  std::shuffle(idx.begin(), idx.end(), g);
 
   double* query = new double[windowSize];
 
@@ -243,7 +245,7 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
   idx.clear();
   for (int i = exclusionZone+1; i < ProfileLength; i++)
     idx.push_back(i);
-  std::random_shuffle(idx.begin(), idx.end());
+  std::shuffle(idx.begin(), idx.end(), g);
 
   double* dotproduct = new double[timeSeriesLength];
 
