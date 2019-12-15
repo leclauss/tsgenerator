@@ -17,7 +17,9 @@
 void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     &pos1_out, int windowSize_in, double stepSize_in)
 {
-  std::mt19937 g((random_device())());
+  auto g = std::default_random_engine(random_device().entropy()
+    ? random_device()()
+    : chrono::system_clock::now().time_since_epoch().count());
 
   int windowSize = windowSize_in;
 
@@ -36,36 +38,32 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
 
   // preprocess, statistics, get the mean and standard deviation of every
   // subsequence in the time series
-  double* ACumSum = new double[timeSeriesLength];
-  ACumSum[0] = timeSeries_in[0];
+  vector<double> ACumSum;
+  ACumSum.push_back(timeSeries_in[0]);
   for (int i = 1; i < timeSeriesLength; i++)
-    ACumSum[i] = timeSeries_in[i] + ACumSum[i - 1];
-  double* ASqCumSum = new double[timeSeriesLength];
-  ASqCumSum[0] = timeSeries_in[0] * timeSeries_in[0];
+    ACumSum.push_back(timeSeries_in[i] + ACumSum[i - 1]);
+  vector<double> ASqCumSum;
+  ASqCumSum.push_back(timeSeries_in[0] * timeSeries_in[0]);
   for (int i = 1; i < timeSeriesLength; i++)
-    ASqCumSum[i] = timeSeries_in[i] * timeSeries_in[i] + ASqCumSum[i - 1];
-  double* ASum = new double[ProfileLength];
-  ASum[0] = ACumSum[windowSize - 1];
+    ASqCumSum.push_back(timeSeries_in[i] * timeSeries_in[i] + ASqCumSum[i
+        - 1]);
+  vector<double> ASum;
+  ASum.push_back(ACumSum[windowSize - 1]);
   for (int i = 0; i < timeSeriesLength - windowSize; i++)
-    ASum[i + 1] = ACumSum[windowSize + i] - ACumSum[i];
-  double* ASumSq = new double[ProfileLength];
-  ASumSq[0] = ASqCumSum[windowSize - 1];
+    ASum.push_back(ACumSum[windowSize + i] - ACumSum[i]);
+  vector<double> ASumSq;
+  ASumSq.push_back(ASqCumSum[windowSize - 1]);
   for (int i = 0; i < timeSeriesLength - windowSize; i++)
-    ASumSq[i + 1] = ASqCumSum[windowSize + i] - ASqCumSum[i];
-  double* AMean = new double[ProfileLength];
+    ASumSq.push_back(ASqCumSum[windowSize + i] - ASqCumSum[i]);
+  vector<double> AMean;
   for (int i = 0; i < ProfileLength; i++)
-    AMean[i] = ASum[i] / windowSize;
-  double* ASigmaSq = new double[ProfileLength];
+    AMean.push_back(ASum[i] / windowSize);
+  vector<double> ASigmaSq;
   for (int i = 0; i < ProfileLength; i++)
-    ASigmaSq[i] = ASumSq[i] / windowSize - AMean[i] * AMean[i];
-  double* ASigma = new double[ProfileLength];
+    ASigmaSq.push_back(ASumSq[i] / windowSize - AMean[i] * AMean[i]);
+  vector<double> ASigma;
   for (int i = 0; i < ProfileLength; i++)
-    ASigma[i] = sqrt(ASigmaSq[i]);
-  delete [] ACumSum;
-  delete [] ASqCumSum;
-  delete [] ASum;
-  delete [] ASumSq;
-  delete [] ASigmaSq;
+    ASigma.push_back(sqrt(ASigmaSq[i]));
 
   //Initialize Matrix Profile and Matrix Profile Index
   double* profile = new double[ProfileLength];
@@ -322,8 +320,6 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
   }
 
   delete [] dotproduct;
-  delete [] AMean;
-  delete [] ASigma;
   delete [] profile;
   delete [] profileIndex;
 }

@@ -103,15 +103,15 @@ TSGenerator::~TSGenerator() { }
 
 void TSGenerator::calcRollingMeanStdDev(const vector<double> &timeSeries_in) {
 
-  // obtain rolling/sliding means and stddevs
+  // obtain running means and stddevs
   if (!means.empty() || !stdDevs.empty()) {
 
     means.clear();
     stdDevs.clear();
   }
 
-  means.resize(timeSeries_in.size() - window + 1);
-  stdDevs.resize(timeSeries_in.size() - window + 1);
+  means.resize(length - window + 1);
+  stdDevs.resize(length - window + 1);
 
   double sum = 0;
   double squareSum = 0;
@@ -119,7 +119,7 @@ void TSGenerator::calcRollingMeanStdDev(const vector<double> &timeSeries_in) {
   // it is faster to multiply than to divide
   double rWindow = 1.0 / (double)window;
 
-  for (int i = 0; i < min(((int)timeSeries_in.size()), window); i++) {
+  for (int i = 0; i < length - window + 1; i++) {
 
     sum += timeSeries_in[i];
     squareSum += timeSeries_in[i] * timeSeries_in[i];
@@ -129,7 +129,7 @@ void TSGenerator::calcRollingMeanStdDev(const vector<double> &timeSeries_in) {
   double buf = squareSum * rWindow - means[0] * means[0];
   stdDevs[0] = buf > 0 ? sqrt(buf) : 0;
 
-  for (int i = 1; i < (int)timeSeries_in.size() - window + 1; i++) {
+  for (int i = 1; i < length - window + 1; i++) {
 
     sum += timeSeries_in[i + window - 1] - timeSeries_in[i - 1];
     means[i] = sum * rWindow;
@@ -171,8 +171,8 @@ void TSGenerator::updateRollingMeanStdDev(const vector<double> &timeSeries_in,
   }
 
   // check if we are at the end of the time series
-  if (end > (int) means.size())
-    end = means.size();
+  if (end > length - window)
+    end = length - window;
 
   // update all means overlapping the new subsequence and all potentially
   // shifted once
@@ -671,12 +671,12 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   int positionOne = -1;
   int positionTwo = -1;
   vector<double> motifCenter;
+  vector<double> subsequence(window, 0.0);
   bool repeatLoop = true;
   double mean;
   double stdDev;
   double d;
   normal_distribution<double> distribution(0.0, noise);
-
 
   do {
 
@@ -730,7 +730,6 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   //declaration stuff
   int position;
   int retryItr = 0;
-  vector<double> subsequence(window, 0.0);
 
   window_out.push_back(motifCenter.size());
 
@@ -816,11 +815,14 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   d_out.push_back(d / 2.0);
 
 
+cout << "in" << endl;
   //add top motif pair to output
   positionOne = 0;
   positionTwo = 0;
 
+cout << "length: " << timeSeries_out.size() << endl;
   scrimpPP(timeSeries_out, positionOne, positionTwo, window);
+cout << "scrimp pass" << endl;
   d = similarity(timeSeries_out, positionOne, positionTwo,
       numeric_limits<double>::max());
   d_out.push_back(d);
@@ -829,5 +831,6 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   motifPositions_out[1].push_back(positionTwo);
 
   window_out.push_back(window);
+cout << "out" << endl;
 }
 
