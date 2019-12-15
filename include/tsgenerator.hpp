@@ -21,7 +21,6 @@
 #include <limits>
 #include <iterator>
 #include <vector>
-#include <tuple>
 #include <fftw3.h>
 #include <motifsetcollection.hpp>
 #include <freepositions.hpp>
