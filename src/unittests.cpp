@@ -1210,7 +1210,7 @@ void test_tsgenerator() {
 
     try {
 
-      generator.testMeanStdDev({}, 0, mean, stdDev);
+      generator.testMeanVariance({}, 0, mean, stdDev);
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -1220,8 +1220,8 @@ void test_tsgenerator() {
 
     try {
 
-      generator.testMeanStdDev({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-          }, 1, mean, stdDev);
+      generator.testMeanVariance({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+          0.0, 0.0 }, 1, mean, stdDev);
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -1231,8 +1231,8 @@ void test_tsgenerator() {
 
     try {
 
-      generator.testMeanStdDev({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-          0, mean, stdDev);
+      generator.testMeanVariance({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+          0.0 }, 0, mean, stdDev);
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -1240,51 +1240,61 @@ void test_tsgenerator() {
       TEST(e == EXIT_FAILURE);
     }
 
-    generator.testMeanStdDev({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-        }, 0, mean, stdDev);
+    generator.testMeanVariance({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0 }, 0, mean, stdDev);
+    stdDev = sqrt(stdDev);
     TEST(mean <= numeric_limits<double>::min() && mean >=
         -numeric_limits<double>::min());
     TEST(stdDev == 1.0);
 
-    generator.testMeanStdDev({ 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0
-        }, 0, mean, stdDev);
+    generator.testMeanVariance({ 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,
+        3.0 }, 0, mean, stdDev);
+    stdDev = sqrt(stdDev);
     TEST(mean <= 3.0 + numeric_limits<double>::min() && mean >= 3.0
         - numeric_limits<double>::min());
     TEST(stdDev == 1.0);
 
-    generator.testMeanStdDev({ 3.0, -3.0, 1.75, 9.0, 33.0, 3.101, 0.03, 3.99999,
-        4.23, -7.093 }, 0, mean, stdDev);
+    generator.testMeanVariance({ 3.0, -3.0, 1.75, 9.0, 33.0, 3.101, 0.03,
+        3.99999, 4.23, -7.093 }, 0, mean, stdDev);
+    stdDev = sqrt(stdDev);
     TEST(mean <= 4.801799 + 0.0000001 && mean >= 4.801799 - 0.0000001);
     TEST(stdDev <= 10.2679615 + 0.0000001 && stdDev >= 10.2679615 - 0.0000001);
 
     generator.setWindow(20);
-    generator.testMeanStdDev(testTimeSeries, topMotifSetPos[0], mean, stdDev);
+    generator.testMeanVariance(testTimeSeries, topMotifSetPos[0], mean,
+        stdDev);
+    stdDev = sqrt(stdDev);
     TEST(mean <= topMotifSetMeans[0] + 0.0000001 && mean >= topMotifSetMeans[0]
         - 0.0000001);
     TEST(stdDev <= topMotifSetStdDevs[0] + 0.0000001 && stdDev >=
         topMotifSetStdDevs[0] - 0.0000001);
 
-    generator.testMeanStdDev(testTimeSeries, topMotifSetPos[1], mean, stdDev);
+    generator.testMeanVariance(testTimeSeries, topMotifSetPos[1], mean,
+        stdDev);
+    stdDev = sqrt(stdDev);
     TEST(mean <= topMotifSetMeans[1] + 0.0000001 && mean >= topMotifSetMeans[1]
         - 0.0000001);
     TEST(stdDev <= topMotifSetStdDevs[1] + 0.0000001 && stdDev >=
         topMotifSetStdDevs[1] - 0.0000001);
 
-    generator.testMeanStdDev(testTimeSeries, topMotifSetPos[2], mean, stdDev);
+    generator.testMeanVariance(testTimeSeries, topMotifSetPos[2], mean,
+        stdDev);
+    stdDev = sqrt(stdDev);
     TEST(mean <= topMotifSetMeans[2] + 0.0000001 && mean >= topMotifSetMeans[2]
         - 0.0000001);
     TEST(stdDev <= topMotifSetStdDevs[2] + 0.0000001 && stdDev >=
         topMotifSetStdDevs[2] - 0.0000001);
 
 
-    //test rolling mean and standard deviation
+    //test running mean and variance
     vector<double> means;
-    vector<double> stds;
+    vector<double> variances;
+    double std;
     bool flagMeansStdsTest = true;
 
-    generator.testCalcRollingMeanStddev(testTimeSeries);
+    generator.testCalcRunnings(testTimeSeries);
     means = generator.getMeans();
-    stds = generator.getStdDevs();
+    variances = generator.getVariances();
 
     if (TEST(testMeans.size() == means.size())) {
 
@@ -1298,12 +1308,17 @@ void test_tsgenerator() {
 
     flagMeansStdsTest = true;
 
-    if (TEST(testStds.size() == stds.size())) {
+    if (TEST(testStds.size() == variances.size())) {
 
-      for (int itr = 0; itr < (int)stds.size(); itr++)
-        if (!(testStds[itr] - 0.000001 <= stds[itr] && testStds[itr] + 0.000001
-              >= stds[itr]))
+      for (int itr = 0; itr < (int)variances.size(); itr++) {
+
+        std = testStds[itr];
+        std = std * std < 1.0 ? 1.0 : std * std;
+
+        if (!(std - 0.000001 <= variances[itr] && std + 0.000001 >=
+            variances[itr]))
           flagMeansStdsTest = false;
+      }
 
       TEST(flagMeansStdsTest);
     }
@@ -1343,9 +1358,7 @@ void test_tsgenerator() {
       TEST(e == EXIT_FAILURE);
     }
 
-    generator.testCalcRollingMeanStddev(testTimeSeries);
-    means = generator.getMeans();
-    stds = generator.getStdDevs();
+    generator.testCalcRunnings(testTimeSeries);
 
     double similarity = generator.testSimilarity(testTimeSeries,
         topMotifSetPos[0], topMotifSetPos[1], numeric_limits<double>::max());
@@ -1570,12 +1583,12 @@ void test_tsgenerator() {
 
 
     generator.testCalculateSubsequence(subsequence, 1, 10.0);
-    generator.testMeanStdDev(subsequence, 0, mean, stdDev);
+    generator.testMeanVariance(subsequence, 0, mean, stdDev);
     vector<double> sequenceTwo;
     double meanTwo;
     double stdDevTwo;
     generator.testCalculateSubsequence(sequenceTwo, 7, 10.0);
-    generator.testMeanStdDev(sequenceTwo, 0, meanTwo, stdDevTwo);
+    generator.testMeanVariance(sequenceTwo, 0, meanTwo, stdDevTwo);
     TEST(mean != meanTwo);
 
 
@@ -1597,7 +1610,7 @@ void test_tsgenerator() {
     TEST(!generator.testCheckIfThereIsALargerMotifSet(testTimeSeries,
           { topMotifSetPos[0], topMotifSetPos[1], 249, 229, 100 },
           topMotifSetRange));
-    generator.testCalcRollingMeanStddev(testTimeSeriesCheckLargerMotifSet);
+    generator.testCalcRunnings(testTimeSeriesCheckLargerMotifSet);
     TEST(generator.testCheckIfThereIsALargerMotifSet(
           testTimeSeriesCheckLargerMotifSet, { 34, 248, topMotifSetPos[1] },
           topMotifSetRange));
@@ -1612,8 +1625,6 @@ void test_tsgenerator() {
     vector<double> d_out;
     vector<int> windowSize_out;
     vector<vector<int>> positions_out;
-    vector<double> means;
-    vector<double> stds;
 
 
     for (int itr = 0; itr < 3; itr++) {
@@ -1624,7 +1635,7 @@ void test_tsgenerator() {
             positions_out);
         TEST("Has to run without throwing an error!");
 
-        simGenerator.testCalcRollingMeanStddev(timeSeries_out);
+        simGenerator.testCalcRunnings(timeSeries_out);
 
         for (auto &pos0 : positions_out[0])
           for (auto &pos1 : positions_out[0])

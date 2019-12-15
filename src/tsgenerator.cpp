@@ -101,17 +101,17 @@ TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
 
 TSGenerator::~TSGenerator() { }
 
-void TSGenerator::calcRollingMeanStdDev(const vector<double> &timeSeries_in) {
+void TSGenerator::calcRunnings(const vector<double> &timeSeries_in) {
 
-  // obtain running means and stddevs
-  if (!means.empty() || !stdDevs.empty()) {
+  // obtain running mean and variance
+  if (!means.empty() || !variances.empty()) {
 
     means.clear();
-    stdDevs.clear();
+    variances.clear();
   }
 
   means.resize(length - window + 1);
-  stdDevs.resize(length - window + 1);
+  variances.resize(length - window + 1);
 
   double sum = 0;
   double squareSum = 0;
@@ -127,7 +127,7 @@ void TSGenerator::calcRollingMeanStdDev(const vector<double> &timeSeries_in) {
 
   means[0] = sum * rWindow;
   double buf = squareSum * rWindow - means[0] * means[0];
-  stdDevs[0] = buf > 0 ? sqrt(buf) : 0;
+  variances[0] = buf > 0.0 ? sqrt(buf) : 0.0;
 
   for (int i = 1; i < length - window + 1; i++) {
 
@@ -137,17 +137,20 @@ void TSGenerator::calcRollingMeanStdDev(const vector<double> &timeSeries_in) {
     squareSum += timeSeries_in[i + window - 1] * timeSeries_in[i
       + window - 1] - timeSeries_in[i - 1] * timeSeries_in[i - 1];
     buf = squareSum * rWindow - means[i] * means[i];
-    stdDevs[i] = buf > 0 ? sqrt(buf) : 0;
+    variances[i] = buf > 0 ? buf : 0;
   }
 }
 
-void TSGenerator::updateRollingMeanStdDev(const vector<double> &timeSeries_in,
+void TSGenerator::updateRunnings(const vector<double> &timeSeries_in,
     int pos_in) {
 
   int start = pos_in - window + 1;
   int end = pos_in + window - 1;
 
-  // check if we need to update the very first mean and standard deviation
+  // it is faster to multiply than to divide
+  double rWindow = 1.0 / (double)window;
+
+  // check if we need to update the very first mean and variance
   if (start < 1) {
     means[0] = timeSeries_in[0];
 
@@ -155,17 +158,16 @@ void TSGenerator::updateRollingMeanStdDev(const vector<double> &timeSeries_in,
       means[0] += timeSeries_in[i];
     }
 
-    means[0] /= window;
+    means[0] *= rWindow;
 
-    stdDevs[0] = timeSeries_in[0] * timeSeries_in[0];
+    variances[0] = timeSeries_in[0] * timeSeries_in[0];
 
     for (int i = 1; i < window; i++) {
-      stdDevs[0] += timeSeries_in[i] * timeSeries_in[i];
+      variances[0] += timeSeries_in[i] * timeSeries_in[i];
     }
 
-    stdDevs[0] /= window;
-
-    stdDevs[0] -= means[0] * means[0];
+    double buf = variances[0] * rWindow - means[0] * means[0];
+    variances[0] = buf > 0.0 ? sqrt(buf) : 0.0;
 
     start = 1;
   }
@@ -177,14 +179,14 @@ void TSGenerator::updateRollingMeanStdDev(const vector<double> &timeSeries_in,
   // update all means overlapping the new subsequence and all potentially
   // shifted once
   for (int i = start; i <= length - window; i++)
-    means[i] = (length * means[i - 1] - timeSeries_in[i - 1] + timeSeries_in[i])
-      / length;
+    means[i] = (window * means[i - 1] - timeSeries_in[i - 1] + timeSeries_in[i])
+      * rWindow;
 
   // update all changed variances
   for (int i = start; i <= end; i++)
-    stdDevs[i] = stdDevs[i - 1] + means[i - 1] * means[i - 1] - means[i]
+    variances[i] = variances[i - 1] + means[i - 1] * means[i - 1] - means[i]
       * means[i] + (timeSeries_in[i] * timeSeries_in[i] - timeSeries_in[i - 1]
-          * timeSeries_in[i - 1]) / window;
+          * timeSeries_in[i - 1]) * rWindow;
 }
 
 double TSGenerator::similarity(const vector<double> &timeSeries_in, const int
@@ -214,10 +216,12 @@ double TSGenerator::similarity(const vector<double> &timeSeries_in, const int
   }
 
   double meanOne = means[subsequenceOnePos_in];
-  double stdDevOne = stdDevs[subsequenceOnePos_in];
+  double stdDevOne = sqrt(variances[subsequenceOnePos_in]);
+  stdDevOne = stdDevOne < 1.0 ? 1.0 : stdDevOne;
 
   double meanTwo = means[subsequenceTwoPos_in];
-  double stdDevTwo = stdDevs[subsequenceTwoPos_in];
+  double stdDevTwo = sqrt(variances[subsequenceTwoPos_in]);
+  stdDevTwo = stdDevTwo < 1.0 ? 1.0 : stdDevTwo;
 
   //calculate similarity
   double sumOfSquares = 0.0;
@@ -226,9 +230,9 @@ double TSGenerator::similarity(const vector<double> &timeSeries_in, const int
   int itrOne = subsequenceOnePos_in;
   int itrTwo = subsequenceTwoPos_in;
 
-        while (itrOne < subsequenceOnePos_in + window  &&
-               itrTwo < subsequenceTwoPos_in + window  &&
-               sumOfSquares < bestSoFar                        ) {
+  while (itrOne < subsequenceOnePos_in + window  &&
+      itrTwo < subsequenceTwoPos_in + window  &&
+      sumOfSquares < bestSoFar) {
 
     double normed1 = (timeSeries_in[itrOne] - meanOne) / stdDevOne;
     double normed2 = (timeSeries_in[itrTwo] - meanTwo) / stdDevTwo;
@@ -242,8 +246,8 @@ double TSGenerator::similarity(const vector<double> &timeSeries_in, const int
   return sqrt(sumOfSquares);
 }
 
-void TSGenerator::meanStdDev(const vector<double> &timeSeries_in, const int
-    subsequencePos_in, double &mean_out, double &stdDev_out) {
+void TSGenerator::meanVariance(const vector<double> &timeSeries_in, const int
+    subsequencePos_in, double &mean_out, double &variance_out) {
 
   if (timeSeries_in.empty()) {
 
@@ -255,34 +259,32 @@ void TSGenerator::meanStdDev(const vector<double> &timeSeries_in, const int
     subsequencePos_in + window < window) {
 
     cerr << "ERROR: Position of subsequence " <<
-      subsequencePos_in << " in meanStdDev function is wrong!" << endl;
+      subsequencePos_in << " in meanVariance function is wrong!" << endl;
     throw(EXIT_FAILURE);
   }
 
+  double rWindow = 1.0 / window;
 
   //calculate mean
   mean_out = accumulate(timeSeries_in.begin() + subsequencePos_in,
-      timeSeries_in.begin() + subsequencePos_in + window, 0.0)
-    / window;
+      timeSeries_in.begin() + subsequencePos_in + window, 0.0) * rWindow;
 
 
-  //calculate standard deviations
-  stdDev_out = 0.0;
+  //calculate variance
+  variance_out = 0.0;
 
   vector<double> diff(window);
   transform(timeSeries_in.begin() + subsequencePos_in, timeSeries_in.begin()
       + subsequencePos_in + window, diff.begin(), [mean_out](double x)
       { return x - mean_out; });
-  stdDev_out = sqrt(inner_product(diff.begin(), diff.end(), diff.begin(), 0.0)
-      / window);
-
-  if (stdDev_out == 0)
-    stdDev_out = 1; // Do not try to divide by a very small number
+  variance_out = inner_product(diff.begin(), diff.end(), diff.begin(), 0.0)
+      * rWindow;
 }
 
 double TSGenerator::similarity(const vector<double> &timeSeries_in, const
     vector<double> &subsequenceOne_in, const double meanOne_in, const double
-    stdDevOne_in, const int subsequenceTwoPos_in, const double bestSoFar_in) {
+    varianceOne_in, const int subsequenceTwoPos_in, const double
+    bestSoFar_in) {
 
   if (timeSeries_in.empty()) {
 
@@ -311,9 +313,13 @@ double TSGenerator::similarity(const vector<double> &timeSeries_in, const
     throw(EXIT_FAILURE);
   }
 
-  //calculate means and standard deviations
+  //calculate means and variance
+  double stdDevOne = sqrt(varianceOne_in);
+  stdDevOne = stdDevOne < 1.0 ? 1.0 : stdDevOne;
+
   double meanTwo = means[subsequenceTwoPos_in];
-  double stdDevTwo = stdDevs[subsequenceTwoPos_in];
+  double stdDevTwo = sqrt(variances[subsequenceTwoPos_in]);
+  stdDevTwo = stdDevTwo < 1.0 ? 1.0 : stdDevTwo;
 
   //calculate similarity
   double sumOfSquares = 0.0;
@@ -322,10 +328,10 @@ double TSGenerator::similarity(const vector<double> &timeSeries_in, const
   int itrOne = 0;
   int itrTwo = subsequenceTwoPos_in;
 
-        while (itrOne < window && itrTwo < subsequenceTwoPos_in
-            + window && sumOfSquares < bestSoFar) {
+  while (itrOne < window && itrTwo < subsequenceTwoPos_in
+      + window && sumOfSquares < bestSoFar) {
 
-    double normed1 = (subsequenceOne_in[itrOne] - meanOne_in) / stdDevOne_in;
+    double normed1 = (subsequenceOne_in[itrOne] - meanOne_in) / stdDevOne;
     double normed2 = (timeSeries_in[itrTwo] - meanTwo) / stdDevTwo;
     double diff = normed1 - normed2;
     sumOfSquares += diff * diff;
@@ -352,11 +358,15 @@ double TSGenerator::similarity(const vector<double> &sequence0_in, const
     throw(EXIT_FAILURE);
   }
 
-  //calculate means and standard deviations
+  //calculate means and variance
   double mean0, stdDev0;
-  meanStdDev(sequence0_in, 0, mean0, stdDev0);
+  meanVariance(sequence0_in, 0, mean0, stdDev0);
+  stdDev0 = sqrt(stdDev0);
+  stdDev0 = stdDev0 < 1.0 ? 1.0 : stdDev0;
   double mean1, stdDev1;
-  meanStdDev(sequence1_in, 0, mean1, stdDev1);
+  meanVariance(sequence1_in, 0, mean1, stdDev1);
+  stdDev1 = sqrt(stdDev1);
+  stdDev1 = stdDev1 < 1.0 ? 1.0 : stdDev1;
 
   //calculate similarity
   double sumOfSquares = 0.0;
@@ -674,7 +684,7 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   vector<double> subsequence(window, 0.0);
   bool repeatLoop = true;
   double mean;
-  double stdDev;
+  double variance;
   double d;
   normal_distribution<double> distribution(0.0, noise);
 
@@ -685,8 +695,8 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
 
-    //compute rolling mean and std dev
-    calcRollingMeanStdDev(timeSeries_out);
+    //compute running mean and std dev
+    calcRunnings(timeSeries_out);
 
     //determine similarity of the top motif pair in the random synthetic time
     //series
@@ -705,8 +715,8 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
     }
 
     mean = 0.0;
-    stdDev = 0.0;
-    meanStdDev(motifCenter, 0, mean, stdDev);
+    variance = 0.0;
+    meanVariance(motifCenter, 0, mean, variance);
 
     //check if there is no other subsequence in the range 3.0 * d / 2.0 around
     //the center subsequence
@@ -717,7 +727,7 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
       vector<double> tmpSubsequence(timeSeries_out.begin() + itr,
           timeSeries_out.begin() + itr + window);
 
-      if (similarity(timeSeries_out, motifCenter, mean, stdDev, itr,
+      if (similarity(timeSeries_out, motifCenter, mean, variance, itr,
             numeric_limits<double>::max()) <= 3.0 * d / 2.0) {
 
         repeatLoop = true;
@@ -765,8 +775,8 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
         for (int i = 0; i < window; i++)
           timeSeries_out[i + position] = subsequence[0] + newSubsequence[i];
 
-        //update the running mean and standard deviation
-        updateRollingMeanStdDev(timeSeries_out, position);
+        //update the running mean and variance
+        updateRunnings(timeSeries_out, position);
 
         if (!searchForUnintentionalMatches(timeSeries_out,
               motifPositions_out[0], d) &&
@@ -781,8 +791,8 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
           for (int i = 0; i < window; i++)
             timeSeries_out[position + i] = subsequence[i];
 
-          //update the running mean and standard deviation
-          updateRollingMeanStdDev(timeSeries_out, position);
+          //update the running mean and variance
+          updateRunnings(timeSeries_out, position);
 
           //get new random position in the synthetic time series
           position = freePositions.calculateRandomPosition();

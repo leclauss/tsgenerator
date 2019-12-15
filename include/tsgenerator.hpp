@@ -175,11 +175,11 @@ protected:
   vector<double> means;
 
   // --------------------------------------------------------------------------
-  ///\brief Running standard deviation.
+  ///\brief Running variance.
   ///
-  ///This variable stores the running standard deviation of the time series.
+  ///This variable stores the running variance of the time series.
   // --------------------------------------------------------------------------
-  vector<double> stdDevs;
+  vector<double> variances;
 
   // --------------------------------------------------------------------------
   ///\brief This list contains all motif types.
@@ -209,25 +209,25 @@ protected:
 
 
   // --------------------------------------------------------------------------
-  ///\brief Calculates the rolling mean and standard deviation of a time series.
+  ///\brief Calculates the running mean and variance of a time series.
   ///
   ///\param [in] &timeSeries_in Hands over the time series.
   ///
-  ///This function calculates the rolling mean and standard deviation of a time
-  ///series. The output tuple contains the means and standard deviations.
+  ///This function calculates the rolling mean and variance of a time series.
+  ///The output tuple contains the means and variance.
   // --------------------------------------------------------------------------
-  void calcRollingMeanStdDev(const vector<double> &timeSeries_in);
+  void calcRunnings(const vector<double> &timeSeries_in);
 
   // --------------------------------------------------------------------------
-  ///\brief Update the rolling mean and standard deviation of a time series.
+  ///\brief Update the running mean and variance of a time series.
   ///
   ///\param [in] &timeSeries_in Hands over the time series.
   ///\param [in] pos_in Hands over the position of the injected subsequence.
   ///
-  ///This function updates the rolling mean and standard deviation of a time
-  ///series at a specific location.
+  ///This function updates the rolling mean and variance of a time series at a
+  ///specific location.
   // --------------------------------------------------------------------------
-  void updateRollingMeanStdDev(const vector<double> &timeSeries_in, int
+  void updateRunnings(const vector<double> &timeSeries_in, int
       pos_in);
 
   // --------------------------------------------------------------------------
@@ -252,19 +252,19 @@ protected:
       bestSoFar_in);
 
   // --------------------------------------------------------------------------
-  ///\brief Calculates the mean and standard deviation.
+  ///\brief Calculates the mean and variance.
   ///
   ///\param [in] &timeSeries_in Time series to calculate the mean and standard
   ///deviation.
   ///\param [in] subsequencePos_in Hands over the position of the subsequence
   ///in the time series.
   ///\param [out] &mean_out The mean of the time series.
-  ///\param [out] &stddev_out The standard deviation of the time series.
+  ///\param [out] &variance_out The variance of the time series.
   ///
-  ///This function calculates the mean and standard deviation.
+  ///This function calculates the mean and variance.
   // --------------------------------------------------------------------------
-  void meanStdDev(const vector<double> &timeSeries_in, const int
-      subsequencePos_in, double &mean_out, double &stdDev_out);
+  void meanVariance(const vector<double> &timeSeries_in, const int
+      subsequencePos_in, double &mean_out, double &variance_out);
 
   // --------------------------------------------------------------------------
   ///\brief Calculates the similarity of two time series.
@@ -273,8 +273,7 @@ protected:
   ///\param [in] &subsequenceOne_in Hands over the first subsequence in the
   ///time series.
   ///\param [in] meanOne_in Hands over the mean of timeSeriesOne_in.
-  ///\param [in] stdDevOne_in Hands over the standard deviation of
-  ///timeSeriesOne_in.
+  ///\param [in] varianceOne_in Hands over the variance of timeSeriesOne_in.
   ///\param [in] subsequenceTwoPos_in Hands over the position of the second
   ///subsequence in the time series.
   ///\param [in] bestSoFar_in Hands over the best similarity so far.
@@ -287,7 +286,7 @@ protected:
   ///time series.
   // --------------------------------------------------------------------------
   double similarity(const vector<double> &timeSeries_in, const vector<double>
-      &subsequenceOne_in, const double meanOne_in, const double stdDevOne_in,
+      &subsequenceOne_in, const double meanOne_in, const double varianceOne_in,
       const int subsequenceTwoPos_in, const double bestSoFar_in);
 
   // --------------------------------------------------------------------------

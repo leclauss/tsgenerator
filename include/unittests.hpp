@@ -685,9 +685,10 @@ vector<double> testMeans({
 
 
 // --------------------------------------------------------------------------
-///\brief This variable contains the test time series rolling stds.
+///\brief This variable contains the test time series running standard
+///deviations.
 ///
-///This variable stores the test times series rolling stds.
+///This variable stores the test times series running standard deviations.
 // --------------------------------------------------------------------------
 vector<double> testStds({
     8.620709,
@@ -1626,30 +1627,29 @@ public:
   }
 
   // --------------------------------------------------------------------------
-  ///\brief Returns the standard deviations of the time series.
+  ///\brief Returns the variances of the time series.
   ///
-  ///\return The standard deviations of the time series.
+  ///\return The variances of the time series.
   ///
-  ///This function returns the content of the variable that stores the standard
-  ///deviations time series.
+  ///This function returns the content of the variable that stores the
+  ///variances time series.
   // --------------------------------------------------------------------------
-  vector<double> &getStdDevs() {
+  vector<double> &getVariances() {
 
-    return stdDevs;
+    return variances;
   }
 
   // --------------------------------------------------------------------------
-  ///\brief Runs the mean and standard deviation function.
+  ///\brief Runs the mean and variance function.
   ///
-  ///\param [in] &timeSeries_in Time series to calculate the mean and standard
-  ///deviation.
+  ///\param [in] &timeSeries_in Time series to calculate the mean and variance.
   ///
-  ///This function runs the mean and standard deviation function since the mean
-  ///and standard deviation function is protected.
+  ///This function runs the mean and variance function since the mean and
+  ///variance function is protected.
   // --------------------------------------------------------------------------
-  void testCalcRollingMeanStddev(const vector<double> &timeSeries_in) {
+  void testCalcRunnings(const vector<double> &timeSeries_in) {
 
-    calcRollingMeanStdDev(timeSeries_in);
+    calcRunnings(timeSeries_in);
   }
 
   // --------------------------------------------------------------------------
@@ -1676,22 +1676,22 @@ public:
   }
 
   // --------------------------------------------------------------------------
-  ///\brief Runs the mean and standard deviation function.
+  ///\brief Runs the mean and variance function.
   ///
   ///\param [in] &timeSeries_in Time series to calculate the mean and standard
   ///deviation.
   ///\param [in] subsequencePos_in Hands over the position of the subsequence
   ///in the time series.
   ///\param [out] &mean_out The mean of the time series.
-  ///\param [out] &stddev_out The standard deviation of the time series.
+  ///\param [out] &variance_out The variance of the time series.
   ///
   ///This function runs the mean and standard deviation function since the mean
-  ///and standard deviation function is protected.
+  ///and variance function is protected.
   // --------------------------------------------------------------------------
-  void testMeanStdDev(const vector<double> &timeSeries_in, const int
-      subsequencePos_in, double &mean_out, double &stdDev_out) {
+  void testMeanVariance(const vector<double> &timeSeries_in, const int
+      subsequencePos_in, double &mean_out, double &variance_out) {
 
-    meanStdDev(timeSeries_in, subsequencePos_in, mean_out, stdDev_out);
+    meanVariance(timeSeries_in, subsequencePos_in, mean_out, variance_out);
   }
 
   // --------------------------------------------------------------------------
