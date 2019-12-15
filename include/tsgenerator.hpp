@@ -169,19 +169,18 @@ protected:
   BaseTS baseTS;
 
   // --------------------------------------------------------------------------
-  ///\brief Backup of the time series.
+  ///\brief Running mean.
   ///
-  ///This variable stores a backup of the time series.
+  ///This variable stores the running mean of the time series.
   // --------------------------------------------------------------------------
-  vector<double> timeSeriesBackup;
+  vector<double> means;
 
   // --------------------------------------------------------------------------
-  ///\brief Means and standard deviations.
+  ///\brief Running standard deviation.
   ///
-  ///This variable stores the means and standard deviations of all time series
-  ///database time series.
+  ///This variable stores the running standard deviation of the time series.
   // --------------------------------------------------------------------------
-  vector<tuple<double, double>> meansStds;
+  vector<double> stdDevs;
 
   // --------------------------------------------------------------------------
   ///\brief This list contains all motif types.
@@ -215,27 +214,22 @@ protected:
   ///
   ///\param [in] &timeSeries_in Hands over the time series.
   ///
-  ///\return The rolling mean and standard deviation.
-  ///
   ///This function calculates the rolling mean and standard deviation of a time
   ///series. The output tuple contains the means and standard deviations.
   // --------------------------------------------------------------------------
-  tuple<vector<double>, vector<double>> calcRollingMeanStdDev(const
-      vector<double> &timeSeries_in);
+  void calcRollingMeanStdDev(const vector<double> &timeSeries_in);
 
   // --------------------------------------------------------------------------
   ///\brief Update the rolling mean and standard deviation of a time series.
   ///
   ///\param [in] &timeSeries_in Hands over the time series.
   ///\param [in] pos_in Hands over the position of the injected subsequence.
-  ///\param [in, out] &mean Hands over the rolling mean.
-  ///\param [in, out] &stdDev Hands over the rolling std deviation.
   ///
   ///This function updates the rolling mean and standard deviation of a time
   ///series at a specific location.
   // --------------------------------------------------------------------------
-  void updateRollingMeanStdDev(const vector<double> &timeSeries_in, int pos_in,
-      vector<double> &mean, vector<double> & stdDev);
+  void updateRollingMeanStdDev(const vector<double> &timeSeries_in, int
+      pos_in);
 
   // --------------------------------------------------------------------------
   ///\brief Calculates the similarity of two time series.
@@ -243,9 +237,6 @@ protected:
   ///\param [in] &timeSeriesOne_in Hands over the time series.
   ///\param [in] subsequenceOnePos_in Hands over the position of the first
   ///subsequence in the time series.
-  ///\param [in] meanOne_in Hands over the mean of timeSeriesOne_in.
-  ///\param [in] stdDevOne_in Hands over the standard deviation of
-  ///timeSeriesOne_in.
   ///\param [in] subsequenceTwoPos_in Hands over the position of the second
   ///subsequence in the time series.
   ///\param [in] bestSoFar_in Hands over the best similarity so far.
@@ -259,7 +250,7 @@ protected:
   // --------------------------------------------------------------------------
   double similarity(const vector<double> &timeSeries_in, const int
       subsequenceOnePos_in, const int subsequenceTwoPos_in, const double
-      bestSoFar_in, const vector<double> &means, const vector<double> &stds);
+      bestSoFar_in);
 
   // --------------------------------------------------------------------------
   ///\brief Calculates the mean and standard deviation.
@@ -301,6 +292,22 @@ protected:
       const int subsequenceTwoPos_in, const double bestSoFar_in);
 
   // --------------------------------------------------------------------------
+  ///\brief Calculates the similarity of two time series.
+  ///
+  ///\param [in] &sequence0_in Hands over the first sequence.
+  ///\param [in] &sequence1_in Hands over the second sequence.
+  ///\param [in] bestSoFar_in Hands over the best similarity so far.
+  ///
+  ///\return The similarity of the two z-normalized sequences.
+  ///
+  ///This function calculates the similarity of two sequences. Therefore, the
+  ///sequences are first z-normalized and the Euclidean Distance is computed.
+  ///The return value is the similarity of the two z-normalized sequneces.
+  // --------------------------------------------------------------------------
+  double similarity(const vector<double> &sequence0_in, const vector<double>
+      &sequence1_in, const double bestSoFar_in);
+
+  // --------------------------------------------------------------------------
   ///\brief Calculates a motif set subsequence.
   ///
   ///\param [out] subsequence_out Hands over the calculated raw subsequence.
@@ -331,8 +338,6 @@ protected:
   ///\param [in] &timeSereis_in Hands over the time series.
   ///\param [in] &subsequencePositions_in Hands over the position of the new
   ///subsequence.
-  ///\param [in] &means_in Hands over the rolling means.
-  ///\param [in] &stds_in Hands over the rolling standard deviations.
   ///\param [in] similarity_in Hands over the similarity to break.
   ///
   ///\return true if there exists an unintentional subsequence match with the
@@ -342,8 +347,7 @@ protected:
   ///time series with the new injected subsequence.
   // --------------------------------------------------------------------------
   bool searchForUnintentionalMatches(const vector<double> &timeSeries_in, const
-      vector<int> &motifPositions_in, const vector<double> &means_in, const
-      vector<double> &stds_in, double similarity_in);
+      vector<int> &motifPositions_in, double similarity_in);
 
   // --------------------------------------------------------------------------
   ///\brief Checks if there is a larger motif set.
@@ -351,8 +355,6 @@ protected:
   ///\param [in] &timeSereis_in Hands over the time series.
   ///\param [in] &subsequencePositions_in Hands over the position of the new
   ///subsequence.
-  ///\param [in] &means_in Hands over the rolling means.
-  ///\param [in] &stds_in Hands over the rolling standard deviations.
   ///\param [in] range_in Hands over the motif set range.
   ///
   ///\return true if there exists an larger motif set.
@@ -361,8 +363,7 @@ protected:
   ///set positions including all overlapping subsequences in the time series.
   // --------------------------------------------------------------------------
   bool checkIfThereIsALargerMotifSet(const vector<double> &timeSeries_in, const
-      vector<int> &motifPositions_in, const vector<double> &means_in, const
-      vector<double> &stds_in, double range_in);
+      vector<int> &motifPositions_in, double range_in);
 
 public:
 

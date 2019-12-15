@@ -1587,19 +1587,6 @@ public:
         height_in) { }
 
   // --------------------------------------------------------------------------
-  ///\brief Returns the backup of the time series.
-  ///
-  ///\return The backup of the time series.
-  ///
-  ///This function returns the content of the variable that stores the backup
-  ///of the time series.
-  // --------------------------------------------------------------------------
-  vector<double> &getTimeSeriesBackup() {
-
-    return timeSeriesBackup;
-  }
-
-  // --------------------------------------------------------------------------
   ///\brief Sets the length of the time series.
   ///
   ///\param [in] length_in The legnth of the time series.
@@ -1626,17 +1613,29 @@ public:
   }
 
   // --------------------------------------------------------------------------
-  ///\brief Returns the means and standard deviations of the time series
-  ///database.
+  ///\brief Returns the means of the time series.
   ///
-  ///\return The free positions in the time series.
+  ///\return The means of the time series.
   ///
   ///This function returns the content of the variable that stores the means
-  ///and standard deviations of the time series database.
+  ///of the time series.
   // --------------------------------------------------------------------------
-  vector<tuple<double, double>> &getMeansStds() {
+  vector<double> &getMeans() {
 
-    return meansStds;
+    return means;
+  }
+
+  // --------------------------------------------------------------------------
+  ///\brief Returns the standard deviations of the time series.
+  ///
+  ///\return The standard deviations of the time series.
+  ///
+  ///This function returns the content of the variable that stores the standard
+  ///deviations time series.
+  // --------------------------------------------------------------------------
+  vector<double> &getStdDevs() {
+
+    return stdDevs;
   }
 
   // --------------------------------------------------------------------------
@@ -1645,15 +1644,12 @@ public:
   ///\param [in] &timeSeries_in Time series to calculate the mean and standard
   ///deviation.
   ///
-  ///\return The rolling mean and standard deviation.
-  ///
   ///This function runs the mean and standard deviation function since the mean
   ///and standard deviation function is protected.
   // --------------------------------------------------------------------------
-  tuple<vector<double>, vector<double>> testCalcRollingMeanStddev(const
-      vector<double> &timeSeries_in) {
+  void testCalcRollingMeanStddev(const vector<double> &timeSeries_in) {
 
-    return calcRollingMeanStdDev(timeSeries_in);
+    calcRollingMeanStdDev(timeSeries_in);
   }
 
   // --------------------------------------------------------------------------
@@ -1665,8 +1661,6 @@ public:
   ///\param [in] subsequenceTwoPos_in Hands over the position of the second
   ///subsequence in the time series.
   ///\param [in] bestSoFar_in Hands over the best similarity so far.
-  ///\param [in] means_in Hands over the means of the time series.
-  ///\param [in] stds_in Hands over the standard deviations of the time series.
   ///
   ///\return The similarity of the two z-normalized time series.
   ///
@@ -1675,11 +1669,10 @@ public:
   // --------------------------------------------------------------------------
   double testSimilarity(const vector<double> &timeSeries_in, const int
       subsequenceOnePos_in, const int subsequenceTwoPos_in, const double
-      bestSoFar_in, const vector<double> &means_in, const vector<double>
-      &stds_in) {
+      bestSoFar_in) {
 
     return similarity(timeSeries_in, subsequenceOnePos_in,
-        subsequenceTwoPos_in, bestSoFar_in, means_in, stds_in);
+        subsequenceTwoPos_in, bestSoFar_in);
   }
 
   // --------------------------------------------------------------------------
@@ -1751,8 +1744,6 @@ public:
   ///\param [in] &timeSereis_in Hands over the time series.
   ///\param [in] &subsequencePositions_in Hands over the position of the new
   ///subsequence.
-  ///\param [in] &means_in Hands over the rolling means.
-  ///\param [in] &stds_in Hands over the rolling standard deviations.
   ///\param [in] similarity_in Hands over the similarity to break.
   ///
   ///\return true if there exists an unintentional subsequence match with the
@@ -1762,11 +1753,10 @@ public:
   ///function since the function is protected.
   // --------------------------------------------------------------------------
   bool testSearchForUnintentionalMatches(const vector<double> &timeSeries_in,
-      const vector<int> &motifSetPositions_in, const vector<double> &means_in,
-      const vector<double> &stds_in, double similarity_in) {
+      const vector<int> &motifSetPositions_in, double similarity_in) {
 
     return searchForUnintentionalMatches(timeSeries_in, motifSetPositions_in,
-        means_in, stds_in, similarity_in);
+        similarity_in);
   }
 
   // --------------------------------------------------------------------------
@@ -1775,8 +1765,6 @@ public:
   ///\param [in] &timeSereis_in Hands over the time series.
   ///\param [in] &subsequencePositions_in Hands over the position of the new
   ///subsequence.
-  ///\param [in] &means_in Hands over the rolling means.
-  ///\param [in] &stds_in Hands over the rolling standard deviations.
   ///\param [in] range_in Hands over the motif set range.
   ///
   ///\return true if there exists an unintentional subsequence match with the
@@ -1787,11 +1775,10 @@ public:
   ///since the function is protected.
   // --------------------------------------------------------------------------
   bool testCheckIfThereIsALargerMotifSet(const vector<double> &timeSeries_in,
-      const vector<int> &motifSetPositions_in, const vector<double> &means_in,
-      const vector<double> &stds_in,  double range_in) {
+      const vector<int> &motifSetPositions_in,  double range_in) {
 
     return checkIfThereIsALargerMotifSet(timeSeries_in, motifSetPositions_in,
-        means_in, stds_in, range_in);
+        range_in);
   }
 };
 

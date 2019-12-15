@@ -3,9 +3,9 @@
 ///\brief File contains the TSGenerator class definition.
 ///
 ///This is the source file of the TSGenerator. The TSGenerator consists of
-///setter functions and the run() function. After configuring the TSGenerator
+///setter functions and the () function. After configuring the TSGenerator
 ///with the setter functions one starts the time series generation by calling
-///the run() function.
+///the rue) function.
 
 
 #include <tsgenerator.hpp>
@@ -101,94 +101,95 @@ TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
 
 TSGenerator::~TSGenerator() { }
 
-tuple<vector< double>, vector<double>> TSGenerator::calcRollingMeanStdDev(const
-    vector<double> &timeSeries_in) {
+void TSGenerator::calcRollingMeanStdDev(const vector<double> &timeSeries_in) {
 
   // obtain rolling/sliding means and stddevs
-  vector<double> means(timeSeries_in.size() - window + 1);
-  vector<double> stds(timeSeries_in.size() - window + 1);
+  if (!means.empty() || !stdDevs.empty()) {
+
+    means.clear();
+    stdDevs.clear();
+  }
+
+  means.resize(timeSeries_in.size() - window + 1);
+  stdDevs.resize(timeSeries_in.size() - window + 1);
 
   double sum = 0;
   double squareSum = 0;
 
   // it is faster to multiply than to divide
-  double rWindowLength = 1.0 / (double)window;
+  double rWindow = 1.0 / (double)window;
 
-  for (int ww = 0; ww < min(((int)timeSeries_in.size()), window); ww++) {
+  for (int i = 0; i < min(((int)timeSeries_in.size()), window); i++) {
 
-    sum += timeSeries_in[ww];
-    squareSum += timeSeries_in[ww] * timeSeries_in[ww];
+    sum += timeSeries_in[i];
+    squareSum += timeSeries_in[i] * timeSeries_in[i];
   }
 
-  means[0] = sum * rWindowLength;
-  double buf = squareSum * rWindowLength - means[0] * means[0];
-  stds[0] = buf > 0 ? sqrt(buf) : 0;
+  means[0] = sum * rWindow;
+  double buf = squareSum * rWindow - means[0] * means[0];
+  stdDevs[0] = buf > 0 ? sqrt(buf) : 0;
 
-  for (int w = 1, end = (int)timeSeries_in.size() - window + 1; w < end;
-      w++) {
+  for (int i = 1; i < (int)timeSeries_in.size() - window + 1; i++) {
 
-    sum += timeSeries_in[w + window - 1] - timeSeries_in[w - 1];
-    means[w] = sum * rWindowLength;
+    sum += timeSeries_in[i + window - 1] - timeSeries_in[i - 1];
+    means[i] = sum * rWindow;
 
-    squareSum += timeSeries_in[w + window - 1] * timeSeries_in[w
-      + window - 1] - timeSeries_in[w - 1] * timeSeries_in[w - 1];
-    buf = squareSum * rWindowLength - means[w] * means[w];
-    stds[w] = buf > 0 ? sqrt(buf) : 0;
+    squareSum += timeSeries_in[i + window - 1] * timeSeries_in[i
+      + window - 1] - timeSeries_in[i - 1] * timeSeries_in[i - 1];
+    buf = squareSum * rWindow - means[i] * means[i];
+    stdDevs[i] = buf > 0 ? sqrt(buf) : 0;
   }
-
-  return make_tuple(means, stds);
 }
 
 void TSGenerator::updateRollingMeanStdDev(const vector<double> &timeSeries_in,
-    int pos_in, vector<double> &mean, vector<double> & stdDev) {
+    int pos_in) {
 
   int start = pos_in - window + 1;
   int end = pos_in + window - 1;
 
   // check if we need to update the very first mean and standard deviation
   if (start < 1) {
-    mean[0] = timeSeries_in[0];
+    means[0] = timeSeries_in[0];
 
     for (int i = 1; i < window; i++) {
-      mean[0] += timeSeries_in[i];
+      means[0] += timeSeries_in[i];
     }
 
-    mean[0] /= window;
+    means[0] /= window;
 
-    stdDev[0] = timeSeries_in[0] * timeSeries_in[0];
+    stdDevs[0] = timeSeries_in[0] * timeSeries_in[0];
 
     for (int i = 1; i < window; i++) {
-      stdDev[0] += timeSeries_in[i] * timeSeries_in[i];
+      stdDevs[0] += timeSeries_in[i] * timeSeries_in[i];
     }
 
-    stdDev[0] /= window;
+    stdDevs[0] /= window;
 
-    stdDev[0] -= mean[0] * mean[0];
+    stdDevs[0] -= means[0] * means[0];
 
     start = 1;
   }
 
   // check if we are at the end of the time series
-  if (end > (int) mean.size())
-    end = mean.size();
+  if (end > (int) means.size())
+    end = means.size();
 
   // update all means overlapping the new subsequence and all potentially
   // shifted once
   for (int i = start; i <= length - window; i++)
-    mean[i] = (length * mean[i - 1] - timeSeries_in[i - 1] + timeSeries_in[i])
+    means[i] = (length * means[i - 1] - timeSeries_in[i - 1] + timeSeries_in[i])
       / length;
 
   // update all changed variances
   for (int i = start; i <= end; i++)
-    stdDev[i] = stdDev[i - 1] + mean[i - 1] * mean[i - 1] - mean[i] * mean[i]
-      + (timeSeries_in[i] * timeSeries_in[i] - timeSeries_in[i - 1]
+    stdDevs[i] = stdDevs[i - 1] + means[i - 1] * means[i - 1] - means[i]
+      * means[i] + (timeSeries_in[i] * timeSeries_in[i] - timeSeries_in[i - 1]
           * timeSeries_in[i - 1]) / window;
 }
 
 double TSGenerator::similarity(const vector<double> &timeSeries_in, const int
     subsequenceOnePos_in, const int subsequenceTwoPos_in, const double
-    bestSoFar_in, const vector<double> &means_in, const vector<double>
-    &stds_in) {
+    bestSoFar_in) {
 
   if (timeSeries_in.empty()) {
 
@@ -212,11 +213,11 @@ double TSGenerator::similarity(const vector<double> &timeSeries_in, const int
     throw(EXIT_FAILURE);
   }
 
-  double meanOne = means_in[subsequenceOnePos_in];
-  double stdDevOne = stds_in[subsequenceOnePos_in];
+  double meanOne = means[subsequenceOnePos_in];
+  double stdDevOne = stdDevs[subsequenceOnePos_in];
 
-  double meanTwo = means_in[subsequenceTwoPos_in];
-  double stdDevTwo = stds_in[subsequenceTwoPos_in];
+  double meanTwo = means[subsequenceTwoPos_in];
+  double stdDevTwo = stdDevs[subsequenceTwoPos_in];
 
   //calculate similarity
   double sumOfSquares = 0.0;
@@ -311,11 +312,8 @@ double TSGenerator::similarity(const vector<double> &timeSeries_in, const
   }
 
   //calculate means and standard deviations
-  double meanTwo = 0.0;
-  double stdDevTwo = 0.0;
-
-  meanStdDev(timeSeries_in, subsequenceTwoPos_in, meanTwo, stdDevTwo);
-
+  double meanTwo = means[subsequenceTwoPos_in];
+  double stdDevTwo = stdDevs[subsequenceTwoPos_in];
 
   //calculate similarity
   double sumOfSquares = 0.0;
@@ -334,6 +332,42 @@ double TSGenerator::similarity(const vector<double> &timeSeries_in, const
 
     itrOne++;
     itrTwo++;
+  }
+
+  return sqrt(sumOfSquares);
+}
+
+double TSGenerator::similarity(const vector<double> &sequence0_in, const
+    vector<double> &sequence1_in, const double bestSoFar_in) {
+
+  if (sequence0_in.empty()) {
+
+    cerr << "ERROR: First sequence is empty!" << endl;
+    throw(EXIT_FAILURE);
+  }
+
+  if (sequence1_in.empty()) {
+
+    cerr << "ERROR: Second sequence is empty!" << endl;
+    throw(EXIT_FAILURE);
+  }
+
+  //calculate means and standard deviations
+  double mean0, stdDev0;
+  meanStdDev(sequence0_in, 0, mean0, stdDev0);
+  double mean1, stdDev1;
+  meanStdDev(sequence1_in, 0, mean1, stdDev1);
+
+  //calculate similarity
+  double sumOfSquares = 0.0;
+  double bestSoFar = bestSoFar_in * bestSoFar_in;
+
+  for (int i = 0; i < window && sumOfSquares < bestSoFar; i++) {
+
+    double normed0 = (sequence0_in[i] - mean0) / stdDev0;
+    double normed1 = (sequence1_in[i] - mean1) / stdDev1;
+    double diff = normed0 - normed1;
+    sumOfSquares += diff * diff;
   }
 
   return sqrt(sumOfSquares);
@@ -428,14 +462,12 @@ void TSGenerator::generateBaseTimeSeries(vector<double> &timeSeries_out) {
 }
 
 bool TSGenerator::searchForUnintentionalMatches(const vector<double>
-    &timeSeries_in, const vector<int> &motifPositions_in, const
-    vector<double> &means_in, const vector<double> &stds_in, double
-    similarity_in) {
+    &timeSeries_in, const vector<int> &motifPositions_in, double similarity_in)
+{
 
   //lower and upper positions of the subsequences overlapping the new motif set
   int lowerBound = max(0, motifPositions_in.back() - window + 1);
-  int upperBound = min(motifPositions_in.back() + window, length
-      - window + 1);
+  int upperBound = min(motifPositions_in.back() + window, length - window + 1);
 
 
   bool candidate;
@@ -446,7 +478,7 @@ bool TSGenerator::searchForUnintentionalMatches(const vector<double>
 
     //check if itr is non overlapping to any motif set subsequence
     for (int position : motifPositions_in)
-         if (abs(position - itr) < window) {
+      if (abs(position - itr) < window) {
 
         candidate = false;
         break;
@@ -460,8 +492,8 @@ bool TSGenerator::searchForUnintentionalMatches(const vector<double>
             //non overlapping and ...
         if (abs(newMotifItr - itr) >= window &&
             //... matching
-            similarity(timeSeries_in, itr, newMotifItr, similarity_in,
-              means_in, stds_in) <= similarity_in)
+            similarity(timeSeries_in, itr, newMotifItr, similarity_in) <=
+            similarity_in)
           return true;
   }
 
@@ -469,8 +501,7 @@ bool TSGenerator::searchForUnintentionalMatches(const vector<double>
 }
 
 bool TSGenerator::checkIfThereIsALargerMotifSet(const vector<double>
-    &timeSeries_in, const vector<int> &motifPositions_in, const
-    vector<double> &means_in, const vector<double> &stds_in, double range_in) {
+    &timeSeries_in, const vector<int> &motifPositions_in, double range_in) {
 
   vector<int> positions;
   int newMotif = motifPositions_in.back();
@@ -514,7 +545,7 @@ bool TSGenerator::checkIfThereIsALargerMotifSet(const vector<double>
         posItr < overlapping[itr].position + overlapping[itr].length; posItr++)
       if (abs(motifPositions_in.back() - posItr) >= window &&
           similarity(timeSeries_in, motifPositions_in.back(), posItr,
-            2 * range_in, means_in, stds_in) <= 2 * range_in) {
+            2 * range_in) <= 2 * range_in) {
 
         lastPos = posItr;
         motifSize++;
@@ -548,7 +579,7 @@ bool TSGenerator::checkIfThereIsALargerMotifSet(const vector<double>
     for (int itr = rightNewSubsequence.position; itr
         < rightNewSubsequence.position + rightNewSubsequence.length; itr++)
       if (abs(item - itr) >= window && similarity(timeSeries_in, item, itr,
-            2 * range_in, means_in, stds_in) <= 2 * range_in) {
+            2 * range_in) <= 2 * range_in) {
 
         motifSize++;
         break;
@@ -561,8 +592,8 @@ bool TSGenerator::checkIfThereIsALargerMotifSet(const vector<double>
           posItr < overlapping[itr].position + overlapping[itr].length;
           posItr++)
         if (abs(item - posItr) >= window &&
-            similarity(timeSeries_in, item, posItr, 2 * range_in, means_in,
-              stds_in) <= 2 * range_in) {
+            similarity(timeSeries_in, item, posItr, 2 * range_in) <=
+            2 * range_in) {
 
           lastPos = posItr;
           motifSize++;
@@ -584,7 +615,7 @@ bool TSGenerator::checkIfThereIsALargerMotifSet(const vector<double>
     for (int itr = leftNewSubsequence.position; itr
         < leftNewSubsequence.position + leftNewSubsequence.length; itr++)
       if (abs(item - itr) >= window && similarity(timeSeries_in, item, itr,
-            2 * range_in, means_in, stds_in) <= 2 * range_in) {
+            2 * range_in) <= 2 * range_in) {
 
         motifSize++;
         break;
@@ -597,7 +628,7 @@ bool TSGenerator::checkIfThereIsALargerMotifSet(const vector<double>
           posItr < overlapping[itr].position + overlapping[itr].length;
           posItr++)
         if (abs(item - posItr) >= window && similarity(timeSeries_in, item,
-              posItr, 2 * range_in, means_in, stds_in) <= 2 * range_in) {
+              posItr, 2 * range_in) <= 2 * range_in) {
 
           lastPos = posItr;
           motifSize++;
@@ -615,17 +646,7 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
     &d_out, vector<int> &window_out, vector<vector<int>>
     &motifPositions_out) {
 
-  //clear the buffers
-  if (!timeSeriesBackup.empty()) {
-
-    timeSeriesBackup.clear();
-    timeSeriesBackup.resize(length);
-  }
-  else {
-
-    timeSeriesBackup.resize(length);
-  }
-
+  //clear the output buffers
   if (!d_out.empty()) {
 
     d_out.clear();
@@ -646,26 +667,14 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   else
     motifPositions_out.resize(2);
 
-
   //declaration stuff
   int positionOne = -1;
   int positionTwo = -1;
-
   vector<double> motifCenter;
-
   bool repeatLoop = true;
-
-  double mean = 0.0;
-  double stdDev = 0.0;
-
-  vector<double> means;
-  vector<double> stdDevs;
-
-  vector<double> meansBackup;
-  vector<double> stdDevsBackup;
-
+  double mean;
+  double stdDev;
   double d;
-
   normal_distribution<double> distribution(0.0, noise);
 
 
@@ -676,19 +685,14 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
 
-    //backup time series
-    for (int timeSeriesItr = 0; timeSeriesItr < length; timeSeriesItr++)
-      timeSeriesBackup[timeSeriesItr] = timeSeries_out[timeSeriesItr];
-
     //compute rolling mean and std dev
-    tie(means, stdDevs) = calcRollingMeanStdDev(timeSeries_out);
+    calcRollingMeanStdDev(timeSeries_out);
 
     //determine similarity of the top motif pair in the random synthetic time
     //series
     scrimpPP(timeSeries_out, positionOne, positionTwo, window);
     d = similarity(timeSeries_out, positionOne, positionTwo,
-        numeric_limits<double>::max(), means, stdDevs);
-
+        numeric_limits<double>::max());
 
     //calculate temporary motif set center subsequence in the window size
     //dimentional room of subsequence values
@@ -725,8 +729,8 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
 
   //declaration stuff
   int position;
-  double difference;
   int retryItr = 0;
+  vector<double> subsequence(window, 0.0);
 
   window_out.push_back(motifCenter.size());
 
@@ -739,86 +743,52 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
 
     motifPositions_out[0].push_back(position);
 
-
-    //calculate the difference between first and last value of the subsequence
-    //in the time series
-    difference = timeSeries_out[position] - timeSeries_out[position
-      + window - 1];
-
-    //update time series after subsequence
-    for (int itr = position + window; itr < (int)timeSeries_out.size();
-        itr++)
-      timeSeries_out[itr] = timeSeries_out[itr] + difference;
-
-    //store the first value of the subsequence
-    double subsequenceFirstValue = timeSeries_out[position];
-
     //check if all motif set subsequences are in range smaller than r / 2.0
     while (retryItr < length + 100) {
 
-      //copy the motif set center subsequence
+      //copy the motif set center subsequence ...
       vector<double> newSubsequence(motifCenter);
 
-      if (noise > 0.0) {
-
+      //... and add noise
+      if (noise > 0.0)
         for (auto& value : newSubsequence)
           value += distribution(randomEngine);
-      }
-
-      //add subsequence to synthetic time series
-      for (int subsequenceItr = position; subsequenceItr < position
-          + window; subsequenceItr++)
-        timeSeries_out[subsequenceItr] = subsequenceFirstValue
-          + newSubsequence[subsequenceItr - position];
 
       //check if the similarity of the subsequence and the center subsequence
       //is at most d / 2.0
-      if (similarity(timeSeries_out, motifCenter, mean, stdDev, position,
-            d / 2.0) < d / 2.0) {
+      if (similarity(motifCenter, newSubsequence, d / 2.0) < d / 2.0) {
 
-        //calculate rolling means and standard deviations
-        vector<double> means;
-        vector<double> stds;
-        tie(means, stds) = calcRollingMeanStdDev(timeSeries_out);
+        //backup subsequence
+        for (int i = 0; i < window; i++)
+          subsequence[i] = timeSeries_out[position + i];
 
+        //add subsequence to synthetic time series
+        for (int i = 0; i < window; i++)
+          timeSeries_out[i + position] = subsequence[0] + newSubsequence[i];
+
+        //update the running mean and standard deviation
+        updateRollingMeanStdDev(timeSeries_out, position);
 
         if (!searchForUnintentionalMatches(timeSeries_out,
-              motifPositions_out[0], means, stds, d) &&
+              motifPositions_out[0], d) &&
             !checkIfThereIsALargerMotifSet(timeSeries_out,
-              motifPositions_out[0], means, stds, d / 2.0)) {
-
-          //update backup time series
-          for (int timeSeriesItr = position; timeSeriesItr < length;
-              timeSeriesItr++)
-            timeSeriesBackup[timeSeriesItr] = timeSeries_out[timeSeriesItr];
+              motifPositions_out[0], d / 2.0)) {
 
           break;
         }
         else {
 
-          //reset time series
-          for (int timeSeriesItr = position; timeSeriesItr < length;
-              timeSeriesItr++)
-            timeSeries_out[timeSeriesItr] = timeSeriesBackup[timeSeriesItr];
+          //restore old subsequence
+          for (int i = 0; i < window; i++)
+            timeSeries_out[position + i] = subsequence[i];
 
-          //calculate new random position in the synthetic time series
+          //update the running mean and standard deviation
+          updateRollingMeanStdDev(timeSeries_out, position);
+
+          //get new random position in the synthetic time series
           position = freePositions.calculateRandomPosition();
 
           motifPositions_out[0].back() = position;
-
-
-          //calculate the difference between first and last value of the
-          //subsequence in the time series
-          difference = timeSeries_out[position] - timeSeries_out[position
-            + window - 1];
-
-          //update time series after subsequence
-          for (int itr = position + window; itr
-              < (int)timeSeries_out.size(); itr++)
-            timeSeries_out[itr] = timeSeries_out[itr] + difference;
-
-          //store the first value of the subsequence
-          subsequenceFirstValue = timeSeries_out[position];
         }
       }
       else {
@@ -850,14 +820,14 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   positionOne = 0;
   positionTwo = 0;
 
-  tie(means, stdDevs) = calcRollingMeanStdDev(timeSeries_out);
-
   scrimpPP(timeSeries_out, positionOne, positionTwo, window);
   d = similarity(timeSeries_out, positionOne, positionTwo,
-      numeric_limits<double>::max(), means, stdDevs);
+      numeric_limits<double>::max());
   d_out.push_back(d);
+
   motifPositions_out[1].push_back(positionOne);
   motifPositions_out[1].push_back(positionTwo);
+
   window_out.push_back(window);
 }
 

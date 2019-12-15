@@ -1282,7 +1282,9 @@ void test_tsgenerator() {
     vector<double> stds;
     bool flagMeansStdsTest = true;
 
-    tie(means, stds) = generator.testCalcRollingMeanStddev(testTimeSeries);
+    generator.testCalcRollingMeanStddev(testTimeSeries);
+    means = generator.getMeans();
+    stds = generator.getStdDevs();
 
     if (TEST(testMeans.size() == means.size())) {
 
@@ -1311,7 +1313,7 @@ void test_tsgenerator() {
     try {
 
       generator.testSimilarity({}, topMotifSetPos[0], topMotifSetPos[0],
-          numeric_limits<double>::max(), means, stds);
+          numeric_limits<double>::max());
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -1322,7 +1324,7 @@ void test_tsgenerator() {
     try {
 
       generator.testSimilarity(testTimeSeries, 303, topMotifSetPos[0],
-          numeric_limits<double>::max(), means, stds);
+          numeric_limits<double>::max());
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -1333,7 +1335,7 @@ void test_tsgenerator() {
     try {
 
       generator.testSimilarity(testTimeSeries, topMotifSetPos[0], 303,
-          numeric_limits<double>::max(), means, stds);
+          numeric_limits<double>::max());
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -1341,23 +1343,24 @@ void test_tsgenerator() {
       TEST(e == EXIT_FAILURE);
     }
 
-    tie(means, stds) = generator.testCalcRollingMeanStddev(testTimeSeries);
+    generator.testCalcRollingMeanStddev(testTimeSeries);
+    means = generator.getMeans();
+    stds = generator.getStdDevs();
 
     double similarity = generator.testSimilarity(testTimeSeries,
-        topMotifSetPos[0], topMotifSetPos[1], numeric_limits<double>::max(),
-        means, stds);
+        topMotifSetPos[0], topMotifSetPos[1], numeric_limits<double>::max());
     TEST(abs(similarity - testSequencesSimilarty) <= 0.0000001);
 
     similarity = generator.testSimilarity(testTimeSeries, topMotifSetPos[1],
-        topMotifSetPos[2], numeric_limits<double>::max(), means, stds);
+        topMotifSetPos[2], numeric_limits<double>::max());
     TEST(abs(similarity) <= 0.0000001);
 
     similarity = generator.testSimilarity(testTimeSeries, topMotifSetPos[0],
-        topMotifSetPos[2], 0.01, means, stds);
+        topMotifSetPos[2], 0.01);
     TEST(similarity >= 0.01);
 
     similarity = generator.testSimilarity(testTimeSeries, topMotifSetPos[1],
-        topMotifSetPos[1], 0.01, means, stds);
+        topMotifSetPos[1], 0.01);
     TEST(abs(similarity) <= 0.0000001);
 
 
@@ -1388,8 +1391,8 @@ void test_tsgenerator() {
 
     try {
 
-      generator.testSimilarity(testTimeSeries, { 0.0, 0.0 }, topMotifSetMeans[0],
-          topMotifSetStdDevs[0], topMotifSetPos[0],
+      generator.testSimilarity(testTimeSeries, { 0.0, 0.0 },
+          topMotifSetMeans[0], topMotifSetStdDevs[0], topMotifSetPos[0],
           numeric_limits<double>::max());
       TEST(!"Has to throw an error!");
     }
@@ -1411,23 +1414,25 @@ void test_tsgenerator() {
     }
 
     similarity = generator.testSimilarity(testTimeSeries,
-        testMotifSetSubsequences[0], topMotifSetMeans[0], topMotifSetStdDevs[0],
-        topMotifSetPos[1], numeric_limits<double>::max());
+        testMotifSetSubsequences[0], topMotifSetMeans[0],
+        topMotifSetStdDevs[0], topMotifSetPos[1],
+        numeric_limits<double>::max());
     TEST(abs(similarity - testSequencesSimilarty) <= 0.0000001);
 
     similarity = generator.testSimilarity(testTimeSeries,
-        testMotifSetSubsequences[1], topMotifSetMeans[1], topMotifSetStdDevs[1],
-        topMotifSetPos[2], numeric_limits<double>::max());
+        testMotifSetSubsequences[1], topMotifSetMeans[1],
+        topMotifSetStdDevs[1], topMotifSetPos[2],
+        numeric_limits<double>::max());
     TEST(abs(similarity) <= 0.0000001);
 
     similarity = generator.testSimilarity(testTimeSeries,
-        testMotifSetSubsequences[0], topMotifSetMeans[0], topMotifSetStdDevs[0],
-        topMotifSetPos[2], 0.01);
+        testMotifSetSubsequences[0], topMotifSetMeans[0],
+        topMotifSetStdDevs[0], topMotifSetPos[2], 0.01);
     TEST(similarity >= 0.01);
 
     similarity = generator.testSimilarity(testTimeSeries,
-        testMotifSetSubsequences[1], topMotifSetMeans[1], topMotifSetStdDevs[1],
-        topMotifSetPos[1], 0.01);
+        testMotifSetSubsequences[1], topMotifSetMeans[1],
+        topMotifSetStdDevs[1], topMotifSetPos[1], 0.01);
     TEST(abs(similarity) <= 0.0000001);
 
 
@@ -1576,31 +1581,26 @@ void test_tsgenerator() {
 
     //test the search for unintantional matches
     TEST(!generator.testSearchForUnintentionalMatches(testTimeSeries,
-          topMotifSetPos, means, stds, 2 * topMotifSetRange));
+          topMotifSetPos, 2 * topMotifSetRange));
     TEST(generator.testSearchForUnintentionalMatches(testTimeSeries,
-          { topMotifSetPos[0], topMotifSetPos[1] }, means, stds,
-          2 * topMotifSetRange));
+          { topMotifSetPos[0], topMotifSetPos[1] }, 2 * topMotifSetRange));
 
 
     //test the check for larger latent set motifs
     TEST(!generator.testCheckIfThereIsALargerMotifSet(testTimeSeries,
-          topMotifSetPos, means, stds,  topMotifSetRange));
+          topMotifSetPos,  topMotifSetRange));
     TEST(!generator.testCheckIfThereIsALargerMotifSet(testTimeSeries,
-          { topMotifSetPos[0], topMotifSetPos[1], 249 }, means, stds,
+          { topMotifSetPos[0], topMotifSetPos[1], 249 }, topMotifSetRange));
+    TEST(!generator.testCheckIfThereIsALargerMotifSet(testTimeSeries,
+          { topMotifSetPos[0], topMotifSetPos[1], 249, 229 },
           topMotifSetRange));
     TEST(!generator.testCheckIfThereIsALargerMotifSet(testTimeSeries,
-          { topMotifSetPos[0], topMotifSetPos[1], 249, 229 }, means, stds,
+          { topMotifSetPos[0], topMotifSetPos[1], 249, 229, 100 },
           topMotifSetRange));
-    TEST(!generator.testCheckIfThereIsALargerMotifSet(testTimeSeries,
-          { topMotifSetPos[0], topMotifSetPos[1], 249, 229, 100 }, means, stds,
-          topMotifSetRange));
-    vector<double> meansLarger;
-    vector<double> stdsLarger;
-    tie(meansLarger, stdsLarger)
-      = generator.testCalcRollingMeanStddev(testTimeSeriesCheckLargerMotifSet);
+    generator.testCalcRollingMeanStddev(testTimeSeriesCheckLargerMotifSet);
     TEST(generator.testCheckIfThereIsALargerMotifSet(
           testTimeSeriesCheckLargerMotifSet, { 34, 248, topMotifSetPos[1] },
-          meansLarger, stdsLarger, topMotifSetRange));
+          topMotifSetRange));
   }
 
 
@@ -1624,13 +1624,12 @@ void test_tsgenerator() {
             positions_out);
         TEST("Has to run without throwing an error!");
 
-        tie(means, stds)
-          = simGenerator.testCalcRollingMeanStddev(timeSeries_out);
+        simGenerator.testCalcRollingMeanStddev(timeSeries_out);
 
         for (auto &pos0 : positions_out[0])
           for (auto &pos1 : positions_out[0])
             TEST(simGenerator.testSimilarity(timeSeries_out, pos0, pos1,
-                  2 * d_out[0], means, stds) <= 2 * d_out[0]);
+                  2 * d_out[0]) <= 2 * d_out[0]);
 
         TEST(d_out.size() == 2);
         TEST(windowSize_out.size() == 2);
