@@ -1306,6 +1306,62 @@ void test_tsgenerator() {
       TEST(flagMeansStdsTest);
     }
 
+    //test update running sum and sum of square
+    {
+      int pos = 59;
+      vector<double> testSeries(testTimeSeries);
+
+      //compute running sum and sum of square
+      generator.testCalcRunnings(testSeries);
+
+      //change the time series
+      for (int i = pos; i < pos + 20; i++)
+        testSeries[i] = 0;
+
+      //update runnings
+      generator.testUpdateRunnings(testSeries, pos);
+
+      //update runnings again with original time series
+      generator.testUpdateRunnings(testTimeSeries, pos);
+
+      sums = generator.getSums();
+      sumSquares = generator.getSumSquares();
+      flagMeansStdsTest = true;
+
+      if (TEST(testMeans.size() == sums.size())) {
+
+        for (int itr = 0; itr < (int)sums.size(); itr++)
+          if (!(testMeans[itr] - 0.000001 <= sums[itr] * rWindow  &&
+                testMeans[itr] + 0.000001 >= sums[itr] * rWindow)) {
+
+            flagMeansStdsTest = false;
+            break;
+          }
+
+        TEST(flagMeansStdsTest);
+      }
+
+      flagMeansStdsTest = true;
+
+      if (TEST(testStds.size() == sumSquares.size())) {
+
+        for (int itr = 0; itr < (int)sumSquares.size(); itr++) {
+
+          std = sums[itr] * rWindow;
+          std = sqrt(sumSquares[itr] * rWindow - std * std);
+
+          if (!(testStds[itr] - 0.000001 <= std &&
+                testStds[itr] + 0.000001 >= std)) {
+
+            flagMeansStdsTest = false;
+            break;
+          }
+        }
+
+        TEST(flagMeansStdsTest);
+      }
+    }
+
 
     //test the first similarity functions
     try {

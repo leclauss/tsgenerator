@@ -124,15 +124,15 @@ void TSGenerator::calcRunnings(const vector<double> &sequence_in) {
 
   for (int i = 0; i < (int)sequence_in.size() - window; i++) {
 
-    sums[i + 1] += sums[i] - sequence_in[i] + sequence_in[i + window];
+    sums[i + 1] = sums[i] - sequence_in[i] + sequence_in[i + window];
 
-    sumSquares[i + 1] += sumSquares[i] - sequence_in[i] * sequence_in[i]
+    sumSquares[i + 1] = sumSquares[i] - sequence_in[i] * sequence_in[i]
       + sequence_in[i + window] * sequence_in[i + window];
   }
 }
 
-void TSGenerator::updateRunnings(const vector<double> &sequence_in,
-    int pos_in) {
+void TSGenerator::updateRunnings(const vector<double> &sequence_in, const int
+    pos_in) {
 
   int start = pos_in - window + 1;
   int end = pos_in + window - 1;
@@ -159,10 +159,10 @@ void TSGenerator::updateRunnings(const vector<double> &sequence_in,
   // update all changed runnings
   for (int i = start - 1; i < end; i++) {
 
-    sums[i + 1] += sums[i] - sequence_in[i] + sequence_in[i + window];
+    sums[i + 1] = sums[i] - sequence_in[i] + sequence_in[i + window];
 
-    sumSquares[i + 1] += sumSquares[i] + sequence_in[i + window]
-      * sequence_in[i + window] - sequence_in[i] * sequence_in[i];
+    sumSquares[i + 1] = sumSquares[i] + sequence_in[i + window] * sequence_in[i
+      + window] - sequence_in[i] * sequence_in[i];
   }
 }
 

@@ -1640,16 +1640,31 @@ public:
   }
 
   // --------------------------------------------------------------------------
+  ///\brief Runs the running sum and sum of square function.
+  ///
+  ///\param [in] &sequence_in Hands over the sequence.
+  ///
+  ///This function runs the running sum and sum of square function since the
+  ///function is protected.
+  // --------------------------------------------------------------------------
+  void testCalcRunnings(const vector<double> &sequence_in) {
+
+    calcRunnings(sequence_in);
+  }
+
+  // --------------------------------------------------------------------------
   ///\brief Runs the mean and variance function.
   ///
-  ///\param [in] &timeSeries_in Time series to calculate the mean and variance.
+  ///\param [in] &sequence_in Hands over the sequence.
+  ///\param [in] pos_in Hands over the position of changed subsequence.
   ///
-  ///This function runs the mean and variance function since the mean and
-  ///variance function is protected.
+  ///This function runs the update running sum and sum of square function since
+  ///the function is protected.
   // --------------------------------------------------------------------------
-  void testCalcRunnings(const vector<double> &timeSeries_in) {
+  void testUpdateRunnings(const vector<double> &sequence_in, const int pos_in)
+    {
 
-    calcRunnings(timeSeries_in);
+    updateRunnings(sequence_in, pos_in);
   }
 
   // --------------------------------------------------------------------------

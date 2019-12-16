@@ -227,7 +227,7 @@ protected:
   ///This function updates the running sum and sum of squares of a sequence at
   ///a specific location.
   // --------------------------------------------------------------------------
-  void updateRunnings(const vector<double> &timeSeries_in, int
+  void updateRunnings(const vector<double> &timeSeries_in, const int
       pos_in);
 
   // --------------------------------------------------------------------------
