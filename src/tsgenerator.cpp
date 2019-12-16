@@ -103,7 +103,7 @@ TSGenerator::~TSGenerator() { }
 
 void TSGenerator::calcRunnings(const vector<double> &sequence_in) {
 
-  // obtain running mean and variance
+  // obtain running sum and sum of square
   if (!sums.empty() || !sumSquares.empty()) {
 
     sums.clear();
@@ -708,38 +708,37 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   window_out.push_back(motifCenter.size());
 
 
-  //calculate the subsequences of the motif set
+  //inject sequences into the time series
   for (int motifItr = 0; motifItr < size; motifItr++) {
 
-    //calculate the random position in the synthetic time series
+    //compute the random position for the subsequence
     position = freePositions.calculateRandomPosition();
 
     motifPositions_out[0].push_back(position);
 
-    //check if all motif set subsequences are in range smaller than r / 2.0
+    //try to inject another sequence
     while (retryItr < length + 100) {
 
-      //copy the motif set center subsequence ...
+      //copy another motif sequence ...
       vector<double> newSubsequence(motifCenter);
 
-      //... and add noise
+      //... with noise
       if (noise > 0.0)
         for (auto& value : newSubsequence)
           value += distribution(randomEngine);
 
-      //check if the similarity of the subsequence and the center subsequence
-      //is at most d / 2.0
+      //check if the sequence is within range d / 2.0 of the center
       if (similarity(motifCenter, newSubsequence, d / 2.0) < d / 2.0) {
 
-        //backup subsequence
+        //backup subsequence at position
         for (int i = 0; i < window; i++)
           subsequence[i] = timeSeries_out[position + i];
 
-        //add subsequence to synthetic time series
+        //inject sequence into the time series
         for (int i = 0; i < window; i++)
           timeSeries_out[i + position] = subsequence[0] + newSubsequence[i];
 
-        //update the running mean and variance
+        //update the running sum and sum of square
         updateRunnings(timeSeries_out, position);
 
         if (!searchForUnintentionalMatches(timeSeries_out,
@@ -763,13 +762,6 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
 
           motifPositions_out[0].back() = position;
         }
-      }
-      else {
-
-        noise -= noise / 100.0;
-
-        if (noise < numeric_limits<double>::min())
-          noise = 0.0;
       }
 
       if (retryItr == length + 100 - 1) {
