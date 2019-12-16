@@ -42,6 +42,11 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
  sudo apt-get install gnuplot
  ```
 
+7. Download and install [GCC](https://gcc.gnu.org/ "GNU Compiler Collection") version 8 if your gcc version is smaller.
+ ```bash
+ sudo apt-get install gcc-8 g++-8
+ ```
+
 **Windows:**
 
 1. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website"). Make sure you add Graphviz to the system path.
@@ -112,9 +117,15 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
  cd "build"
  ```
 
-3. Create the TSGenerator project with CMake and build the project by executing [GNU Make](https://www.gnu.org/software/make/ "GNU Make website").
+3. Create the TSGenerator project with CMake and build the project by executing
+   [GNU Make](https://www.gnu.org/software/make/ "GNU Make website"). If your default [GCC](https://gcc.gnu.org/ "GNU Compiler Collection") is at least version 8 just build the project with
  ```bash
  cmake ..
+ make
+ ```
+ otherwise specify your [GCC](https://gcc.gnu.org/ "GNU Compiler Collection") explicitlya.
+ ```bash
+ CXX=g++-8 CC=Gcc-8 cmake ..
  make
  ```
 
