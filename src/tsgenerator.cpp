@@ -703,6 +703,8 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   //declaration stuff
   int position;
   int retryItr = 0;
+  double value;
+  double min, max;
 
   window_out.push_back(motifCenter.size());
 
@@ -733,9 +735,33 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
         for (int i = 0; i < window; i++)
           subsequence[i] = timeSeries_out[position + i];
 
+        value = subsequence[0];
+
+        //make sure we are in maxi when maxi can handle the motif height
+        if (abs(height) <= 2 * maxi) {
+
+          max = newSubsequence[0];
+          min = max;
+
+          for (int i = 0; i < window; i++) {
+
+            if (newSubsequence[i] < min)
+              min = newSubsequence[i];
+
+            if (newSubsequence[i] > max)
+              max = newSubsequence[i];
+          }
+
+          if (value + max > maxi)
+            value = maxi - max;
+
+          if (value - min < -maxi)
+            value = -maxi - min;
+        }
+
         //inject sequence into the time series
         for (int i = 0; i < window; i++)
-          timeSeries_out[i + position] = subsequence[0] + newSubsequence[i];
+          timeSeries_out[i + position] = value + newSubsequence[i];
 
         //update the running sum and sum of square
         updateRunnings(timeSeries_out, position);

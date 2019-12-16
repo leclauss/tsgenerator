@@ -41,12 +41,12 @@ void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
   //add the remaining values
   for (int i = 1; i < length_in; i++) {
 
-    value += delta_in * distribution(randomEngine) - 2 * delta_in;
+    value = delta_in * distribution(randomEngine) - 2 * delta_in;
 
     if (noise_in / 2.0 > 0.0)
       value += distributionNoise(randomEngine);
 
-    timeSeries_out.push_back(value);
+    timeSeries_out.push_back(timeSeries_out[i - 1] + value);
   }
 }
 
@@ -75,12 +75,12 @@ void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
   //add the remaining values
   for (int i = 1; i < length_in; i++) {
 
-    value += distribution(randomEngine);
+    value = distribution(randomEngine);
 
     if (noise_in / 2.0 > 0.0)
       value += distributionNoise(randomEngine);
 
-    timeSeries_out.push_back(value);
+    timeSeries_out.push_back(timeSeries_out[i - 1] + value);
   }
 }
 
@@ -110,13 +110,15 @@ void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
   //add the remaining values
   for (int i = 1; i < length_in; i++) {
 
+    value = 0.0;
+
     if (delta_in > 0.0)
       value += distribution(randomEngine);
 
     if (noise_in / 2.0 > 0.0)
       value += distributionNoise(randomEngine);
 
-    timeSeries_out.push_back(value);
+    timeSeries_out.push_back(timeSeries_out[i - 1] + value);
   }
 }
 
@@ -244,6 +246,8 @@ void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
 
   //add the remaining values
   for (int i = 1; i < length_in; i++) {
+
+    value = 0.0;
 
     if (delta_in > 0.0)
       value += distribution(randomEngine);
