@@ -650,7 +650,8 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   double mean;
   double stdDev;
   double d;
-  normal_distribution<double> distribution(0.0, noise);
+  normal_distribution<double> distribution(0.0, noise <= 0.0
+      ? numeric_limits<double>::min() : noise);
 
   do {
 
@@ -672,11 +673,9 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
     //dimentional room of subsequence values
     calculateSubsequence(motifCenter, type, height);
 
-    if (noise > 0.0) {
-
+    if (noise > 0.0)
       for (auto& value : motifCenter)
         value += distribution(randomEngine);
-    }
 
     mean = 0.0;
     stdDev = 0.0;
