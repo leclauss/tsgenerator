@@ -1205,12 +1205,13 @@ void test_tsgenerator() {
 
     double mean;
     double stdDev;
+    double rWindow = 0.1;
 
     generator.setWindow(10);
 
     try {
 
-      generator.testMeanVariance({}, 0, mean, stdDev);
+      generator.testMeanStdDev({}, mean, stdDev);
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -1218,106 +1219,88 @@ void test_tsgenerator() {
       TEST(e == EXIT_FAILURE);
     }
 
-    try {
-
-      generator.testMeanVariance({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-          0.0, 0.0 }, 1, mean, stdDev);
-      TEST(!"Has to throw an error!");
-    }
-    catch (int e) {
-
-      TEST(e == EXIT_FAILURE);
-    }
-
-    try {
-
-      generator.testMeanVariance({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-          0.0 }, 0, mean, stdDev);
-      TEST(!"Has to throw an error!");
-    }
-    catch (int e) {
-
-      TEST(e == EXIT_FAILURE);
-    }
-
-    generator.testMeanVariance({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0 }, 0, mean, stdDev);
-    stdDev = sqrt(stdDev);
+    generator.testMeanStdDev({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0 }, mean, stdDev);
     TEST(mean <= numeric_limits<double>::min() && mean >=
         -numeric_limits<double>::min());
     TEST(stdDev == 1.0);
 
-    generator.testMeanVariance({ 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,
-        3.0 }, 0, mean, stdDev);
-    stdDev = sqrt(stdDev);
+    generator.testMeanStdDev({ 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,
+        3.0 }, mean, stdDev);
     TEST(mean <= 3.0 + numeric_limits<double>::min() && mean >= 3.0
         - numeric_limits<double>::min());
     TEST(stdDev == 1.0);
 
-    generator.testMeanVariance({ 3.0, -3.0, 1.75, 9.0, 33.0, 3.101, 0.03,
-        3.99999, 4.23, -7.093 }, 0, mean, stdDev);
-    stdDev = sqrt(stdDev);
+    generator.testMeanStdDev({ 3.0, -3.0, 1.75, 9.0, 33.0, 3.101, 0.03,
+        3.99999, 4.23, -7.093 }, mean, stdDev);
     TEST(mean <= 4.801799 + 0.0000001 && mean >= 4.801799 - 0.0000001);
     TEST(stdDev <= 10.2679615 + 0.0000001 && stdDev >= 10.2679615 - 0.0000001);
 
+    rWindow = 0.05;
     generator.setWindow(20);
-    generator.testMeanVariance(testTimeSeries, topMotifSetPos[0], mean,
-        stdDev);
-    stdDev = sqrt(stdDev);
+    vector<double> subsequence(testTimeSeries.begin() + topMotifSetPos[0],
+        testTimeSeries.begin() + topMotifSetPos[0] + 20);
+    generator.testMeanStdDev(subsequence, mean, stdDev);
     TEST(mean <= topMotifSetMeans[0] + 0.0000001 && mean >= topMotifSetMeans[0]
         - 0.0000001);
     TEST(stdDev <= topMotifSetStdDevs[0] + 0.0000001 && stdDev >=
         topMotifSetStdDevs[0] - 0.0000001);
 
-    generator.testMeanVariance(testTimeSeries, topMotifSetPos[1], mean,
-        stdDev);
-    stdDev = sqrt(stdDev);
+    vector<double> subsequence1(testTimeSeries.begin() + topMotifSetPos[1],
+        testTimeSeries.begin() + topMotifSetPos[1] + 20);
+    generator.testMeanStdDev(subsequence1, mean, stdDev);
     TEST(mean <= topMotifSetMeans[1] + 0.0000001 && mean >= topMotifSetMeans[1]
         - 0.0000001);
     TEST(stdDev <= topMotifSetStdDevs[1] + 0.0000001 && stdDev >=
         topMotifSetStdDevs[1] - 0.0000001);
 
-    generator.testMeanVariance(testTimeSeries, topMotifSetPos[2], mean,
-        stdDev);
-    stdDev = sqrt(stdDev);
+    vector <double> subsequence2(testTimeSeries.begin() + topMotifSetPos[2],
+        testTimeSeries.begin() + topMotifSetPos[2] + 20);
+    generator.testMeanStdDev(subsequence2, mean, stdDev);
     TEST(mean <= topMotifSetMeans[2] + 0.0000001 && mean >= topMotifSetMeans[2]
         - 0.0000001);
     TEST(stdDev <= topMotifSetStdDevs[2] + 0.0000001 && stdDev >=
         topMotifSetStdDevs[2] - 0.0000001);
 
 
-    //test running mean and variance
-    vector<double> means;
-    vector<double> variances;
+    //test running sum and sum of squares
+    vector<double> sums;
+    vector<double> sumSquares;
     double std;
     bool flagMeansStdsTest = true;
 
     generator.testCalcRunnings(testTimeSeries);
-    means = generator.getMeans();
-    variances = generator.getVariances();
+    sums = generator.getSums();
+    sumSquares = generator.getSumSquares();
 
-    if (TEST(testMeans.size() == means.size())) {
+    if (TEST(testMeans.size() == sums.size())) {
 
-      for (int itr = 0; itr < (int)means.size(); itr++)
-        if (!(testMeans[itr] - 0.000001 <= means[itr] && testMeans[itr]
-              + 0.000001 >= means[itr]))
+      for (int itr = 0; itr < (int)sums.size(); itr++)
+        if (!(testMeans[itr] - 0.000001 <= sums[itr] * rWindow  &&
+              testMeans[itr] + 0.000001 >= sums[itr] * rWindow)) {
+
           flagMeansStdsTest = false;
+          break;
+        }
 
       TEST(flagMeansStdsTest);
     }
 
     flagMeansStdsTest = true;
 
-    if (TEST(testStds.size() == variances.size())) {
+    if (TEST(testStds.size() == sumSquares.size())) {
 
-      for (int itr = 0; itr < (int)variances.size(); itr++) {
+      for (int itr = 0; itr < (int)sumSquares.size(); itr++) {
 
-        std = testStds[itr];
-        std = std * std < 1.0 ? 1.0 : std * std;
+        std = sums[itr] * rWindow;
+        std = sqrt(sumSquares[itr] * rWindow - std * std);
 
-        if (!(std - 0.000001 <= variances[itr] && std + 0.000001 >=
-            variances[itr]))
+        if (!(testStds[itr] - 0.000001 <= std &&
+              testStds[itr] + 0.000001 >= std)) {
+
           flagMeansStdsTest = false;
+          break;
+        }
       }
 
       TEST(flagMeansStdsTest);
@@ -1450,7 +1433,8 @@ void test_tsgenerator() {
 
 
     //test calculate raw subsequence
-    vector<double> subsequence;
+    subsequence.clear();
+    subsequence.resize(0);
 
     generator.testCalculateSubsequence(subsequence, 0, 5.0);
     TEST(subsequence.size() == 20);
@@ -1583,12 +1567,12 @@ void test_tsgenerator() {
 
 
     generator.testCalculateSubsequence(subsequence, 1, 10.0);
-    generator.testMeanVariance(subsequence, 0, mean, stdDev);
+    generator.testMeanStdDev(subsequence, mean, stdDev);
     vector<double> sequenceTwo;
     double meanTwo;
     double stdDevTwo;
     generator.testCalculateSubsequence(sequenceTwo, 7, 10.0);
-    generator.testMeanVariance(sequenceTwo, 0, meanTwo, stdDevTwo);
+    generator.testMeanStdDev(sequenceTwo, meanTwo, stdDevTwo);
     TEST(mean != meanTwo);
 
 

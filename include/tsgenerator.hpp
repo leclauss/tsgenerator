@@ -168,18 +168,18 @@ protected:
   BaseTS baseTS;
 
   // --------------------------------------------------------------------------
-  ///\brief Running mean.
+  ///\brief Running sum.
   ///
-  ///This variable stores the running mean of the time series.
+  ///This variable stores the running sum of the time series.
   // --------------------------------------------------------------------------
-  vector<double> means;
+  vector<double> sums;
 
   // --------------------------------------------------------------------------
-  ///\brief Running variance.
+  ///\brief Running sum of squares.
   ///
-  ///This variable stores the running variance of the time series.
+  ///This variable stores the running sum of squares of the time series.
   // --------------------------------------------------------------------------
-  vector<double> variances;
+  vector<double> sumSquares;
 
   // --------------------------------------------------------------------------
   ///\brief This list contains all motif types.
@@ -209,88 +209,82 @@ protected:
 
 
   // --------------------------------------------------------------------------
-  ///\brief Calculates the running mean and variance of a time series.
+  ///\brief Calculates the running sum and sum of squares of a sequence.
   ///
-  ///\param [in] &timeSeries_in Hands over the time series.
+  ///\param [in] &sequence_in Hands over the sequence.
   ///
-  ///This function calculates the rolling mean and variance of a time series.
-  ///The output tuple contains the means and variance.
+  ///This function computes the running sum and sum of squares of a time
+  ///series.
   // --------------------------------------------------------------------------
-  void calcRunnings(const vector<double> &timeSeries_in);
+  void calcRunnings(const vector<double> &sequence_in);
 
   // --------------------------------------------------------------------------
-  ///\brief Update the running mean and variance of a time series.
+  ///\brief Update the running sum and sum of squares of a sequence.
   ///
-  ///\param [in] &timeSeries_in Hands over the time series.
+  ///\param [in] &sequence_in Hands over the sequence.
   ///\param [in] pos_in Hands over the position of the injected subsequence.
   ///
-  ///This function updates the rolling mean and variance of a time series at a
-  ///specific location.
+  ///This function updates the running sum and sum of squares of a sequence at
+  ///a specific location.
   // --------------------------------------------------------------------------
   void updateRunnings(const vector<double> &timeSeries_in, int
       pos_in);
 
   // --------------------------------------------------------------------------
-  ///\brief Calculates the similarity of two time series.
+  ///\brief Computes the similarity of two subsequences in a sequence.
   ///
-  ///\param [in] &timeSeriesOne_in Hands over the time series.
-  ///\param [in] subsequenceOnePos_in Hands over the position of the first
-  ///subsequence in the time series.
-  ///\param [in] subsequenceTwoPos_in Hands over the position of the second
-  ///subsequence in the time series.
+  ///\param [in] &sequence_in Hands over the sequence.
+  ///\param [in] pos0_in Hands over the position of the first subsequence.
+  ///\param [in] pos1_in Hands over the position of the second subsequence.
   ///\param [in] bestSoFar_in Hands over the best similarity so far.
   ///
-  ///\return The similarity of the two z-normalized time series.
+  ///\return The similarity of the two z-normalized subsequences.
   ///
-  ///This function calculates the similarity of two time series. Therefore, the
-  ///time series are first z-normalized and the Euclidean Distance is
-  ///calculated. The return value is the similarity of the two z-normalized
-  ///time series.
+  ///This function computes the similarity of two subsequences. Therefore, the
+  ///subsequences are first z-normalized and the Euclidean Distance is
+  ///computed. The return value is the similarity of the two z-normalized
+  ///subsequences.
   // --------------------------------------------------------------------------
-  double similarity(const vector<double> &timeSeries_in, const int
-      subsequenceOnePos_in, const int subsequenceTwoPos_in, const double
-      bestSoFar_in);
+  double similarity(const vector<double> &sequence_in, const int pos0_in, const
+      int pos1_in, const double bestSoFar_in);
 
   // --------------------------------------------------------------------------
-  ///\brief Calculates the mean and variance.
+  ///\brief Computes the mean and standard deviation of a sequence.
   ///
-  ///\param [in] &timeSeries_in Time series to calculate the mean and standard
-  ///deviation.
-  ///\param [in] subsequencePos_in Hands over the position of the subsequence
-  ///in the time series.
-  ///\param [out] &mean_out The mean of the time series.
-  ///\param [out] &variance_out The variance of the time series.
+  ///\param [in] &sequence_in Hands over the sequence.
+  ///\param [out] &mean_out The mean of the sequence.
+  ///\param [out] &stdDev_out The standard deviation of the sequence.
   ///
-  ///This function calculates the mean and variance.
+  ///This function calculates the mean and standard deviation of a sequence.
   // --------------------------------------------------------------------------
-  void meanVariance(const vector<double> &timeSeries_in, const int
-      subsequencePos_in, double &mean_out, double &variance_out);
+  void meanStdDev(const vector<double> &sequence_in, double &mean_out, double
+      &variance_out);
 
   // --------------------------------------------------------------------------
-  ///\brief Calculates the similarity of two time series.
+  ///\brief Computes the similarity of a sequence and a subsequence in the time
+  ///series.
   ///
-  ///\param [in] &timeSeriesOne_in Hands over the time series.
-  ///\param [in] &subsequenceOne_in Hands over the first subsequence in the
-  ///time series.
-  ///\param [in] meanOne_in Hands over the mean of timeSeriesOne_in.
-  ///\param [in] varianceOne_in Hands over the variance of timeSeriesOne_in.
-  ///\param [in] subsequenceTwoPos_in Hands over the position of the second
-  ///subsequence in the time series.
+  ///\param [in] &timeSeries_in Hands over the time series.
+  ///\param [in] &sequence_in Hands over the sequence.
+  ///\param [in] mean_in Hands over the mean of sequence_in.
+  ///\param [in] stdDev_in Hands over the standard deviation of sequence_in.
+  ///\param [in] pos_in Hands over the position of the subsequence in the time
+  ///series.
   ///\param [in] bestSoFar_in Hands over the best similarity so far.
   ///
-  ///\return The similarity of the two z-normalized time series.
+  ///\return The similarity of the two z-normalized sequence and subsequence.
   ///
-  ///This function calculates the similarity of two time series. Therefore, the
-  ///time series are first z-normalized and the Euclidean Distance is
-  ///calculated. The return value is the similarity of the two z-normalized
-  ///time series.
+  ///This function computes the similarity of a sequence and a subsequence in
+  ///the time series. Therefore, the sequence and the subsequence are first
+  ///z-normalized and the Euclidean Distance is computed. The return value is
+  ///the similarity of the z-normalized sequence and subsequence.
   // --------------------------------------------------------------------------
   double similarity(const vector<double> &timeSeries_in, const vector<double>
-      &subsequenceOne_in, const double meanOne_in, const double varianceOne_in,
-      const int subsequenceTwoPos_in, const double bestSoFar_in);
+      &subsequence_in, const double mean_in, const double stdDev_in, const int
+      pos_in, const double bestSoFar_in);
 
   // --------------------------------------------------------------------------
-  ///\brief Calculates the similarity of two time series.
+  ///\brief Computes the similarity of two sequences.
   ///
   ///\param [in] &sequence0_in Hands over the first sequence.
   ///\param [in] &sequence1_in Hands over the second sequence.
@@ -298,7 +292,7 @@ protected:
   ///
   ///\return The similarity of the two z-normalized sequences.
   ///
-  ///This function calculates the similarity of two sequences. Therefore, the
+  ///This function computes the similarity of two sequences. Therefore, the
   ///sequences are first z-normalized and the Euclidean Distance is computed.
   ///The return value is the similarity of the two z-normalized sequneces.
   // --------------------------------------------------------------------------
@@ -306,14 +300,14 @@ protected:
       &sequence1_in, const double bestSoFar_in);
 
   // --------------------------------------------------------------------------
-  ///\brief Calculates a motif set subsequence.
+  ///\brief Computes a motif set subsequence.
   ///
   ///\param [out] subsequence_out Hands over the calculated raw subsequence.
   ///\param [in] type_in Hands over the motif set type.
   ///\param [in] height_in Hands over the height of the subsequence.
   ///
-  ///This function calculates a motif set subsequence according to the motif
-  ///set type, height and window size. Attention! The range is random and the
+  ///This function computes a motif set subsequence according to the motif
+  ///type, height and window size. Attention! The range is random and the
   ///subsequence is not added to the synthetic time series.
   // --------------------------------------------------------------------------
   void calculateSubsequence(vector<double> &subsequence_out, int type_in,
