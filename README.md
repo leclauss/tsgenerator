@@ -125,7 +125,7 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
  ```
  otherwise specify your [GCC](https://gcc.gnu.org/ "GNU Compiler Collection") explicitlya.
  ```bash
- CXX=g++-8 CC=Gcc-8 cmake ..
+ CXX=g++-8 CC=gcc-8 cmake ..
  make
  ```
 
