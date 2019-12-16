@@ -49,9 +49,13 @@ bool check_if_float(const string string_in) {
 
 void parseArgs(int argc, char **argv, vector<string> &argTokens) {
 
-  for (int i = 0; i < argc; i++)
-    if (string(argv[i]) != "")
-      argTokens.push_back(string(argv[i]));
+  for (int i = 0; i < argc; i++) {
+
+    string token(argv[i]);
+
+    if (token != "")
+      argTokens.push_back(token);
+  }
 }
 
 bool checkArg(vector<string> &argTokens, const string arg_in, vector<string>

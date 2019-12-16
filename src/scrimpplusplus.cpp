@@ -17,7 +17,7 @@
 void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     &pos1_out, int windowSize_in, double stepSize_in)
 {
-  auto g = std::default_random_engine(random_device().entropy()
+  auto g = default_random_engine(random_device().entropy()
     ? random_device()()
     : chrono::system_clock::now().time_since_epoch().count());
 
@@ -66,12 +66,12 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     ASigma.push_back(sqrt(ASigmaSq[i]));
 
   //Initialize Matrix Profile and Matrix Profile Index
-  double* profile = new double[ProfileLength];
-  int* profileIndex = new int[ProfileLength];
+  vector <double> profile;
+  vector <int> profileIndex;
   for (int i=0; i<ProfileLength; i++)
   {
-    profile[i]=std::numeric_limits<double>::infinity();
-    profileIndex[i]=0;
+    profile.push_back(numeric_limits<double>::infinity());
+    profileIndex.push_back(0);
   }
 
   //int fftsize = pow(2,ceil(log2(timeSeriesLength)));
@@ -99,6 +99,7 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
   plan = fftw_plan_dft_1d(fftsize, ATime, AFreq, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute(plan);
   fftw_free(ATime);
+  fftw_destroy_plan(plan);
 
   fftw_complex* queryTime = (fftw_complex*)fftw_malloc(sizeof(fftw_complex)
       * fftsize);
@@ -111,12 +112,12 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
 
   //Sample subsequences with a fixed stepSize, then random shuffle their
   //computation order
-  std::vector<int> idx;
+  vector<int> idx;
   for (int i = 0; i < timeSeriesLength - windowSize + 1; i += stepSize)
     idx.push_back(i);
-  std::shuffle(idx.begin(), idx.end(), g);
+  shuffle(idx.begin(), idx.end(), g);
 
-  double* query = new double[windowSize];
+  vector<double> query(windowSize);
 
   for (int idx_i = 0; idx_i < (int) idx.size(); idx_i++)
   {
@@ -141,6 +142,7 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     plan = fftw_plan_dft_1d(fftsize, queryTime, queryFreq, FFTW_FORWARD,
         FFTW_ESTIMATE);
     fftw_execute(plan);
+    fftw_destroy_plan(plan);
 
     for (int j = 0; j < fftsize; j++)
     {
@@ -153,16 +155,17 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     plan = fftw_plan_dft_1d(fftsize, AQueryFreq, AQueryTime, FFTW_BACKWARD,
         FFTW_ESTIMATE);
     fftw_execute(plan);
+    fftw_destroy_plan(plan);
 
     int exclusionZoneStart = i - exclusionZone;
     int exclusionZoneEnd = i + exclusionZone;
-    double minimumDistance = std::numeric_limits<double>::infinity();
+    double minimumDistance = numeric_limits<double>::infinity();
     int minimumDistanceIndex;
     for (int j = 0; j < timeSeriesLength - windowSize + 1; j++)
     {
       double distance;
       if ((j > exclusionZoneStart) && (j < exclusionZoneEnd))
-        distance = std::numeric_limits<double>::infinity();
+        distance = numeric_limits<double>::infinity();
       else
       {
         distance = 2 * (windowSize - (AQueryTime[windowSize + j - 1][0]
@@ -229,7 +232,6 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     }
   }
 
-  fftw_destroy_plan(plan);
   fftw_free(AFreq);
   fftw_free(queryTime);
   fftw_free(queryFreq);
@@ -243,9 +245,9 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
   idx.clear();
   for (int i = exclusionZone+1; i < ProfileLength; i++)
     idx.push_back(i);
-  std::shuffle(idx.begin(), idx.end(), g);
+  shuffle(idx.begin(), idx.end(), g);
 
-  double* dotproduct = new double[timeSeriesLength];
+  vector<double> dotproduct(timeSeriesLength);
 
   //iteratively evaluate the diagonals of the distance matrix
   for (int ri = 0; ri < (int) idx.size(); ri++)
@@ -306,7 +308,7 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     }
   }
 
-  double ssf = std::numeric_limits<double>::infinity();
+  double ssf = numeric_limits<double>::infinity();
   // Write final Matrix Profile and Matrix Profile Index to file.
   for (int i = 0; i < timeSeriesLength - windowSize + 1; i++)
   {
@@ -319,7 +321,5 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     }
   }
 
-  delete [] dotproduct;
-  delete [] profile;
-  delete [] profileIndex;
+  fftw_cleanup();
 }

@@ -825,14 +825,11 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   d_out.push_back(d / 2.0);
 
 
-cout << "in" << endl;
   //add top motif pair to output
   positionOne = 0;
   positionTwo = 0;
 
-cout << "length: " << timeSeries_out.size() << endl;
   scrimpPP(timeSeries_out, positionOne, positionTwo, window);
-cout << "scrimp pass" << endl;
   d = similarity(timeSeries_out, positionOne, positionTwo,
       numeric_limits<double>::max());
   d_out.push_back(d);
@@ -841,6 +838,5 @@ cout << "scrimp pass" << endl;
   motifPositions_out[1].push_back(positionTwo);
 
   window_out.push_back(window);
-cout << "out" << endl;
 }
 
