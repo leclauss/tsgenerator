@@ -23,7 +23,7 @@ using namespace std;
 ///\brief This class represents the BaseTS.
 ///
 ///The BaseTS is a collection of generation methods for random time series
-///without injecting any motifs.
+///withouat injecting any motifs.
 // --------------------------------------------------------------------------
 class BaseTS {
 
@@ -105,6 +105,28 @@ public:
   void normalRandomWalk(vector<double> &timeSeries_out, int length_in, double
       start_in, double delta_in, double noise_in);
 
+  ///\brief Generates a random syntheteic time series.
+  ///
+  ///\param [out] &timeSeries_out Hands over the random synthetic time series.
+  ///\param [in] length_in Hands over the length of the time series.
+  ///\param [in] start_in Hands over the start value of the time series.
+  ///\param [in] delta_in Hands over the average maximal difference between two
+  ///consecutive values in the time series.
+  ///\param [in] step_in Hands over the step size.
+  ///\param [in] noise_in Hands over the noise option.
+  ///
+  ///This function generates a random synthetic time series by performing the
+  ///extended random walk. The noise is a value between -noise_in / 2 and
+  ///noise_in /2. The I(i+1)th value v_{I(i+1)} of the time series is an normal
+  ///distributed value between v_{I(i)} - delta_in and v_{I(i)} + delta_in with
+  ///+- noise_in / 2 noise. The step size tells the function to generate
+  ///a random next value v_{I(i+1)} poisson distributed difference I(i+1)
+  ///- I(i) with mean step_in. Values with indices j, I(i) < j < I(i+1), are
+  ///linear approximated.
+  // --------------------------------------------------------------------------
+  void linearRandomWalk(vector<double> &timeSeries_out, int length_in, double
+      start_in, double delta_in, double step_in, double noise_in);
+
   ///\brief The simple random walk method.
   ///
   ///\param [out] &timeSeries_out Hands over the random synthetic time series.
@@ -164,6 +186,31 @@ public:
   // --------------------------------------------------------------------------
   void normalRandomWalk(vector<double> &timeSeries_out, int length_in, double
       start_in, double delta_in, double maxi_in, double noise_in);
+
+  ///\brief Generates a random syntheteic time series.
+  ///
+  ///\param [out] &timeSeries_out Hands over the random synthetic time series.
+  ///\param [in] length_in Hands over the length of the time series.
+  ///\param [in] start_in Hands over the start value of the time series.
+  ///\param [in] delta_in Hands over the average maximal difference between two
+  ///consecutive values in the time series.
+  ///\param [in] maxi_in Hands over the maximum absolut value.
+  ///\param [in] step_in Hands over the step size.
+  ///\param [in] noise_in Hands over the noise option.
+  ///
+  ///This function generates a random synthetic time series by performing the
+  ///extended random walk. The noise is a value between -noise_in / 2 and
+  ///noise_in /2. The i+1th value v_{i+1} of the time series is an normal
+  ///distributed value between v_i - delta_in and v_i + delta_in with +-
+  ///noise_in / 2 noise. The step size tells the function to generate a random
+  ///next value v_{I(i+1)} poisson distributed difference I(i+1) - I(i) with
+  ///mean step_in. Values with indices j, I(i) < j < I(i+1), are linear
+  ///approximated. The maxi_in option makes sure that the absolute value of
+  ///a times series value without noise is at most maxi_in.
+  // --------------------------------------------------------------------------
+  void linearRandomWalk(vector<double> &timeSeries_out, int length_in, double
+      start_in, double delta_in, double step_in, double maxi_in, double
+      noise_in);
 
   ///\brief Generates a random syntheteic time series.
   ///

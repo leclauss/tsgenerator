@@ -58,6 +58,7 @@ int main(int argc, char *argv[]) {
     int size = 3;
     double height = 10.0;
     double start = 0.0;
+    double step = 1.0;
     double maxi = 20.0;
     string method("boundedNormalRandomWalk");
 
@@ -183,7 +184,7 @@ int main(int argc, char *argv[]) {
         height = stoll(payload[0]);
       }
 
-      if (checkArg(argTokens, "-st", payload) || checkArg(argTokens,
+      if (checkArg(argTokens, "-sta", payload) || checkArg(argTokens,
             "--start", payload)) {
 
         if (payload.empty()) {
@@ -199,6 +200,36 @@ int main(int argc, char *argv[]) {
         }
 
         start = stoll(payload[0]);
+      }
+
+      if (checkArg(argTokens, "-ste", payload) || checkArg(argTokens,
+            "--step", payload)) {
+
+        if (payload.empty()) {
+
+          cerr << "ERROR: Step is missing an argument." << endl;
+          exit(EXIT_FAILURE);
+        }
+
+        if (!check_if_float(payload[0])) {
+
+          cerr << "ERROR: " << payload[0] << " is not a valid float!" << endl;
+          throw(EXIT_FAILURE);
+        }
+
+        start = stoll(payload[0]);
+      }
+
+      if (checkArg(argTokens, "-me", payload) || checkArg(argTokens,
+            "--Method", payload)) {
+
+        if (payload.empty()) {
+
+          cerr << "ERROR: Type is missing an argument." << endl;
+          exit(EXIT_FAILURE);
+        }
+
+        method = payload[0];
       }
 
       if (checkArg(argTokens, "-ma", payload) || checkArg(argTokens,
@@ -219,18 +250,6 @@ int main(int argc, char *argv[]) {
         maxi = stoll(payload[0]);
       }
 
-      if (checkArg(argTokens, "-me", payload) || checkArg(argTokens,
-            "--Method", payload)) {
-
-        if (payload.empty()) {
-
-          cerr << "ERROR: Type is missing an argument." << endl;
-          exit(EXIT_FAILURE);
-        }
-
-        method = payload[0];
-      }
-
 
       //generate the time series
       vector<double> timeSeries;
@@ -238,7 +257,7 @@ int main(int argc, char *argv[]) {
       vector<int> windows;
       vector<vector<int>> motifPositions;
       TSGenerator tSGenerator(length, window, delta, noise, type, size, height,
-          start, method, maxi);
+          start, step, method, maxi);
       tSGenerator.run(timeSeries, dVector, windows, motifPositions);
 
       //output stuff

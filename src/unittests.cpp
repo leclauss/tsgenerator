@@ -375,7 +375,7 @@ void test_basets() {
   baseTS.simpleRandomWalk(ts, 0, 10.0, 1.0, 0.1);
   TEST(ts.size() == 0);
 
-  //realRandomWalk
+  //real random walk
   baseTS.realRandomWalk(ts, 100, 0.0, 1.0, 0.0);
   TEST(ts.size() == 100);
   TEST(ts[0] == 0.0);
@@ -387,7 +387,7 @@ void test_basets() {
   baseTS.realRandomWalk(ts, 0, 10.0, 1.0, 0.1);
   TEST(ts.size() == 0);
 
-  //normalRandomWalk
+  //normal random walk
   baseTS.normalRandomWalk(ts, 100, 0.0, 1.0, 0.0);
   TEST(ts.size() == 100);
   TEST(ts[0] == 0.0);
@@ -396,7 +396,100 @@ void test_basets() {
   TEST(ts.size() == 23);
   TEST(ts[0] == 10.0);
 
-  baseTS.normalRandomWalk(ts, 0, 10.0, 1.0, 0.1);
+  //linear random walk
+  baseTS.linearRandomWalk(ts, 100, 0.0, 1.0, 3.0, 0.0);
+  TEST(ts.size() == 100);
+  TEST(ts[0] == 0.0);
+
+  baseTS.linearRandomWalk(ts, 23, 10.0, 1.0, 3.0, 0.1);
+  TEST(ts.size() == 23);
+  TEST(ts[0] == 10.0);
+
+  baseTS.linearRandomWalk(ts, 0, 10.0, 1.0, 3.0, 0.1);
+  TEST(ts.size() == 0);
+
+  //bounded simple random walk
+  baseTS.simpleRandomWalk(ts, 100, 0.0, 1.0, 0.0);
+  TEST(ts.size() == 100);
+  TEST(ts[0] == 0.0);
+
+  baseTS.simpleRandomWalk(ts, 23, 10.0, 1.0, 0.1);
+  TEST(ts.size() == 23);
+  TEST(ts[0] == 10.0);
+
+  baseTS.simpleRandomWalk(ts, 0, 10.0, 1.0, 0.1);
+  TEST(ts.size() == 0);
+
+  //bounded real random walk
+  baseTS.realRandomWalk(ts, 100, 0.0, 1.0, 20.0, 0.0);
+  TEST(ts.size() == 100);
+  TEST(ts[0] == 0.0);
+
+  baseTS.realRandomWalk(ts, 23, 10.0, 1.0, 20.0, 0.1);
+  TEST(ts.size() == 23);
+  TEST(ts[0] == 10.0);
+
+  baseTS.realRandomWalk(ts, 0, 10.0, 1.0, 20.0, 0.1);
+  TEST(ts.size() == 0);
+
+  //bounded normal random walk
+  baseTS.normalRandomWalk(ts, 100, 0.0, 1.0, 20.0, 0.0);
+  TEST(ts.size() == 100);
+  TEST(ts[0] == 0.0);
+
+  baseTS.normalRandomWalk(ts, 23, 10.0, 1.0, 20.0, 0.1);
+  TEST(ts.size() == 23);
+  TEST(ts[0] == 10.0);
+
+  baseTS.normalRandomWalk(ts, 0, 10.0, 1.0, 20.0, 0.1);
+  TEST(ts.size() == 0);
+
+  //bounded linear random walk
+  baseTS.linearRandomWalk(ts, 100, 0.0, 1.0, 3.0, 20.0, 0.0);
+  TEST(ts.size() == 100);
+  TEST(ts[0] == 0.0);
+
+  baseTS.linearRandomWalk(ts, 23, 10.0, 1.0, 3.0, 20.0, 0.1);
+  TEST(ts.size() == 23);
+  TEST(ts[0] == 10.0);
+
+  baseTS.linearRandomWalk(ts, 0, 10.0, 1.0, 3.0, 20.0, 0.1);
+  TEST(ts.size() == 0);
+
+  //uniform random
+  baseTS.uniformRandom(ts, 100, 0.0, 1.0, 0.0);
+  TEST(ts.size() == 100);
+  TEST(ts[0] == 0.0);
+
+  baseTS.uniformRandom(ts, 23, 10.0, 1.0, 0.1);
+  TEST(ts.size() == 23);
+  TEST(ts[0] == 10.0);
+
+  baseTS.uniformRandom(ts, 0, 10.0, 1.0, 0.1);
+  TEST(ts.size() == 0);
+
+  //normal random
+  baseTS.normalRandom(ts, 100, 0.0, 1.0, 0.0);
+  TEST(ts.size() == 100);
+  TEST(ts[0] == 0.0);
+
+  baseTS.normalRandom(ts, 23, 10.0, 1.0, 0.1);
+  TEST(ts.size() == 23);
+  TEST(ts[0] == 10.0);
+
+  baseTS.normalRandom(ts, 0, 10.0, 1.0, 0.1);
+  TEST(ts.size() == 0);
+
+  //piecewise linear random
+  baseTS.piecewiseLinearRandom(ts, 100, 0.0, 1.0, 0.0);
+  TEST(ts.size() == 100);
+  TEST(ts[0] == 0.0);
+
+  baseTS.piecewiseLinearRandom(ts, 23, 10.0, 1.0, 0.1);
+  TEST(ts.size() == 23);
+  TEST(ts[0] == 10.0);
+
+  baseTS.piecewiseLinearRandom(ts, 0, 10.0, 1.0, 0.1);
   TEST(ts.size() == 0);
 }
 

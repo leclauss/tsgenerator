@@ -13,11 +13,11 @@
 
 TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
     double noise_in, int type_in, int size_in, double height_in, double
-    start_in, int method_in, double maxi_in)
+    start_in, double step_in, int method_in, double maxi_in)
   : length(abs(length_in)), window(window_in), delta(delta_in),
   noise(noise_in), type(abs(type_in)), size(abs(size_in)), height(height_in),
-  start(start_in), method(method_in), maxi(abs(maxi_in)), freePositions(length,
-      window), randomEngine(random_device().entropy()
+  start(start_in), step(abs(step_in)), method(method_in), maxi(abs(maxi_in)),
+  freePositions(length, window), randomEngine(random_device().entropy()
     ? random_device()()
     : chrono::system_clock::now().time_since_epoch().count()) {
 
@@ -53,10 +53,10 @@ TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
 
 TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
     double noise_in, string type_in, int size_in, double height_in, double
-    start_in, string method_in, double maxi_in)
+    start_in, double step_in, string method_in, double maxi_in)
   : length(abs(length_in)), window(window_in), delta(delta_in),
   noise(noise_in), size(abs(size_in)), height(height_in), start(start_in),
-  maxi(abs(maxi_in)), freePositions(length, window),
+  step(abs(step_in)), maxi(abs(maxi_in)), freePositions(length, window),
   randomEngine(random_device().entropy()
     ? random_device()()
     : chrono::system_clock::now().time_since_epoch().count()) {
@@ -408,24 +408,32 @@ void TSGenerator::generateBaseTimeSeries(vector<double> &timeSeries_out) {
       baseTS.normalRandomWalk(timeSeries_out, length, start, delta, noise);
       break;
     case 3:
-      baseTS.simpleRandomWalk(timeSeries_out, length, start, delta, maxi,
+      baseTS.linearRandomWalk(timeSeries_out, length, start, delta, step,
           noise);
       break;
     case 4:
-      baseTS.realRandomWalk(timeSeries_out, length, start, delta, maxi,
+      baseTS.simpleRandomWalk(timeSeries_out, length, start, delta, maxi,
           noise);
       break;
     case 5:
-      baseTS.normalRandomWalk(timeSeries_out, length, start, delta, maxi,
+      baseTS.realRandomWalk(timeSeries_out, length, start, delta, maxi,
           noise);
       break;
     case 6:
-      baseTS.uniformRandom(timeSeries_out, length, start, delta, noise);
+      baseTS.normalRandomWalk(timeSeries_out, length, start, delta, maxi,
+          noise);
       break;
     case 7:
-      baseTS.normalRandom(timeSeries_out, length, start, delta, noise);
+      baseTS.linearRandomWalk(timeSeries_out, length, start, delta, step, maxi,
+          noise);
       break;
     case 8:
+      baseTS.uniformRandom(timeSeries_out, length, start, delta, noise);
+      break;
+    case 9:
+      baseTS.normalRandom(timeSeries_out, length, start, delta, noise);
+      break;
+    case 10:
       baseTS.piecewiseLinearRandom(timeSeries_out, length, start, delta,
           noise);
       break;

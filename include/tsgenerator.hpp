@@ -128,6 +128,13 @@ protected:
   double start = 0.0;
 
   // --------------------------------------------------------------------------
+  ///\brief This variable contains the step size value.
+  ///
+  ///This variable stores the step size of random walk generation.
+  // --------------------------------------------------------------------------
+  double step = 1.0;
+
+  // --------------------------------------------------------------------------
   ///\brief This variable contains the base time series generation method.
   ///
   ///This variable stores the method for the generation of the base times
@@ -203,8 +210,9 @@ protected:
   ///tsgenerator.cpp.
   // --------------------------------------------------------------------------
   vector<string> methods{"simpleRandomWalk", "realRandomWalk",
-    "normalRandomWalk", "boundedSimpleRandomWalk", "boundedRealRandomWalk",
-    "boundedNormalRandomWalk", "uniformRandom", "normalRandom",
+    "normalRandomWalk", "linearRandomWalk", "boundedSimpleRandomWalk",
+    "boundedRealRandomWalk", "boundedNormalRandomWalk",
+    "boundedLinearRandomWalk", "uniformRandom", "normalRandom",
     "piecewiseLinearRandom"};
 
 
@@ -383,8 +391,8 @@ public:
   ///stores the result in the trueRandomEngineAvailable variable.
   // --------------------------------------------------------------------------
   TSGenerator(int length_in, int window_in, double delta_in, double noise_in,
-      int type_in, int size_in, double height_in, double start_in = 5, int
-      method_in = 5, double maxi_in = 100.0);
+      int type_in, int size_in, double height_in, double start_in = 5, double
+      step_in = 1.0, int method_in = 5, double maxi_in = 100.0);
 
   // --------------------------------------------------------------------------
   ///\brief The constructor initializes the TSGenerator.
@@ -411,7 +419,8 @@ public:
   // --------------------------------------------------------------------------
   TSGenerator(int length_in, int window_in, double delta_in, double noise_in,
       string type_in, int size_in, double height_in, double start_in = 5,
-      string method_in = "boundedNormalRandomWalk", double maxi_in = 100.0);
+      double step_in = 1.0, string method_in = "boundedNormalRandomWalk",
+      double maxi_in = 100.0);
 
   // --------------------------------------------------------------------------
   ///\brief Frees the memory allocated by the TSGenerator.
