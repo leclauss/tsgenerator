@@ -120,13 +120,6 @@ protected:
   double height = 10.0;
 
   // --------------------------------------------------------------------------
-  ///\brief This variable contains the first value.
-  ///
-  ///This variable stores the first value of the time series.
-  // --------------------------------------------------------------------------
-  double start = 0.0;
-
-  // --------------------------------------------------------------------------
   ///\brief This variable contains the step size value.
   ///
   ///This variable stores the step size of random walk generation.
@@ -332,8 +325,8 @@ protected:
   ///
   ///\param [out] timeSeries_out Hands over the computed time series.
   ///
-  ///This function computes a base times series according to the length, start,
-  ///delta, maxi and noise values.
+  ///This function computes a base times series according to the length, delta,
+  ///maxi and noise values.
   // --------------------------------------------------------------------------
   void generateBaseTimeSeries(vector<double> &timeSeries_out);
 
@@ -387,7 +380,6 @@ public:
   ///by the motif.
   ///\param [in] height_in Hands over the maximum difference between two values
   ///of the motif.
-  ///\param [in] start_in Hands over the first value of the time sieres.
   ///\param [in] times_in Hands over the times of steps.
   ///\param [in] method_in Hands over the method for base time series
   ///generation.
@@ -398,9 +390,8 @@ public:
   ///stores the result in the trueRandomEngineAvailable variable.
   // --------------------------------------------------------------------------
   TSGenerator(int length_in, int window_in, double delta_in, double noise_in,
-      int type_in, int size_in, double height_in, double start_in = 5, double
-      step_in = 1.0, int times_in = 3, int method_in = 5, double maxi_in
-      = 100.0);
+      int type_in, int size_in, double height_in, double step_in = 1.0, int
+      times_in = 3, int method_in = 5, double maxi_in = 100.0);
 
   // --------------------------------------------------------------------------
   ///\brief The constructor initializes the TSGenerator.
@@ -416,7 +407,6 @@ public:
   ///by the motif.
   ///\param [in] height_in Hands over the maximum difference between two values
   ///of the motif.
-  ///\param [in] start_in Hands over the first value of the time sieres.
   ///\param [in] times_in Hands over the times of steps.
   ///\param [in] method_in Hands over the method for base time series
   ///generation.
@@ -427,9 +417,9 @@ public:
   ///stores the result in the trueRandomEngineAvailable variable.
   // --------------------------------------------------------------------------
   TSGenerator(int length_in, int window_in, double delta_in, double noise_in,
-      string type_in, int size_in, double height_in, double start_in = 5,
-      double step_in = 1.0, int times_in = 3, string method_in
-      = "boundedNormalRandomWalk", double maxi_in = 100.0);
+      string type_in, int size_in, double height_in, double step_in = 1.0, int
+      times_in = 3, string method_in = "boundedNormalRandomWalk", double
+      maxi_in = 100.0);
 
   // --------------------------------------------------------------------------
   ///\brief Frees the memory allocated by the TSGenerator.

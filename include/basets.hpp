@@ -75,7 +75,6 @@ public:
   ///
   ///\param [out] &timeSeries_out Hands over the random synthetic time series.
   ///\param [in] length_in Hands over the length of the time series.
-  ///\param [in] start_in Hands over the start value of the time series.
   ///\param [in] delta_in Hands over the average maximal difference between two
   ///consecutive values in the time series.
   ///\param [in] noise_in Hands over the noise option.
@@ -86,13 +85,12 @@ public:
   ///the time series is either v_i - delta_in or v_i + delta_in.
   // --------------------------------------------------------------------------
   void simpleRandomWalk(vector<double> &timeSeries_out, int length_in, double
-      start_in, double delta_in, double noise_in);
+      delta_in, double noise_in);
 
   ///\brief Generates a random syntheteic time series.
   ///
   ///\param [out] &timeSeries_out Hands over the random synthetic time series.
   ///\param [in] length_in Hands over the length of the time series.
-  ///\param [in] start_in Hands over the start value of the time series.
   ///\param [in] delta_in Hands over the average maximal difference between two
   ///consecutive values in the time series.
   ///\param [in] noise_in Hands over the noise option.
@@ -103,13 +101,12 @@ public:
   ///between v_i - delta_in and v_i + delta_in with +- noise_in / 2 noise.
   // --------------------------------------------------------------------------
   void realRandomWalk(vector<double> &timeSeries_out, int length_in, double
-      start_in, double delta_in, double noise_in);
+      delta_in, double noise_in);
 
   ///\brief Generates a random syntheteic time series.
   ///
   ///\param [out] &timeSeries_out Hands over the random synthetic time series.
   ///\param [in] length_in Hands over the length of the time series.
-  ///\param [in] start_in Hands over the start value of the time series.
   ///\param [in] delta_in Hands over the average maximal difference between two
   ///consecutive values in the time series.
   ///\param [in] noise_in Hands over the noise option.
@@ -121,13 +118,12 @@ public:
   ///noise_in / 2 noise.
   // --------------------------------------------------------------------------
   void normalRandomWalk(vector<double> &timeSeries_out, int length_in, double
-      start_in, double delta_in, double noise_in);
+      delta_in, double noise_in);
 
   ///\brief Generates a random syntheteic time series.
   ///
   ///\param [out] &timeSeries_out Hands over the random synthetic time series.
   ///\param [in] length_in Hands over the length of the time series.
-  ///\param [in] start_in Hands over the start value of the time series.
   ///\param [in] delta_in Hands over the average maximal difference between two
   ///consecutive values in the time series.
   ///\param [in] step_in Hands over the step size.
@@ -143,13 +139,12 @@ public:
   ///linear approximated.
   // --------------------------------------------------------------------------
   void linearRandomWalk(vector<double> &timeSeries_out, int length_in, double
-      start_in, double delta_in, double step_in, double noise_in);
+      delta_in, double step_in, double noise_in);
 
   ///\brief The simple random walk method.
   ///
   ///\param [out] &timeSeries_out Hands over the random synthetic time series.
   ///\param [in] length_in Hands over the length of the time series.
-  ///\param [in] start_in Hands over the start value of the time series.
   ///\param [in] delta_in Hands over the average maximal difference between two
   ///consecutive values in the time series.
   ///\param [in] maxi_in Hands over the maximum absolut value.
@@ -163,13 +158,12 @@ public:
   ///at most maxi_in.
   // --------------------------------------------------------------------------
   void simpleRandomWalk(vector<double> &timeSeries_out, int length_in, double
-      start_in, double delta_in, double maxi_in, double noise_in);
+      delta_in, double maxi_in, double noise_in);
 
   ///\brief Generates a random syntheteic time series.
   ///
   ///\param [out] &timeSeries_out Hands over the random synthetic time series.
   ///\param [in] length_in Hands over the length of the time series.
-  ///\param [in] start_in Hands over the start value of the time series.
   ///\param [in] delta_in Hands over the average maximal difference between two
   ///consecutive values in the time series.
   ///\param [in] maxi_in Hands over the maximum absolut value.
@@ -183,13 +177,12 @@ public:
   ///is at most maxi_in.
   // --------------------------------------------------------------------------
   void realRandomWalk(vector<double> &timeSeries_out, int length_in, double
-      start_in, double delta_in, double maxi_in, double noise_in);
+      delta_in, double maxi_in, double noise_in);
 
   ///\brief Generates a random syntheteic time series.
   ///
   ///\param [out] &timeSeries_out Hands over the random synthetic time series.
   ///\param [in] length_in Hands over the length of the time series.
-  ///\param [in] start_in Hands over the start value of the time series.
   ///\param [in] delta_in Hands over the average maximal difference between two
   ///consecutive values in the time series.
   ///\param [in] maxi_in Hands over the maximum absolut value.
@@ -203,13 +196,12 @@ public:
   ///of a times series value is at most maxi_in.
   // --------------------------------------------------------------------------
   void normalRandomWalk(vector<double> &timeSeries_out, int length_in, double
-      start_in, double delta_in, double maxi_in, double noise_in);
+      delta_in, double maxi_in, double noise_in);
 
   ///\brief Generates a random syntheteic time series.
   ///
   ///\param [out] &timeSeries_out Hands over the random synthetic time series.
   ///\param [in] length_in Hands over the length of the time series.
-  ///\param [in] start_in Hands over the start value of the time series.
   ///\param [in] delta_in Hands over the average maximal difference between two
   ///consecutive values in the time series.
   ///\param [in] maxi_in Hands over the maximum absolut value.
@@ -227,14 +219,13 @@ public:
   ///a times series value without noise is at most maxi_in.
   // --------------------------------------------------------------------------
   void linearRandomWalk(vector<double> &timeSeries_out, int length_in, double
-      start_in, double delta_in, double step_in, double maxi_in, double
+      delta_in, double step_in, double maxi_in, double
       noise_in);
 
   ///\brief Generates a random syntheteic time series.
   ///
   ///\param [out] &timeSeries_out Hands over the random synthetic time series.
   ///\param [in] length_in Hands over the length of the time series.
-  ///\param [in] start_in Hands over the start value of the time series.
   ///\param [in] delta_in Hands over the average maximal difference between two
   ///consecutive values in the time series.
   ///\param [in] noise_in Hands over the noise option.
@@ -244,13 +235,12 @@ public:
   ///2.0 <= v_i < delta_in / 2.0.
   // --------------------------------------------------------------------------
   void uniformRandom(vector<double> &timeSeries_out, int length_in, double
-      start_in, double delta_in, double noise_in);
+      delta_in, double noise_in);
 
   ///\brief Generates a random syntheteic time series.
   ///
   ///\param [out] &timeSeries_out Hands over the random synthetic time series.
   ///\param [in] length_in Hands over the length of the time series.
-  ///\param [in] start_in Hands over the start value of the time series.
   ///\param [in] delta_in Hands over the average maximal difference between two
   ///consecutive values in the time series.
   ///\param [in] noise_in Hands over the noise option.
@@ -258,13 +248,12 @@ public:
   ///This function generates a random synthetic time series by computing random
   ///values with normal distribution variance delta_in / 2.0.
   void normalRandom(vector<double> &timeSeries_out, int length_in, double
-      start_in, double delta_in, double noise_in);
+      delta_in, double noise_in);
 
   ///\brief Generates a random syntheteic time series.
   ///
   ///\param [out] &timeSeries_out Hands over the random synthetic time series.
   ///\param [in] length_in Hands over the length of the time series.
-  ///\param [in] start_in Hands over the start value of the time series.
   ///\param [in] delta_in Hands over the average maximal difference between two
   ///consecutive values in the time series.
   ///\param [in] noise_in Hands over the noise option.
@@ -274,7 +263,7 @@ public:
   ///-delta_in / 4.0, 0.0, delta_in / 4.0 and delta_in / 2.0. The corresponding
   ///weights are 0.0, 10.0, 0.0, 10.0, 0.0
   void piecewiseLinearRandom(vector<double> &timeSeries_out, int length_in,
-      double start_in, double delta_in, double noise_in);
+      double delta_in, double noise_in);
 
   ///\brief Generates a random syntheteic time series.
   ///

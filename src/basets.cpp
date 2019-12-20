@@ -96,7 +96,7 @@ void BaseTS::cubicSpline(const vector<double> & x_in, const vector<double>
 }
 
 void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
-    double start_in, double delta_in, double noise_in) {
+    double delta_in, double noise_in) {
 
   if (!(timeSeries_out.empty())) {
 
@@ -113,7 +113,7 @@ void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
   uniform_int_distribution<int> distribution(0, 1);
 
   //add the first value
-  double value = start_in;
+  double value = 0.0;
 
   timeSeries_out.push_back(value);
 
@@ -130,7 +130,7 @@ void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
 }
 
 void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
-    double start_in, double delta_in, double noise_in) {
+    double delta_in, double noise_in) {
 
   if (!(timeSeries_out.empty())) {
 
@@ -147,7 +147,7 @@ void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
   uniform_real_distribution<double> distribution(-delta_in, delta_in);
 
   //add the first value
-  double value = start_in;
+  double value = 0.0;
 
   timeSeries_out.push_back(value);
 
@@ -164,7 +164,7 @@ void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
 }
 
 void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
-    double start_in, double delta_in, double noise_in) {
+    double delta_in, double noise_in) {
 
   if (!(timeSeries_out.empty())) {
 
@@ -182,7 +182,7 @@ void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
       ? delta_in : numeric_limits<double>::min());
 
   //add the first value
-  double value = start_in;
+  double value = 0.0;
 
   timeSeries_out.push_back(value);
 
@@ -202,7 +202,7 @@ void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
 }
 
 void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
-    double start_in, double delta_in, double step_in, double noise_in) {
+    double delta_in, double step_in, double noise_in) {
 
   if (!(timeSeries_out.empty())) {
 
@@ -223,7 +223,7 @@ void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
   poisson_distribution<int> distributionStep((double)step);
 
   //add the first value
-  double value = start_in;
+  double value = 0.0;
 
   timeSeries_out.push_back(value);
 
@@ -288,7 +288,7 @@ void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
 }
 
 void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
-    double start_in, double delta_in, double maxi_in, double noise_in) {
+    double delta_in, double maxi_in, double noise_in) {
 
   if (maxi_in - delta_in < 0.0) {
 
@@ -312,7 +312,7 @@ void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
   uniform_int_distribution<int> distribution(0, 1);
 
   //add the first value
-  double value = start_in;
+  double value = 0.0;
 
   timeSeries_out.push_back(value);
 
@@ -325,10 +325,10 @@ void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
       value += distributionNoise(randomEngine);
 
     //check if border is crossed
-    if (timeSeries_out[i - 1] + value < start_in - maxi_in)
+    if (timeSeries_out[i - 1] + value < -maxi_in)
       value = abs(value);
 
-    if (timeSeries_out[i - 1] + value > start_in + maxi_in)
+    if (timeSeries_out[i - 1] + value > maxi_in)
       value = -abs(value);
 
     timeSeries_out.push_back(timeSeries_out[i - 1] + value);
@@ -336,7 +336,7 @@ void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
 }
 
 void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
-    double start_in, double delta_in, double maxi_in, double noise_in) {
+    double delta_in, double maxi_in, double noise_in) {
 
   if (maxi_in - delta_in < 0.0) {
 
@@ -360,7 +360,7 @@ void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
   uniform_real_distribution<double> distribution(-delta_in, delta_in);
 
   //add the first value
-  double value = start_in;
+  double value = 0.0;
 
   timeSeries_out.push_back(value);
 
@@ -373,10 +373,10 @@ void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
       value += distributionNoise(randomEngine);
 
     //check if border is crossed
-    if (timeSeries_out[i - 1] + value < start_in - maxi_in)
+    if (timeSeries_out[i - 1] + value < -maxi_in)
       value = abs(value);
 
-    if (timeSeries_out[i - 1] + value > start_in + maxi_in)
+    if (timeSeries_out[i - 1] + value > maxi_in)
       value = -abs(value);
 
     timeSeries_out.push_back(timeSeries_out[i - 1] + value);
@@ -384,7 +384,7 @@ void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
 }
 
 void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
-    double start_in, double delta_in, double maxi_in, double noise_in) {
+    double delta_in, double maxi_in, double noise_in) {
 
   if (maxi_in - delta_in < 0.0) {
 
@@ -409,7 +409,7 @@ void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
       ? delta_in : numeric_limits<double>::min());
 
   //add the first value
-  double value = start_in;
+  double value = 0.0;
 
   timeSeries_out.push_back(value);
 
@@ -425,10 +425,10 @@ void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
       value += distributionNoise(randomEngine);
 
     //check if border is crossed
-    if (timeSeries_out[i - 1] + value < start_in - maxi_in)
+    if (timeSeries_out[i - 1] + value < -maxi_in)
       value = abs(value);
 
-    if (timeSeries_out[i - 1] + value > start_in + maxi_in)
+    if (timeSeries_out[i - 1] + value > maxi_in)
       value = -abs(value);
 
     timeSeries_out.push_back(timeSeries_out[i - 1] + value);
@@ -436,8 +436,7 @@ void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
 }
 
 void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
-    double start_in, double delta_in, double step_in, double maxi_in, double
-    noise_in) {
+    double delta_in, double step_in, double maxi_in, double noise_in) {
 
   if (maxi_in - delta_in < 0.0) {
 
@@ -465,7 +464,7 @@ void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
   poisson_distribution<int> distributionStep((double)step);
 
   //add the first value
-  double value = start_in;
+  double value = 0.0;
 
   timeSeries_out.push_back(value);
 
@@ -480,10 +479,10 @@ void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
   value = distribution(randomEngine);
 
   //check if border is crossed
-  if (lValue + value < start_in - maxi_in)
+  if (lValue + value < -maxi_in)
     value = abs(value);
 
-  if (lValue + value > start_in + maxi_in)
+  if (lValue + value > maxi_in)
     value = -abs(value);
 
   double nValue = lValue + value;
@@ -518,10 +517,10 @@ void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
         value = distribution(randomEngine);
 
       //check if border is crossed
-      if (lValue + value < start_in - maxi_in)
+      if (lValue + value < -maxi_in)
         value = abs(value);
 
-      if (lValue + value > start_in + maxi_in)
+      if (lValue + value > maxi_in)
         value = -abs(value);
 
       nValue += value;
@@ -548,7 +547,7 @@ void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
 }
 
 void BaseTS::uniformRandom(vector<double> &timeSeries_out, int length_in,
-    double start_in, double delta_in, double noise_in) {
+    double delta_in, double noise_in) {
 
   if (!(timeSeries_out.empty())) {
 
@@ -566,7 +565,7 @@ void BaseTS::uniformRandom(vector<double> &timeSeries_out, int length_in,
       / 2.0);
 
   //add the first value
-  double value = start_in;
+  double value = 0.0;
 
   timeSeries_out.push_back(value);
 
@@ -583,7 +582,7 @@ void BaseTS::uniformRandom(vector<double> &timeSeries_out, int length_in,
 }
 
 void BaseTS::normalRandom(vector<double> &timeSeries_out, int length_in, double
-    start_in, double delta_in, double noise_in) {
+    delta_in, double noise_in) {
 
   if (!(timeSeries_out.empty())) {
 
@@ -601,14 +600,14 @@ void BaseTS::normalRandom(vector<double> &timeSeries_out, int length_in, double
       ? delta_in / 2.0 : numeric_limits<double>::min());
 
   //add the first value
-  double value = start_in;
+  double value = 0.0;
 
   timeSeries_out.push_back(value);
 
   //add the remaining values
   for (int i = 1; i < length_in; i++) {
 
-    value = start_in;
+    value = 0.0;
 
     if (delta_in / 2.0 > 0.0)
       value += distribution(randomEngine);
@@ -621,7 +620,7 @@ void BaseTS::normalRandom(vector<double> &timeSeries_out, int length_in, double
 }
 
 void BaseTS::piecewiseLinearRandom(vector<double> &timeSeries_out, int
-    length_in, double start_in, double delta_in, double noise_in) {
+    length_in, double delta_in, double noise_in) {
 
   if (!(timeSeries_out.empty())) {
 
@@ -643,7 +642,7 @@ void BaseTS::piecewiseLinearRandom(vector<double> &timeSeries_out, int
       intervals.end(), weights.begin());
 
   //add the first value
-  double value = start_in;
+  double value = 0.0;
 
   timeSeries_out.push_back(value);
 
