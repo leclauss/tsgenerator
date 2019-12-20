@@ -108,7 +108,7 @@ void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
     return;
 
   //initialize the distributions for the random walk
-  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+  normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
   uniform_int_distribution<int> distribution(0, 1);
 
@@ -142,7 +142,7 @@ void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
     return;
 
   //initialize the distributions for the random walk
-  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+  normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
   uniform_real_distribution<double> distribution(-delta_in, delta_in);
 
@@ -176,9 +176,9 @@ void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
     return;
 
   //initialize the distributions for noise and the random walk
-  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+  normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
-  normal_distribution<double> distribution(0.0, delta_in > 0.0
+  normal_distribution<double> distribution(0.0, abs(delta_in) > 0.0
       ? delta_in : numeric_limits<double>::min());
 
   //add the first value
@@ -216,9 +216,9 @@ void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
   int step = abs(step_in);
 
   //initialize the distributions for noise and the random walk
-  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+  normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
-  normal_distribution<double> distribution(0.0, delta_in > 0.0
+  normal_distribution<double> distribution(0.0, abs(delta_in) > 0.0
       ? delta_in : numeric_limits<double>::min());
   poisson_distribution<int> distributionStep((double)step);
 
@@ -307,7 +307,7 @@ void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
     return;
 
   //initialize the distributions for the random walk
-  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+  normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
   uniform_int_distribution<int> distribution(0, 1);
 
@@ -355,7 +355,7 @@ void BaseTS::realRandomWalk(vector<double> &timeSeries_out, int length_in,
     return;
 
   //initialize the distributions for the random walk
-  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+  normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
   uniform_real_distribution<double> distribution(-delta_in, delta_in);
 
@@ -403,9 +403,9 @@ void BaseTS::normalRandomWalk(vector<double> &timeSeries_out, int length_in,
     return;
 
   //initialize the distributions for noise and the random walk
-  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+  normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
-  normal_distribution<double> distribution(0.0, delta_in > 0.0
+  normal_distribution<double> distribution(0.0, abs(delta_in) > 0.0
       ? delta_in : numeric_limits<double>::min());
 
   //add the first value
@@ -457,9 +457,9 @@ void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
   int step = abs(step_in);
 
   //initialize the distributions for noise and the random walk
-  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+  normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
-  normal_distribution<double> distribution(0.0, delta_in > 0.0
+  normal_distribution<double> distribution(0.0, abs(delta_in) > 0.0
       ? delta_in : numeric_limits<double>::min());
   poisson_distribution<int> distributionStep((double)step);
 
@@ -559,7 +559,7 @@ void BaseTS::uniformRandom(vector<double> &timeSeries_out, int length_in,
     return;
 
   //initialize the distributions for noise and the random walk
-  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+  normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
   uniform_real_distribution<double> distribution(-delta_in / 2.0, delta_in
       / 2.0);
@@ -594,9 +594,9 @@ void BaseTS::normalRandom(vector<double> &timeSeries_out, int length_in, double
     return;
 
   //initialize the distributions for noise and the random walk
-  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+  normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
-  normal_distribution<double> distribution(0.0, delta_in / 2.0 > 0.0
+  normal_distribution<double> distribution(0.0, abs(delta_in) / 2.0 > 0.0
       ? delta_in / 2.0 : numeric_limits<double>::min());
 
   //add the first value
@@ -632,7 +632,7 @@ void BaseTS::piecewiseLinearRandom(vector<double> &timeSeries_out, int
     return;
 
   //initialize the distributions for noise and the random walk
-  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+  normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
 
   vector<double> intervals {-delta_in / 2.0, -delta_in / 4.0, 0.0, delta_in
@@ -674,7 +674,7 @@ void BaseTS::splineRepeated(vector<double> &timeSeries_out, int length_in,
   int times = abs(times_in);
 
   //initialize the distributions for noise and the random walk
-  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+  normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
   uniform_real_distribution<double> distribution(delta_in / 2.0 > 0.0
       ? -delta_in / 2.0 : -numeric_limits<double>::min(), delta_in / 2.0 > 0.0

@@ -659,7 +659,7 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double> &d_out,
   double mean;
   double stdDev;
   double d;
-  normal_distribution<double> distribution(0.0, noise / 4.0 <= 0.0
+  normal_distribution<double> distribution(0.0, abs(noise) / 4.0 <= 0.0
       ? numeric_limits<double>::min() : noise / 4.0);
 
   for (int i = 0; i < 50 && repeatLoop; i++) {
@@ -730,7 +730,7 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double> &d_out,
     //try to inject another sequence
     while (retryItr < length + 100) {
 
-      normal_distribution<double> distribution(0.0, noise / 4.0 <= 0.0
+      normal_distribution<double> distribution(0.0, abs(noise) / 4.0 <= 0.0
           ? numeric_limits<double>::min() : noise / 4.0);
 
       //copy another motif sequence ...
