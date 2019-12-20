@@ -13,7 +13,6 @@
 #include <vector>
 #include <cmath>
 #include <list>
-#include <iostream>
 
 using namespace std;
 
