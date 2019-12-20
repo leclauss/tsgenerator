@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
     double height = 10.0;
     double start = 0.0;
     double step = 1.0;
+    int times = 3;
     double maxi = 20.0;
     string method("boundedNormalRandomWalk");
 
@@ -136,7 +137,7 @@ int main(int argc, char *argv[]) {
         noise = stod(payload[0]);
       }
 
-      if (checkArg(argTokens, "-t", payload) || checkArg(argTokens,
+      if (checkArg(argTokens, "-ty", payload) || checkArg(argTokens,
             "--type", payload)) {
 
         if (payload.empty()) {
@@ -148,7 +149,7 @@ int main(int argc, char *argv[]) {
         type = payload[0];
       }
 
-      if (checkArg(argTokens, "-s", payload) || checkArg(argTokens,
+      if (checkArg(argTokens, "-si", payload) || checkArg(argTokens,
             "--size", payload)) {
 
         if (payload.empty()) {
@@ -217,7 +218,25 @@ int main(int argc, char *argv[]) {
           throw(EXIT_FAILURE);
         }
 
-        start = stoll(payload[0]);
+        step = stoll(payload[0]);
+      }
+
+      if (checkArg(argTokens, "-ti", payload) || checkArg(argTokens,
+            "--times", payload)) {
+
+        if (payload.empty()) {
+
+          cerr << "ERROR: Times is missing an argument." << endl;
+          exit(EXIT_FAILURE);
+        }
+
+        if (payload[0].find_first_not_of("0123456789") != string::npos) {
+
+          cerr << "ERROR: " << (payload[0]) << " is not a valid number!" << endl;
+          exit(EXIT_FAILURE);
+        }
+
+        times = stoi(payload[0]);
       }
 
       if (checkArg(argTokens, "-me", payload) || checkArg(argTokens,
@@ -257,7 +276,7 @@ int main(int argc, char *argv[]) {
       vector<int> windows;
       vector<vector<int>> motifPositions;
       TSGenerator tSGenerator(length, window, delta, noise, type, size, height,
-          start, step, method, maxi);
+          start, step, times, method, maxi);
       tSGenerator.run(timeSeries, dVector, windows, motifPositions);
 
       //output stuff

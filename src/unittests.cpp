@@ -491,6 +491,17 @@ void test_basets() {
 
   baseTS.piecewiseLinearRandom(ts, 0, 10.0, 1.0, 0.1);
   TEST(ts.size() == 0);
+
+  //spline repeated
+  baseTS.splineRepeated(ts, 1000, 20.0, 20.0, 10, 2.0);
+  TEST(ts.size() == 1000);
+
+  baseTS.splineRepeated(ts, 23, 20.0, 20.0, 10, 2.0);
+  TEST(ts.size() == 23);
+
+  baseTS.splineRepeated(ts, 0, 20.0, 20.0, 10, 2.0);
+  TEST(ts.size() == 0);
+
 }
 
 void test_outputgenerator() {

@@ -16,6 +16,85 @@ BaseTS::BaseTS()
 
 BaseTS::~BaseTS() { }
 
+void BaseTS::cubicSpline(const vector<double> & x_in, const vector<double>
+    &y_in, vector<double> &a_out, vector<double> &b_out, vector<double> &c_out,
+    vector<double> &d_out) {
+
+  if (x_in.size() != y_in.size()) {
+
+    cerr << "ERROR: x and y values have different length!" << endl;
+    throw(EXIT_FAILURE);
+  }
+
+  int length = x_in.size();
+
+  if (!(a_out.empty())) {
+
+    a_out.clear();
+    a_out.resize(0);
+  }
+
+  for (int i = 0; i < length; i++)
+    a_out.push_back(y_in[i]);
+
+  if (!(b_out.empty()))
+    b_out.clear();
+
+  b_out.resize(length - 1);
+
+  if (!(d_out.empty()))
+    d_out.clear();
+
+  d_out.resize(length - 1);
+
+  vector<double> h;
+
+  for (int i = 0; i < length - 1; i++)
+    h.push_back(x_in[i + 1] - x_in[i]);
+
+  vector<double> alpha;
+
+  //dummy
+  alpha.push_back(0);
+
+  for (int i = 1; i < length - 1; i++)
+    alpha.push_back(3.0 * (a_out[i + 1] - a_out[i]) / h[i] - 3.0 * (a_out[i]
+          - a_out[i - 1]) / h[i - 1]);
+
+  if (!(c_out.empty()))
+    c_out.clear();
+
+  c_out.resize(length);
+
+  vector<double> l(length), mu(length), z(length);
+
+  l[0] = 1.0;
+  mu[0] = 0.0;
+  z[0] = 0.0;
+
+  for (int i = 1; i < length - 1; i++) {
+
+    l[i] = 2.0 * (x_in[i + 1] - x_in[i - 1]) - h[i - 1] * mu[i - 1];
+    mu[i] = h[i] / l[i];
+    z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / l[i];
+  }
+
+  l[length - 1] = 1.0;
+  z[length - 1] = 0.0;
+  c_out[length - 1] = 0.0;
+
+  for (int i = length - 2; i >= 0; i--) {
+
+    c_out[i] = z[i] - mu[i] * c_out[i + 1];
+    b_out[i] = (a_out[i + 1] - a_out[i]) / h[i] - h[i] * (c_out[i + 1] + 2.0
+        * c_out[i]) / 3.0;
+    d_out[i] = (c_out[i + 1] - c_out[i]) / (3.0 * h[i]);
+  }
+
+  a_out.pop_back();
+  c_out.pop_back();
+}
+
 void BaseTS::simpleRandomWalk(vector<double> &timeSeries_out, int length_in,
     double start_in, double delta_in, double noise_in) {
 
@@ -194,6 +273,7 @@ void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
 
       //get next step
       step = distributionStep(randomEngine);
+      rStep = 1.0 / step;
 
       //update diff
       diff = nValue - lValue;
@@ -453,6 +533,7 @@ void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
 
       //get next step
       step = distributionStep(randomEngine);
+      rStep = 1.0 / step;
 
       //update diff
       diff = nValue - lValue;
@@ -501,8 +582,8 @@ void BaseTS::uniformRandom(vector<double> &timeSeries_out, int length_in,
   }
 }
 
-void BaseTS::normalRandom(vector<double> &timeSeries_out, int length_in,
-    double start_in, double delta_in, double noise_in) {
+void BaseTS::normalRandom(vector<double> &timeSeries_out, int length_in, double
+    start_in, double delta_in, double noise_in) {
 
   if (!(timeSeries_out.empty())) {
 
@@ -575,5 +656,81 @@ void BaseTS::piecewiseLinearRandom(vector<double> &timeSeries_out, int
       value += distributionNoise(randomEngine);
 
     timeSeries_out.push_back(value);
+  }
+}
+
+void BaseTS::splineRepeated(vector<double> &timeSeries_out, int length_in,
+    double delta_in, int step_in, int times_in, double noise_in) {
+
+  if (!(timeSeries_out.empty())) {
+
+    timeSeries_out.clear();
+    timeSeries_out.resize(0);
+  }
+
+  if (length_in < 1)
+    return;
+
+  int step = abs(step_in);
+  int times = abs(times_in);
+
+  //initialize the distributions for noise and the random walk
+  normal_distribution<double> distributionNoise(0.0, noise_in / 2.0 > 0.0
+      ? noise_in / 2.0 : numeric_limits<double>::min());
+  uniform_real_distribution<double> distribution(delta_in / 2.0 > 0.0
+      ? -delta_in / 2.0 : -numeric_limits<double>::min(), delta_in / 2.0 > 0.0
+      ? delta_in / 2.0 : numeric_limits<double>::min());
+  uniform_int_distribution<int> distributionStep(1, step < 1 ? 1 : step);
+
+  //generate the repeating sequence
+  vector<double> x;
+  vector<double> y;
+
+  x.push_back(0);
+  y.push_back(distribution(randomEngine));
+
+  for (int i = 1; i < times; i++) {
+
+    x.push_back(x[i - 1] + distributionStep(randomEngine));
+    y.push_back(distribution(randomEngine));
+  }
+
+  x.push_back(x[times - 1] + distributionStep(randomEngine));
+  y.push_back(y[0]);
+
+  for (int i = 1; i < times; i++) {
+
+    x.push_back(x[times] + x[i]);
+    y.push_back(y[i]);
+  }
+
+  vector<double> a;
+  vector<double> b;
+  vector<double> c;
+  vector<double> d;
+
+  cubicSpline(x, y, a, b, c, d);
+
+  int start = times / 2;
+  int t = 0;
+
+  //add spline parts until time series is full
+  while (t < length_in) {
+
+    //compute time series spline parts
+    for (int i = start; i < start + times && t < length_in; i++) {
+
+      for (int j = x[i]; j < x[i + 1] && t < length_in; j++) {
+
+        //get spline value
+        timeSeries_out.push_back(a[i] + b[i] * (j - x[i]) + c[i] * pow(j
+              - x[i], 2.0) + d[i] * pow(j - x[i], 3.0));
+
+        //add noise
+        timeSeries_out[t] += distributionNoise(randomEngine);
+
+        t++;
+      }
+    }
   }
 }

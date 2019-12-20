@@ -9,6 +9,7 @@
 #define BASETS_HPP
 
 #include <iostream>
+#include <cmath>
 #include <random>
 #include <chrono>
 #include <vector>
@@ -36,6 +37,23 @@ protected:
   ///19937 generator.
   // --------------------------------------------------------------------------
   mt19937 randomEngine;
+
+  // --------------------------------------------------------------------------
+  ///\brief This function computes a cubic spline.
+  ///
+  ///\param [in] &x_in Hands over the x values.
+  ///\param [in] &y_in Hands over the y values.
+  ///\param [out] &a_out Hands over the a coefficients.
+  ///\param [out] &b_out Hands over the b coefficients.
+  ///\param [out] &c_out Hands over the c coefficients.
+  ///\param [out] &d_out Hands over the d coefficients.
+  ///
+  ///This function computes a natural cubic spline according to the algorithm
+  ///proposed on wikipedia.
+  // --------------------------------------------------------------------------
+  void cubicSpline(const vector<double> & x_in, const vector<double> &y_in,
+      vector<double> &a_out, vector<double> &b_out, vector<double> &c_out,
+      vector<double> &d_out);
 
 public:
 
@@ -257,6 +275,25 @@ public:
   ///weights are 0.0, 10.0, 0.0, 10.0, 0.0
   void piecewiseLinearRandom(vector<double> &timeSeries_out, int length_in,
       double start_in, double delta_in, double noise_in);
+
+  ///\brief Generates a random syntheteic time series.
+  ///
+  ///\param [out] &timeSeries_out Hands over the random synthetic time series.
+  ///\param [in] length_in Hands over the length of the time series.
+  ///\param [in] delta_in Hands over the average maximal difference between two
+  ///consecutive values in the time series.
+  ///\param [in] step_in Hands over the step size.
+  ///\param [in] times_in Hands over the times size.
+  ///\param [in] noise_in Hands over the noise option.
+  ///
+  ///This function generates a random pattern within the window size. Delta
+  ///tells the function to generate values between -delta_in / 2.0 and delta_in
+  /// / 2.0 without noise and spline. The step is the maximal step in the
+  ///window to generate a new value. The values are splined with a cubic spline
+  ///and noise is added.
+  // --------------------------------------------------------------------------
+  void splineRepeated(vector<double> &timeSeries_out, int length_in, double
+      delta_in, int step_in, int times_in, double noise_in);
 };
 
 #endif

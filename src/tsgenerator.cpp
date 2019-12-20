@@ -13,11 +13,12 @@
 
 TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
     double noise_in, int type_in, int size_in, double height_in, double
-    start_in, double step_in, int method_in, double maxi_in)
+    start_in, double step_in, int times_in, int method_in, double maxi_in)
   : length(abs(length_in)), window(window_in), delta(delta_in),
   noise(noise_in), type(abs(type_in)), size(abs(size_in)), height(height_in),
-  start(start_in), step(abs(step_in)), method(method_in), maxi(abs(maxi_in)),
-  freePositions(length, window), randomEngine(random_device().entropy()
+  start(start_in), step(abs(step_in)), times(abs(times_in)), method(method_in),
+  maxi(abs(maxi_in)), freePositions(length, window),
+  randomEngine(random_device().entropy()
     ? random_device()()
     : chrono::system_clock::now().time_since_epoch().count()) {
 
@@ -53,11 +54,11 @@ TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
 
 TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
     double noise_in, string type_in, int size_in, double height_in, double
-    start_in, double step_in, string method_in, double maxi_in)
+    start_in, double step_in, int times_in, string method_in, double maxi_in)
   : length(abs(length_in)), window(window_in), delta(delta_in),
   noise(noise_in), size(abs(size_in)), height(height_in), start(start_in),
-  step(abs(step_in)), maxi(abs(maxi_in)), freePositions(length, window),
-  randomEngine(random_device().entropy()
+  step(abs(step_in)), times(abs(times_in)), maxi(abs(maxi_in)),
+  freePositions(length, window), randomEngine(random_device().entropy()
     ? random_device()()
     : chrono::system_clock::now().time_since_epoch().count()) {
 
@@ -167,8 +168,7 @@ void TSGenerator::updateRunnings(const vector<double> &sequence_in, const int
 }
 
 double TSGenerator::similarity(const vector<double> &timeSeries_in, const int
-    pos0_in, const int pos1_in, const double
-    bestSoFar_in) {
+    pos0_in, const int pos1_in, const double bestSoFar_in) {
 
   if (timeSeries_in.empty()) {
 
@@ -245,9 +245,8 @@ void TSGenerator::meanStdDev(const vector<double> &sequence_in, double
 }
 
 double TSGenerator::similarity(const vector<double> &timeSeries_in, const
-    vector<double> &sequence_in, const double mean_in, const double
-    stdDev_in, const int pos_in, const double
-    bestSoFar_in) {
+    vector<double> &sequence_in, const double mean_in, const double stdDev_in,
+    const int pos_in, const double bestSoFar_in) {
 
   if (timeSeries_in.empty()) {
 
@@ -437,6 +436,9 @@ void TSGenerator::generateBaseTimeSeries(vector<double> &timeSeries_out) {
       baseTS.piecewiseLinearRandom(timeSeries_out, length, start, delta,
           noise);
       break;
+    case 11:
+      baseTS.splineRepeated(timeSeries_out, length, delta, step, times, noise);
+      break;
     default:
       cerr << "ERROR: Unknown method: " << method << endl;
       throw(EXIT_FAILURE);
@@ -624,9 +626,8 @@ bool TSGenerator::checkIfThereIsALargerMotifSet(const vector<double>
   return false;
 }
 
-void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
-    &d_out, vector<int> &window_out, vector<vector<int>>
-    &motifPositions_out) {
+void TSGenerator::run(vector<double> &timeSeries_out, vector<double> &d_out,
+    vector<int> &window_out, vector<vector<int>> &motifPositions_out) {
 
   //clear the output buffers
   if (!d_out.empty()) {
@@ -658,10 +659,10 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   double mean;
   double stdDev;
   double d;
-  normal_distribution<double> distribution(0.0, noise <= 0.0
-      ? numeric_limits<double>::min() : noise);
+  normal_distribution<double> distribution(0.0, noise / 4.0 <= 0.0
+      ? numeric_limits<double>::min() : noise / 4.0);
 
-  do {
+  for (int i = 0; i < 50 && repeatLoop; i++) {
 
     repeatLoop = false;
 
@@ -705,7 +706,7 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
         break;
       }
     }
-  } while(repeatLoop);
+  }
 
 
   //declaration stuff
@@ -713,6 +714,7 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
   int retryItr = 0;
   double value;
   double min, max;
+  double lth = noise / length;
 
   window_out.push_back(motifCenter.size());
 
@@ -727,6 +729,9 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
 
     //try to inject another sequence
     while (retryItr < length + 100) {
+
+      normal_distribution<double> distribution(0.0, noise / 4.0 <= 0.0
+          ? numeric_limits<double>::min() : noise / 4.0);
 
       //copy another motif sequence ...
       vector<double> newSubsequence(motifCenter);
@@ -794,7 +799,13 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double>
           position = freePositions.calculateRandomPosition();
 
           motifPositions_out[0].back() = position;
+
+          noise -= lth;
         }
+      }
+      else {
+
+        noise -= lth;
       }
 
       if (retryItr == length + 100 - 1) {

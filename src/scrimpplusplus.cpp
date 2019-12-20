@@ -15,52 +15,49 @@
 
 
 void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
-    &pos1_out, int windowSize_in, double stepSize_in)
+    &pos1_out, int window_in, double stepSize_in)
 {
   auto g = default_random_engine(random_device().entropy()
     ? random_device()()
     : chrono::system_clock::now().time_since_epoch().count());
 
-  int windowSize = windowSize_in;
+  int window = window_in;
+  double rWindow = 1.0 / window;
 
-  int stepSize = floor(stepSize_in*windowSize);
+  int stepSize = floor(stepSize_in*window);
 
   if (stepSize_in < 0.0)
-    stepSize = floor(0.4*windowSize);
+    stepSize = floor(0.4*window);
 
   int timeSeriesLength = timeSeries_in.size();
 
   // set exclusion zone
-  int exclusionZone = windowSize / 4;
+  int exclusionZone = window / 4;
 
   // set Matrix Profile Length
-  int ProfileLength = timeSeriesLength - windowSize + 1;
+  int ProfileLength = timeSeriesLength - window + 1;
 
   // preprocess, statistics, get the mean and standard deviation of every
   // subsequence in the time series
-  vector<double> ACumSum;
-  ACumSum.push_back(timeSeries_in[0]);
-  for (int i = 1; i < timeSeriesLength; i++)
-    ACumSum.push_back(timeSeries_in[i] + ACumSum[i - 1]);
-  vector<double> ASqCumSum;
-  ASqCumSum.push_back(timeSeries_in[0] * timeSeries_in[0]);
-  for (int i = 1; i < timeSeriesLength; i++)
-    ASqCumSum.push_back(timeSeries_in[i] * timeSeries_in[i] + ASqCumSum[i
-        - 1]);
   vector<double> ASum;
-  ASum.push_back(ACumSum[windowSize - 1]);
-  for (int i = 0; i < timeSeriesLength - windowSize; i++)
-    ASum.push_back(ACumSum[windowSize + i] - ACumSum[i]);
+  ASum.push_back(timeSeries_in[0]);
+  for (int i = 1; i < window; i++)
+    ASum[0] += timeSeries_in[i];
+  for (int i = 0; i < timeSeriesLength - window; i++)
+    ASum.push_back(ASum[i] - timeSeries_in[i] + timeSeries_in[window + i]);
   vector<double> ASumSq;
-  ASumSq.push_back(ASqCumSum[windowSize - 1]);
-  for (int i = 0; i < timeSeriesLength - windowSize; i++)
-    ASumSq.push_back(ASqCumSum[windowSize + i] - ASqCumSum[i]);
+  ASumSq.push_back(timeSeries_in[0] * timeSeries_in[0]);
+  for (int i = 1; i < window; i++)
+    ASumSq[0] += timeSeries_in[i] * timeSeries_in[i];
+  for (int i = 0; i < timeSeriesLength - window; i++)
+    ASumSq.push_back(ASumSq[i] - timeSeries_in[i] * timeSeries_in[i]
+        + timeSeries_in[i + window] * timeSeries_in[i + window]);
   vector<double> AMean;
   for (int i = 0; i < ProfileLength; i++)
-    AMean.push_back(ASum[i] / windowSize);
+    AMean.push_back(ASum[i] * rWindow);
   vector<double> ASigmaSq;
   for (int i = 0; i < ProfileLength; i++)
-    ASigmaSq.push_back(ASumSq[i] / windowSize - AMean[i] * AMean[i]);
+    ASigmaSq.push_back(ASumSq[i] * rWindow - AMean[i] * AMean[i]);
   vector<double> ASigma;
   for (int i = 0; i < ProfileLength; i++)
     ASigma.push_back(sqrt(ASigmaSq[i]));
@@ -75,8 +72,8 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
   }
 
   //int fftsize = pow(2,ceil(log2(timeSeriesLength)));
-  int fftsize = timeSeriesLength; //fftsize must be at least 2*windowSize
-  fftsize = fftsize > 2 * windowSize ? fftsize : 2 * windowSize;
+  int fftsize = timeSeriesLength; //fftsize must be at least 2*window
+  fftsize = fftsize > 2 * window ? fftsize : 2 * window;
 
 
   /*******************************PreSCRIMP***********************************/
@@ -113,16 +110,16 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
   //Sample subsequences with a fixed stepSize, then random shuffle their
   //computation order
   vector<int> idx;
-  for (int i = 0; i < timeSeriesLength - windowSize + 1; i += stepSize)
+  for (int i = 0; i < timeSeriesLength - window + 1; i += stepSize)
     idx.push_back(i);
   shuffle(idx.begin(), idx.end(), g);
 
-  vector<double> query(windowSize);
+  vector<double> query(window);
 
   for (int idx_i = 0; idx_i < (int) idx.size(); idx_i++)
   {
     int i = idx[idx_i];
-    for (int j = 0; j < windowSize; j++)
+    for (int j = 0; j < window; j++)
     {
       query[j] = timeSeries_in[i + j];
     }
@@ -133,8 +130,8 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     {
       queryTime[j][1] = 0;
 
-      if (j < windowSize)
-        queryTime[j][0] = query[windowSize - j - 1];
+      if (j < window)
+        queryTime[j][0] = query[window - j - 1];
       else
         queryTime[j][0] = 0;
     }
@@ -160,16 +157,16 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     int exclusionZoneStart = i - exclusionZone;
     int exclusionZoneEnd = i + exclusionZone;
     double minimumDistance = numeric_limits<double>::infinity();
-    int minimumDistanceIndex;
-    for (int j = 0; j < timeSeriesLength - windowSize + 1; j++)
+    int minimumDistanceIndex = 0;
+    double distance;
+    for (int j = 0; j < timeSeriesLength - window + 1; j++)
     {
-      double distance;
       if ((j > exclusionZoneStart) && (j < exclusionZoneEnd))
         distance = numeric_limits<double>::infinity();
       else
       {
-        distance = 2 * (windowSize - (AQueryTime[windowSize + j - 1][0]
-              / fftsize - windowSize * AMean[j] * queryMean) / (ASigma[j]
+        distance = 2 * (window - (AQueryTime[window + j - 1][0]
+              / fftsize - window * AMean[j] * queryMean) / (ASigma[j]
                 * queryStd));
       }
 
@@ -189,17 +186,16 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     profileIndex[i] = minimumDistanceIndex;
 
     int j = profileIndex[i];
-    double lastz = (windowSize - profile[i] / 2) * (ASigma[j] * ASigma[i])
-      + windowSize * AMean[j] * AMean[i];
+    double lastz = (window - profile[i] / 2) * (ASigma[j] * ASigma[i])
+      + window * AMean[j] * AMean[i];
     double lastzz = lastz;
-    double distance;
-    for (int k = 1; k < stepSize && i + k < timeSeriesLength - windowSize
-        + 1 && j + k < timeSeriesLength - windowSize + 1; k++)
+    for (int k = 1; k < stepSize && i + k < timeSeriesLength - window
+        + 1 && j + k < timeSeriesLength - window + 1; k++)
     {
       lastz = lastz - timeSeries_in[i + k - 1] * timeSeries_in[j + k - 1]
-        + timeSeries_in[i + k + windowSize - 1] * timeSeries_in[j
-        + k + windowSize - 1];
-      distance = 2 * (windowSize - (lastz - windowSize * AMean[j + k] * AMean[i
+        + timeSeries_in[i + k + window - 1] * timeSeries_in[j
+        + k + window - 1];
+      distance = 2 * (window - (lastz - window * AMean[j + k] * AMean[i
             + k]) / (ASigma[j + k] * ASigma[i + k]));
       if (distance < profile[i + k])
       {
@@ -215,9 +211,9 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     lastz = lastzz;
     for (int k = 1; k < stepSize && i - k >= 0 && j - k >= 0; k++)
     {
-      lastz = lastz - timeSeries_in[i - k + windowSize] * timeSeries_in[j
-        - k + windowSize] + timeSeries_in[i - k] * timeSeries_in[j - k];
-      distance = 2 * (windowSize - (lastz - windowSize * AMean[j - k] * AMean[i
+      lastz = lastz - timeSeries_in[i - k + window] * timeSeries_in[j
+        - k + window] + timeSeries_in[i - k] * timeSeries_in[j - k];
+      distance = 2 * (window - (lastz - window * AMean[j - k] * AMean[i
             - k]) / (ASigma[j - k] * ASigma[i - k]));
       if (distance < profile[i - k])
       {
@@ -263,7 +259,7 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
     //evaluate the fist distance value in the current diagonal
     double distance;
     double lastz=0; //the dot product of a subsequence
-    for (int k = 0; k < windowSize; k++)
+    for (int k = 0; k < window; k++)
       lastz += dotproduct[k+diag];
 
     //j is the column index, i is the row index of the current distance value
@@ -271,7 +267,7 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
       int j=diag, i=j-diag;
 
     //evaluate the distance based on the dot product
-      distance = 2 * (windowSize - (lastz - windowSize * AMean[j] * AMean[i])
+      distance = 2 * (window - (lastz - window * AMean[j] * AMean[i])
           / (ASigma[j] * ASigma[i]));
 
     //update matrix profile and matrix profile index if the current distance
@@ -289,11 +285,11 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
 
     //evaluate the second to the last distance values along the diagonal and
     //update the matrix profile/matrix profile index.
-      for (j=diag+1; j<ProfileLength; j++)
+    for (j=diag+1; j<ProfileLength; j++)
     {
       i=j-diag;
-      lastz = lastz + dotproduct[j+windowSize-1] - dotproduct [j-1];
-      distance = 2 * (windowSize - (lastz - windowSize * AMean[j] * AMean[i])
+      lastz = lastz + dotproduct[j+window-1] - dotproduct [j-1];
+      distance = 2 * (window - (lastz - window * AMean[j] * AMean[i])
           / (ASigma[j] * ASigma[i]));
       if (distance < profile[j])
       {
@@ -309,15 +305,16 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
   }
 
   double ssf = numeric_limits<double>::infinity();
-  // Write final Matrix Profile and Matrix Profile Index to file.
-  for (int i = 0; i < timeSeriesLength - windowSize + 1; i++)
+
+  //Write final Matrix Profile and Matrix Profile Index to file.
+  for (int i = 0; i < ProfileLength; i++)
   {
-    profile[i] = sqrt(abs(profile[i]));
+    profile[i] = profile[i];
     if (profile[i] < ssf) {
 
       pos0_out = i;
       pos1_out = profileIndex[i];
-      ssf = profile[i];
+      ssf = sqrt(profile[i]);
     }
   }
 

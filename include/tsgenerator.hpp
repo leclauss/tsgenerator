@@ -25,7 +25,6 @@
 #include <motifsetcollection.hpp>
 #include <freepositions.hpp>
 #include <basets.hpp>
-#include <global.hpp>
 #include <scrimpplusplus.hpp>
 
 
@@ -135,6 +134,14 @@ protected:
   double step = 1.0;
 
   // --------------------------------------------------------------------------
+  ///\brief This variable contains the number of steps.
+  ///
+  ///This variable stores the number of values in a repeating section of the
+  ///time series.
+  // --------------------------------------------------------------------------
+  int times = 2;
+
+  // --------------------------------------------------------------------------
   ///\brief This variable contains the base time series generation method.
   ///
   ///This variable stores the method for the generation of the base times
@@ -213,7 +220,7 @@ protected:
     "normalRandomWalk", "linearRandomWalk", "boundedSimpleRandomWalk",
     "boundedRealRandomWalk", "boundedNormalRandomWalk",
     "boundedLinearRandomWalk", "uniformRandom", "normalRandom",
-    "piecewiseLinearRandom"};
+    "piecewiseLinearRandom", "splineRepeated"};
 
 
   // --------------------------------------------------------------------------
@@ -235,8 +242,7 @@ protected:
   ///This function updates the running sum and sum of squares of a sequence at
   ///a specific location.
   // --------------------------------------------------------------------------
-  void updateRunnings(const vector<double> &timeSeries_in, const int
-      pos_in);
+  void updateRunnings(const vector<double> &timeSeries_in, const int pos_in);
 
   // --------------------------------------------------------------------------
   ///\brief Computes the similarity of two subsequences in a sequence.
@@ -382,6 +388,7 @@ public:
   ///\param [in] height_in Hands over the maximum difference between two values
   ///of the motif.
   ///\param [in] start_in Hands over the first value of the time sieres.
+  ///\param [in] times_in Hands over the times of steps.
   ///\param [in] method_in Hands over the method for base time series
   ///generation.
   ///\param [in] max_in Hands over the maximum absolute value of the time
@@ -392,7 +399,8 @@ public:
   // --------------------------------------------------------------------------
   TSGenerator(int length_in, int window_in, double delta_in, double noise_in,
       int type_in, int size_in, double height_in, double start_in = 5, double
-      step_in = 1.0, int method_in = 5, double maxi_in = 100.0);
+      step_in = 1.0, int times_in = 3, int method_in = 5, double maxi_in
+      = 100.0);
 
   // --------------------------------------------------------------------------
   ///\brief The constructor initializes the TSGenerator.
@@ -409,6 +417,7 @@ public:
   ///\param [in] height_in Hands over the maximum difference between two values
   ///of the motif.
   ///\param [in] start_in Hands over the first value of the time sieres.
+  ///\param [in] times_in Hands over the times of steps.
   ///\param [in] method_in Hands over the method for base time series
   ///generation.
   ///\param [in] maxi_in Hands over the maximum absolute value of the time
@@ -419,8 +428,8 @@ public:
   // --------------------------------------------------------------------------
   TSGenerator(int length_in, int window_in, double delta_in, double noise_in,
       string type_in, int size_in, double height_in, double start_in = 5,
-      double step_in = 1.0, string method_in = "boundedNormalRandomWalk",
-      double maxi_in = 100.0);
+      double step_in = 1.0, int times_in = 3, string method_in
+      = "boundedNormalRandomWalk", double maxi_in = 100.0);
 
   // --------------------------------------------------------------------------
   ///\brief Frees the memory allocated by the TSGenerator.
@@ -444,8 +453,8 @@ public:
   ///a file. A not defined motif tag is treated as a random motif. Therfore,
   ///a ranodm motif type is chosen. The default motif type is the random motif.
   // --------------------------------------------------------------------------
-  void run(vector<double> &timeSeries_out, vector<double> &d_out,
-      vector<int> &window_out, vector<vector<int>> &motifPositions_out);
+  void run(vector<double> &timeSeries_out, vector<double> &d_out, vector<int>
+      &window_out, vector<vector<int>> &motifPositions_out);
 };
 
 #endif
