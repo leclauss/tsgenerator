@@ -41,7 +41,7 @@ if (WIN32)
   set_target_properties(fftw3 PROPERTIES IMPORTED_LOCATION
     ../${ARCH}/fftw3/libfftw3-3.lib)
 
-  add_library(${PROJECT_NAME} STATIC
+  add_library(${PROJECT_NAME} SHARED
     src/motifsetcollection
     src/freepositions
     src/basets
