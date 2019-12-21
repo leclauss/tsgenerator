@@ -35,35 +35,56 @@ if (WIN32)
   if (CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(ARCH win64)
   endif()
+  if (CMAKE_GENERATOR_PLATFORM MATCHES .*32.*)
+    set(ARCH win32)
+  endif()
+  if (CMAKE_GENERATOR_PLATFORM MATCHES .*64.*)
+    set(ARCH win64)
+  endif()
 
-  add_library(fftw3 STATIC IMPORTED)
+  add_library(fftw STATIC IMPORTED)
 
-  set_target_properties(fftw3 PROPERTIES IMPORTED_LOCATION
-    ../${ARCH}/fftw3/libfftw3-3.lib)
+  get_filename_component(FFTW3_LIB_PATH ../${ARCH}/fftw3/libfftw3-3.lib
+    ABSOLUTE)
 
-  add_library(${PROJECT_NAME} SHARED
+  set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
+    ${FFTW3_LIB_PATH})
+
+  add_library(shared SHARED
     src/motifsetcollection
     src/freepositions
     src/basets
     src/scrimpplusplus
     src/tsgenerator)
 
-  target_include_directories(${PROJECT_NAME} PRIVATE
+  set_target_properties(shared PROPERTIES
+    OUTPUT_NAME ${PROJECT_NAME})
+
+  target_include_directories(shared PRIVATE
     api include src
     PUBLIC
     ../${ARCH}/fftw3)
 
-  target_link_libraries(${PROJECT_NAME}
+  target_link_libraries(shared
     fftw3)
 
-  target_compile_options(${PROJECT_NAME} PUBLIC
-    ${FFTW3_CFLAGS_OTHER})
+  add_library(static STATIC
+    src/motifsetcollection
+    src/freepositions
+    src/basets
+    src/scrimpplusplus
+    src/tsgenerator)
 
-  set_target_properties(${PROJECT_NAME} PROPERTIES
-    VERSION ${TSG_VERSION}
-    SOVERSION ${TSG_SOVERSION}
-    PUBLIC_HEADER
-    api/tsgenerator.hpp)
+  set_target_properties(static PROPERTIES
+    OUTPUT_NAME ${PROJECT_NAME})
+
+  target_include_directories(static PRIVATE
+    api include src
+    PUBLIC
+    ../${ARCH}/fftw3)
+
+  target_link_libraries(static
+    fftw3)
 else ()
   # check the dependencies
   find_package(PkgConfig REQUIRED)
