@@ -41,12 +41,12 @@ if (WIN32)
     set(ARCH win64)
   endif()
 
-  add_library(fftw STATIC IMPORTED)
+  add_library(fftw3 STATIC IMPORTED)
 
   get_filename_component(FFTW3_LIB_PATH ../${ARCH}/fftw3/libfftw3-3.lib
     ABSOLUTE)
 
-  set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
+  set_target_properties(fftw3 PROPERTIES IMPORTED_LOCATION
     ${FFTW3_LIB_PATH})
 
   add_library(shared SHARED
