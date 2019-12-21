@@ -31,7 +31,17 @@ endif ()
 
 if (WIN32)
   # build project
-  add_library(${PROJECT_NAME} SHARED
+  set(ARCH win32)
+  if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(ARCH win64)
+  endif()
+
+  add_library(fftw3 STATIC IMPORTED)
+
+  set_target_properties(fftw3 PROPERTIES IMPORTED_LOCATION
+    ../${ARCH}/fftw3/libfftw3-3.lib)
+
+  add_library(${PROJECT_NAME} STATIC
     src/motifsetcollection
     src/freepositions
     src/basets
@@ -41,10 +51,10 @@ if (WIN32)
   target_include_directories(${PROJECT_NAME} PRIVATE
     api include src
     PUBLIC
-    ${FFTW3_INCLUDEDIR})
+    ../${ARCH}/fftw3)
 
   target_link_libraries(${PROJECT_NAME}
-    ${FFTW3_LIBRARIES})
+    fftw3)
 
   target_compile_options(${PROJECT_NAME} PUBLIC
     ${FFTW3_CFLAGS_OTHER})
