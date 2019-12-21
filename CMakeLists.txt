@@ -1,34 +1,23 @@
 cmake_minimum_required(VERSION 3.10.2)
-project(TSGenerator VERSION 1.0.0.0 LANGUAGES CXX)
+
+set(TSG_SOVERSION 1)
+set(TSG_VERSION ${TSG_SOVERSION}.0.0)
+set(LIB_NAME tsgenerator)
+project(TSGenerator VERSION ${TSG_VERSION} DESCRIPTION "TSGenerator library"
+  LANGUAGES CXX)
 
 if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif ()
 
-subdirs(src)
-
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
-  string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/bin)
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib)
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/lib)
-endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
-
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc/man)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/man/TSGenerator.3
-  ${CMAKE_CURRENT_BINARY_DIR}/doc/man/TSGenerator.3 COPYONLY)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "--enable-checking -g -O0 -v -da -Q")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+
 if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8)
   message(FATAL_ERROR "This project requires gcc version 8 or higher")
 endif ()
@@ -54,3 +43,74 @@ enable_testing()
 add_test(NAME "Unit_tests" COMMAND unittests)
 add_test(NAME "Help_text" COMMAND ${PROJECT_NAME} -h)
 add_test(NAME "Version_text" COMMAND ${PROJECT_NAME} -v)
+
+
+if (WIN32)
+  set(ARCH win32)
+  if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(ARCH win64)
+  endif()
+
+  add_library(fftw STATIC IMPORTED)
+  set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
+    ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3/libfftw3-3.lib)
+
+  include_directories(${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3)
+  link_directories(${PROJECT_SOURCE_DIR}/src)
+
+  add_executable(${PROJECT_NAME} main.cpp global.cpp motifsetcollection.cpp
+    outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
+    tsgenerator.cpp)
+  target_link_libraries(${PROJECT_NAME} fftw)
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
+    -E copy "${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3/libfftw3-3.dll"
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+
+  add_executable(unittests unittests.cpp global.cpp motifsetcollection.cpp
+    outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
+    tsgenerator.cpp)
+  target_link_libraries(unittests fftw)
+  add_custom_command(TARGET unittests POST_BUILD COMMAND ${CMAKE_COMMAND} -E
+    copy "${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3/libfftw3-3.dll"
+    $<TARGET_FILE_DIR:unittests>)
+else ()
+
+  find_package(PkgConfig REQUIRED)
+
+  pkg_check_modules(TSG REQUIRED tsgenerator)
+
+  add_executable(${PROJECT_NAME}
+    src/main.cpp
+    src/global.cpp
+    src/outputgenerator.cpp)
+
+  target_include_directories(${PROJECT_NAME} PRIVATE
+    include src
+    PUBLIC
+    ${TSG_INCLUDEDIR})
+
+  target_compile_options(${PROJECT_NAME} PUBLIC
+    ${TSG_CFLAGS_OTHER})
+
+  target_link_libraries(${PROJECT_NAME} PUBLIC
+    stdc++fs
+    ${TSG_LIBRARIES})
+
+  add_executable(unittests
+    src/unittests.cpp
+    src/global.cpp
+    src/outputgenerator.cpp)
+
+  target_include_directories(unittests PRIVATE
+    include src
+    PUBLIC
+    ${TSG_INCLUDEDIR})
+
+  target_compile_options(unittests PUBLIC
+    ${TSG_CFLAGS_OTHER})
+
+  target_link_libraries(unittests PUBLIC
+    stdc++fs
+    ${TSG_LIBRARIES})
+endif ()

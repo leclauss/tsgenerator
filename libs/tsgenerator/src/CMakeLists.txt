@@ -1,5 +1,23 @@
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
+add_library(${LIB_NAME} SHARED
+  motifsetcollection
+  freepositions
+  basets
+  scrimpplusplus
+  tsgenerator)
+set_target_properties(${LIB_NAME} PROPERTIES
+  VERSION ${TSG_VERSION}
+  SOVERSION ${TSG_SOVERSION}
+  PUBLIC_HEADER tsgenerator.hpp)
+target_include_directories(${LIB_NAME} PRIVATE include src)
+install(TARGETS ${LIB_NAME}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+configure_file(tsgenerator.pc.in tsgenerator.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/tsgenerator.pc DESTINATION
+  ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
+
 if (WIN32)
   set(ARCH win32)
   if (CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -53,17 +71,15 @@ else ()
     ${CMAKE_CURRENT_BINARY_DIR}/fftw/install/include)
   link_directories(${PROJECT_SOURCE_DIR}/src)
 
-  add_executable(${PROJECT_NAME} main.cpp global.cpp motifsetcollection.cpp
-    outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
-    tsgenerator.cpp fftw)
+  add_executable(${PROJECT_NAME} main.cpp global.cpp outputgenerator.cpp
+    ${LIB_NAME} fftw)
 
   add_dependencies(${PROJECT_NAME} project_fftw)
-  target_link_libraries(${PROJECT_NAME} PUBLIC stdc++fs fftw)
+  target_link_libraries(${PROJECT_NAME} PUBLIC stdc++fs ${LIB_NAME} fftw)
 
-  add_executable(unittests unittests.cpp global.cpp motifsetcollection.cpp
-    outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
-    tsgenerator.cpp fftw)
+  add_executable(unittests unittests.cpp global.cpp outputgenerator.cpp
+    ${LIB_NAME} fftw)
 
   add_dependencies(unittests project_fftw)
-  target_link_libraries(unittests PUBLIC stdc++fs fftw)
+  target_link_libraries(unittests PUBLIC stdc++fs ${LIB_NAME} fftw)
 endif ()
