@@ -43,7 +43,7 @@ if (WIN32)
 
   add_library(fftw3 STATIC IMPORTED)
 
-  get_filename_component(FFTW3_LIB_PATH ../${ARCH}/fftw3/libfftw3-3.lib
+  get_filename_component(FFTW3_LIB_PATH ../libs/${ARCH}/fftw3/libfftw3-3.lib
     ABSOLUTE)
 
   set_target_properties(fftw3 PROPERTIES IMPORTED_LOCATION
@@ -62,7 +62,7 @@ if (WIN32)
   target_include_directories(shared PRIVATE
     api include src
     PUBLIC
-    ../${ARCH}/fftw3)
+    ../libs/${ARCH}/fftw3)
 
   target_link_libraries(shared
     fftw3)
@@ -80,7 +80,7 @@ if (WIN32)
   target_include_directories(static PRIVATE
     api include src
     PUBLIC
-    ../${ARCH}/fftw3)
+    ../libs/${ARCH}/fftw3)
 
   target_link_libraries(static
     fftw3)
