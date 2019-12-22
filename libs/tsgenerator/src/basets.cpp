@@ -214,14 +214,14 @@ void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
   if (length_in < 1)
     return;
 
-  int step = abs(step_in);
+  double step = abs(step_in);
 
   //initialize the distributions for noise and the random walk
   normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
   normal_distribution<double> distribution(0.0, abs(delta_in) > 0.0
       ? delta_in : numeric_limits<double>::min());
-  poisson_distribution<int> distributionStep((double)step);
+  poisson_distribution<int> distributionStep(step);
 
   //add the first value
   double value = 0.0;

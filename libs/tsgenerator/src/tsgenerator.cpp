@@ -60,7 +60,7 @@ TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
   times(abs(times_in)), maxi(abs(maxi_in)), freePositions(length, window),
   randomEngine(random_device().entropy()
     ? random_device()()
-    : (unsinged int)(chrono::system_clock::now().time_since_epoch().count())) {
+    : (unsigned int)(chrono::system_clock::now().time_since_epoch().count())) {
 
   // get the type number
   type = (int)(distance(motifTypes.begin(), find(motifTypes.begin(),

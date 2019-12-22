@@ -19,7 +19,7 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
 {
   auto g = default_random_engine(random_device().entropy()
     ? random_device()()
-    : chrono::system_clock::now().time_since_epoch().count());
+    : (unsigned int)(chrono::system_clock::now().time_since_epoch().count()));
 
   int window = window_in;
   double rWindow = 1.0 / window;
