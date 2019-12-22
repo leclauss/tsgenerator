@@ -24,12 +24,12 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
   int window = window_in;
   double rWindow = 1.0 / window;
 
-  int stepSize = floor(stepSize_in*window);
+  int stepSize = (int)(floor(stepSize_in*window));
 
   if (stepSize_in < 0.0)
-    stepSize = floor(0.4*window);
+    stepSize = (int)(floor(0.4*window));
 
-  int timeSeriesLength = timeSeries_in.size();
+  int timeSeriesLength = (int)(timeSeries_in.size());
 
   // set exclusion zone
   int exclusionZone = window / 4;

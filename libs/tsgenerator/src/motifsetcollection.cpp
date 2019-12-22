@@ -21,7 +21,7 @@ void generateBoxMotif(vector<double> &subsequence_out, const double &warp_in,
   int length = length_in;
   double height = height_in;
 
-  int realLength = warp * length;
+  int realLength = (int)(warp * length);
 
   subsequence_out.push_back(0.0);
 
@@ -49,7 +49,7 @@ void generateTriangleMotif(vector<double> &subsequence_out, const double
   int length = length_in;
   double height = height_in;
 
-  int realLength = warp * length;
+  int realLength = (int)(warp * length);
 
   subsequence_out.push_back(0.0);
 
@@ -90,7 +90,7 @@ void generateSemicircleMotif(vector<double> &subsequence_out, const double
     scale = -scale;
   }
 
-  int realLength = warp * length;
+  int realLength = (int)(warp * length);
 
   subsequence_out.push_back(0.0);
 
@@ -131,7 +131,7 @@ void generateTrapezoidMotif(vector<double> &subsequence_out, const double
   int length = length_in;
   double height = height_in;
 
-  int realLength = warp * length;
+  int realLength = (int)(warp * length);
 
   subsequence_out.push_back(0.0);
 
@@ -167,7 +167,7 @@ void generatePositiveFlankMotif(vector<double> &subsequence_out, const double
   int length = length_in;
   double height = height_in;
 
-  int realLength = warp * length;
+  int realLength = (int)(warp * length);
 
   subsequence_out.push_back(0.0);
 
@@ -197,7 +197,7 @@ void generateNegativeFlankMotif(vector<double> &subsequence_out, const double
   int length = length_in;
   double height = height_in;
 
-  int realLength = warp * length;
+  int realLength = (int)(warp * length);
 
   subsequence_out.push_back(0.0);
 
@@ -226,7 +226,7 @@ void generateSineMotif(vector<double> &subsequence_out, const double &warp_in,
   int length = length_in;
   double height = height_in / 2.0;
 
-  int realLength = warp * length;
+  int realLength = (int)(warp * length);
   int middle = (realLength - 1) / 2;
 
   if (realLength > 2) {
@@ -257,7 +257,7 @@ void generateCosineMotif(vector<double> &subsequence_out, const double
   int length = length_in;
   double height = height_in / 2.0;
 
-  int realLength = warp * length;
+  int realLength = (int)(warp * length);
 
   if (realLength > 2)
     for (int itr = 0; itr < realLength; itr++)

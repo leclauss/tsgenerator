@@ -51,7 +51,7 @@ protected:
   ///This function computes a natural cubic spline according to the algorithm
   ///proposed on wikipedia.
   // --------------------------------------------------------------------------
-  void cubicSpline(const vector<double> & x_in, const vector<double> &y_in,
+  void cubicSpline(const vector<int> & x_in, const vector<double> &y_in,
       vector<double> &a_out, vector<double> &b_out, vector<double> &c_out,
       vector<double> &d_out);
 

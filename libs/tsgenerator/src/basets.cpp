@@ -12,11 +12,12 @@
 BaseTS::BaseTS()
   : randomEngine(random_device().entropy()
     ? random_device()()
-    : chrono::system_clock::now().time_since_epoch().count()) { }
+    : (unsigned int)(chrono::system_clock::now().time_since_epoch().count()))
+{ }
 
 BaseTS::~BaseTS() { }
 
-void BaseTS::cubicSpline(const vector<double> & x_in, const vector<double>
+void BaseTS::cubicSpline(const vector<int> & x_in, const vector<double>
     &y_in, vector<double> &a_out, vector<double> &b_out, vector<double> &c_out,
     vector<double> &d_out) {
 
@@ -26,7 +27,7 @@ void BaseTS::cubicSpline(const vector<double> & x_in, const vector<double>
     throw(EXIT_FAILURE);
   }
 
-  int length = x_in.size();
+  int length = (int)x_in.size();
 
   if (!(a_out.empty())) {
 
@@ -454,14 +455,14 @@ void BaseTS::linearRandomWalk(vector<double> &timeSeries_out, int length_in,
   if (length_in < 1)
     return;
 
-  int step = abs(step_in);
+  double step = abs(step_in);
 
   //initialize the distributions for noise and the random walk
   normal_distribution<double> distributionNoise(0.0, abs(noise_in) / 2.0 > 0.0
       ? noise_in / 2.0 : numeric_limits<double>::min());
   normal_distribution<double> distribution(0.0, abs(delta_in) > 0.0
       ? delta_in : numeric_limits<double>::min());
-  poisson_distribution<int> distributionStep((double)step);
+  poisson_distribution<int> distributionStep(step);
 
   //add the first value
   double value = 0.0;
@@ -682,7 +683,7 @@ void BaseTS::splineRepeated(vector<double> &timeSeries_out, int length_in,
   uniform_int_distribution<int> distributionStep(1, step < 1 ? 1 : step);
 
   //generate the repeating sequence
-  vector<double> x;
+  vector<int> x;
   vector<double> y;
 
   x.push_back(0);

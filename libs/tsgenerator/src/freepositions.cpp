@@ -12,7 +12,8 @@
 FreePositions::FreePositions(int length_in, int window_in)
   : window(window_in), randomEngine(random_device().entropy()
       ? random_device()()
-      : chrono::system_clock::now().time_since_epoch().count()) {
+      : (unsigned int)(chrono::system_clock::now().time_since_epoch().count()))
+  {
 
   //create first large interval
   interval first;

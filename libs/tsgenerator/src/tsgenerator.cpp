@@ -20,7 +20,7 @@ TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
   maxi(abs(maxi_in)), freePositions(length, window),
   randomEngine(random_device().entropy()
     ? random_device()()
-    : chrono::system_clock::now().time_since_epoch().count()) {
+    : (unsigned int)(chrono::system_clock::now().time_since_epoch().count())) {
 
   //check if type exists
   if (type >= (int) motifTypes.size()) {
@@ -60,11 +60,11 @@ TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
   times(abs(times_in)), maxi(abs(maxi_in)), freePositions(length, window),
   randomEngine(random_device().entropy()
     ? random_device()()
-    : chrono::system_clock::now().time_since_epoch().count()) {
+    : (unsinged int)(chrono::system_clock::now().time_since_epoch().count())) {
 
   // get the type number
-  type = distance(motifTypes.begin(), find(motifTypes.begin(),
-        motifTypes.end(), type_in));
+  type = (int)(distance(motifTypes.begin(), find(motifTypes.begin(),
+        motifTypes.end(), type_in)));
 
   // check if type exists
   if (type >= (int) motifTypes.size()) {
@@ -74,8 +74,8 @@ TSGenerator::TSGenerator(int length_in, int window_in, double delta_in,
   }
 
   // get the method
-  method = distance(methods.begin(), find(methods.begin(), methods.end(),
-        method_in));
+  method = (int)(distance(methods.begin(), find(methods.begin(), methods.end(),
+        method_in)));
 
   // check if type exists
   if (method >= (int) methods.size()) {
@@ -155,7 +155,7 @@ void TSGenerator::updateRunnings(const vector<double> &sequence_in, const int
 
   // check if we are at the end of the time series
   if (end > (int)sequence_in.size() - window)
-    end = sequence_in.size() - window;
+    end = (int)(sequence_in.size()) - window;
 
   // update all changed runnings
   for (int i = start - 1; i < end; i++) {
@@ -437,7 +437,8 @@ void TSGenerator::generateBaseTimeSeries(vector<double> &timeSeries_out) {
           noise);
       break;
     case 11:
-      baseTS.splineRepeated(timeSeries_out, length, delta, step, times, noise);
+      baseTS.splineRepeated(timeSeries_out, length, delta, (int)step, times,
+          noise);
       break;
     default:
       cerr << "ERROR: Unknown method: " << method << endl;
@@ -716,7 +717,7 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double> &d_out,
   double min, max;
   double lth = noise / length;
 
-  window_out.push_back(motifCenter.size());
+  window_out.push_back((int)(motifCenter.size()));
 
 
   //inject sequences into the time series
