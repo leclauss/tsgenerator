@@ -659,7 +659,7 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double> &d_out,
   bool repeatLoop = true;
   double mean;
   double stdDev;
-  double d;
+  double d = numeric_limits<double>::max();
   normal_distribution<double> distribution(0.0, abs(noise) / 4.0 <= 0.0
       ? numeric_limits<double>::min() : noise / 4.0);
 
@@ -731,16 +731,16 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double> &d_out,
     //try to inject another sequence
     while (retryItr < length + 100) {
 
-      normal_distribution<double> distribution(0.0, abs(noise) / 4.0 <= 0.0
-          ? numeric_limits<double>::min() : noise / 4.0);
+      normal_distribution<double> distributionNoise(0.0, abs(noise) / 4.0 <=
+          0.0 ? numeric_limits<double>::min() : noise / 4.0);
 
       //copy another motif sequence ...
       vector<double> newSubsequence(motifCenter);
 
       //... with noise
       if (noise > 0.0)
-        for (auto& value : newSubsequence)
-          value += distribution(randomEngine);
+        for (auto& item : newSubsequence)
+          item += distributionNoise(randomEngine);
 
       //check if the sequence is within range d / 2.0 of the center
       if (similarity(motifCenter, newSubsequence, d / 2.0) < d / 2.0) {
