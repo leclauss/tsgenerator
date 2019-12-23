@@ -45,6 +45,7 @@ add_test(NAME "Help_text" COMMAND ${PROJECT_NAME} -h)
 add_test(NAME "Version_text" COMMAND ${PROJECT_NAME} -v)
 
 
+# check dependencies
 if (WIN32)
   # build project
   set(ARCH win32)
@@ -69,14 +70,10 @@ else ()
   set(STDCPPFS stdc++fs)
 
   find_package(PkgConfig REQUIRED)
+  pkg_check_modules(TSG REQUIRED tsgenerator)
   pkg_check_modules(FFTW3 REQUIRED fftw3)
 endif ()
 
-# check dependencies
-find_package(PkgConfig REQUIRED)
-
-pkg_check_modules(TSG REQUIRED tsgenerator)
-pkg_check_modules(FFTW3 REQUIRED fftw3)
 
 # add the libraries
 find_library(TSG_LOCATION NAMES tsgenerator
