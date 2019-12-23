@@ -83,7 +83,7 @@ endif ()
 find_library(TSG_LOCATION NAMES tsgenerator
   HINTS libs/${ARCH}/tsgenerator)
 
-add_library(TSG SHARED IMPORTED)
+add_library(TSG STATIC IMPORTED)
 set_target_properties(TSG PROPERTIES
   IMPORTED_LOCATION ${TSG_LOCATION})
 
