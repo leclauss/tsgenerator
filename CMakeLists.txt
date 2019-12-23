@@ -61,10 +61,10 @@ if (WIN32)
   set(TSG_INCLUDEDIR tsgenerator/include)
   set(FFTW3_INCLUDEDIR libs/${ARCH}/fftw3)
 
-  file(GLOB FFTW3_LIB_NAME "../libs/${ARCH}/fftw3/libfftw3-*.lib")
+  file(GLOB FFTW3_LIB_NAME "libs/${ARCH}/fftw3/libfftw3-*.lib")
   string(REGEX MATCH "libfftw3-.*.lib" FFTW3_LIB_NAME ${FFTW3_LIB_NAME})
 
-  file(GLOB FFTW3_DLL_NAME "../libs/${ARCH}/fftw3/libfftw3-*.dll")
+  file(GLOB FFTW3_DLL_NAME "libs/${ARCH}/fftw3/libfftw3-*.dll")
 else ()
   set(STDCPPFS stdc++fs)
 
@@ -88,6 +88,10 @@ set_target_properties(TSG PROPERTIES
 
 find_library(FFTW3_LOCATION NAMES fftw3 ${FFTW3_LIB_NAME}
   HINTS libs/${ARCH}/fftw3)
+
+if (FFTW3_LOCATION EQUAL "FFTW3_LOCATION-NOTFOUND")
+  message(FATAL "Cannot find FFTW3")
+endif ()
 
 add_library(FFTW3 STATIC IMPORTED)
 set_target_properties(FFTW3 PROPERTIES

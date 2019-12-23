@@ -54,7 +54,7 @@ endif ()
 
 # build
 find_library(FFTW3_LOCATION NAMES fftw3 ${FFTW3_LIB_NAME}
-  HINTS libs/${ARCH}/fftw3)
+  HINTS ../libs/${ARCH}/fftw3)
 
 if (FFTW3_LOCATION EQUAL "FFTW3_LOCATION-NOTFOUND")
   message(FATAL "Cannot find FFTW3")
@@ -76,7 +76,7 @@ target_include_directories(shared PRIVATE
   PUBLIC
   ${FFTW3_INCLUDEDIR})
 
-target_link_libraries(shared
+target_link_libraries(shared PUBLIC
   FFTW3)
 
 target_compile_options(shared PUBLIC
@@ -104,8 +104,8 @@ target_include_directories(static PRIVATE
   PUBLIC
   ${FFTW3_INCLUDEDIR})
 
-target_link_libraries(static
-  fftw3)
+target_link_libraries(static PUBLIC
+  FFTW3)
 
 
 # install
