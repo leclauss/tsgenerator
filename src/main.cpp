@@ -250,7 +250,6 @@ int main(int argc, char *argv[]) {
         maxi = stoll(payload[0]);
       }
 
-
       //generate the time series
       vector<double> timeSeries;
       vector<double> dVector;

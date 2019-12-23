@@ -46,8 +46,15 @@ add_test(NAME "Version_text" COMMAND ${PROJECT_NAME} -v)
 
 
 if (WIN32)
+  # build project
   set(ARCH win32)
   if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(ARCH win64)
+  endif()
+  if (CMAKE_GENERATOR_PLATFORM MATCHES .*32.*)
+    set(ARCH win32)
+  endif()
+  if (CMAKE_GENERATOR_PLATFORM MATCHES .*64.*)
     set(ARCH win64)
   endif()
 
@@ -84,7 +91,7 @@ else ()
     src/main.cpp
     src/global.cpp
     src/outputgenerator.cpp)
-
+  message(STATUS "inc: ${TSG_INCLUDEDIR} 2: ${TSG_INCLUDE_DIRS}")
   target_include_directories(${PROJECT_NAME} PRIVATE
     include src
     PUBLIC

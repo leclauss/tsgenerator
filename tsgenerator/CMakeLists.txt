@@ -112,9 +112,7 @@ else ()
 
   set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION ${TSG_VERSION}
-    SOVERSION ${TSG_SOVERSION}
-    PUBLIC_HEADER
-    api/tsgenerator.hpp)
+    SOVERSION ${TSG_SOVERSION})
 
 
   # install
@@ -124,8 +122,16 @@ else ()
 
   install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+  install(FILES
+    include/tsgenerator.hpp
+    include/basets.hpp
+    include/freepositions.hpp
+    include/motifsetcollection.hpp
+    include/scrimpplusplus.hpp
+    DESTINATION
+    ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 
   install(FILES ${CMAKE_BINARY_DIR}/tsgenerator.pc DESTINATION
     ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
@@ -133,7 +139,6 @@ else ()
 
   # package
   set(CPACK_GENERATOR DEB)
-  set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
   set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${TSG_VERSION})
   set(CPACK_PACKAGE_CONTACT "Rafael Moczalla")
   set(CPACK_DEBIAN_PACKAGE_DEPENDS libfftw3-dev)
