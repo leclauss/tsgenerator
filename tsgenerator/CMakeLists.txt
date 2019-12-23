@@ -113,7 +113,7 @@ include(GNUInstallDirs)
 
 configure_file(tsgenerator.pc.in tsgenerator.pc @ONLY)
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS shared
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
