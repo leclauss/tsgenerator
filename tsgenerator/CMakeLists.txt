@@ -111,7 +111,7 @@ else ()
     ${FFTW3_INCLUDEDIR})
 
   target_link_libraries(${PROJECT_NAME}
-    ${FFTW3})
+    FFTW3)
 
   target_compile_options(${PROJECT_NAME} PUBLIC
     ${FFTW3_CFLAGS_OTHER})
