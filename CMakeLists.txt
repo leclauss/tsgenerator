@@ -83,26 +83,45 @@ if (WIN32)
     $<TARGET_FILE_DIR:unittests>)
 else ()
 
+  # check dependencies
   find_package(PkgConfig REQUIRED)
 
   pkg_check_modules(TSG REQUIRED tsgenerator)
+  pkg_check_modules(FFTW3 REQUIRED fftw3)
 
+  # add the libraries
+  find_library(TSG_LOCATION NAMES tsgenerator)
+
+  add_library(TSG SHARED IMPORTED)
+  set_target_properties(TSG PROPERTIES
+    IMPORTED_LOCATION ${TSG_LOCATION})
+
+  find_library(FFTW3_LOCATION NAMES fftw3)
+
+  add_library(FFTW3 STATIC IMPORTED)
+  set_target_properties(FFTW3 PROPERTIES
+    IMPORTED_LOCATION ${FFTW3_LOCATION})
+
+  # build
   add_executable(${PROJECT_NAME}
     src/main.cpp
     src/global.cpp
     src/outputgenerator.cpp)
-  message(STATUS "inc: ${TSG_INCLUDEDIR} 2: ${TSG_INCLUDE_DIRS}")
+
   target_include_directories(${PROJECT_NAME} PRIVATE
     include src
     PUBLIC
-    ${TSG_INCLUDEDIR})
+    ${TSG_INCLUDEDIR}
+    ${FFTW3_INCLUDEDIR})
 
   target_compile_options(${PROJECT_NAME} PUBLIC
-    ${TSG_CFLAGS_OTHER})
+    ${TSG_CFLAGS_OTHER}
+    ${FFTW3_CFLAGS_OTHER})
 
   target_link_libraries(${PROJECT_NAME} PUBLIC
     stdc++fs
-    ${TSG_LIBRARIES})
+    TSG
+    FFTW3)
 
   add_executable(unittests
     src/unittests.cpp
@@ -112,12 +131,15 @@ else ()
   target_include_directories(unittests PRIVATE
     include src
     PUBLIC
-    ${TSG_INCLUDEDIR})
+    ${TSG_INCLUDEDIR}
+    ${FFTW3_INCLUDEDIR})
 
   target_compile_options(unittests PUBLIC
-    ${TSG_CFLAGS_OTHER})
+    ${TSG_CFLAGS_OTHER}
+    ${FFTW3_CFLAGS_OTHER})
 
   target_link_libraries(unittests PUBLIC
     stdc++fs
-    ${TSG_LIBRARIES})
+    TSG
+    FFTW3)
 endif ()

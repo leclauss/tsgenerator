@@ -92,6 +92,12 @@ else ()
 
 
   # build
+  find_library(FFTW3_LOCATION NAMES fftw3)
+
+  add_library(FFTW3 STATIC IMPORTED)
+  set_target_properties(FFTW3 PROPERTIES
+    IMPORTED_LOCATION ${FFTW3_LOCATION})
+
   add_library(${PROJECT_NAME} SHARED
     src/motifsetcollection
     src/freepositions
@@ -105,7 +111,7 @@ else ()
     ${FFTW3_INCLUDEDIR})
 
   target_link_libraries(${PROJECT_NAME}
-    ${FFTW3_LIBRARIES})
+    ${FFTW3})
 
   target_compile_options(${PROJECT_NAME} PUBLIC
     ${FFTW3_CFLAGS_OTHER})
