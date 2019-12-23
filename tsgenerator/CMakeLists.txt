@@ -107,6 +107,22 @@ target_include_directories(static PRIVATE
 target_link_libraries(static PUBLIC
   FFTW3)
 
+add_executable(unittests
+  test/unittests.cpp)
+
+target_include_directories(unittests PRIVATE
+  test include src
+  PUBLIC
+  ${FFTW3_INCLUDEDIR})
+
+target_compile_options(unittests PUBLIC
+  ${FFTW3_CFLAGS_OTHER})
+
+target_link_libraries(unittests PUBLIC
+  ${STDCPPFS}
+  shared
+  FFTW3)
+
 
 # install
 include(GNUInstallDirs)
@@ -114,10 +130,12 @@ include(GNUInstallDirs)
 configure_file(tsgenerator.pc.in tsgenerator.pc @ONLY)
 
 install(TARGETS shared
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 install(TARGETS static
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
