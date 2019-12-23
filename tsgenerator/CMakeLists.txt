@@ -45,7 +45,7 @@ if (WIN32)
   file(GLOB FFTW3_LIB_NAME "../libs/${ARCH}/fftw3/libfftw3-*.lib")
   string(REGEX MATCH "libfftw3-.*.lib" FFTW3_LIB_NAME ${FFTW3_LIB_NAME})
 
-  set(FFTW3_INCLUDE_DIR ../libs/${ARCH}/fftw3)
+  set(FFTW3_INCLUDEDIR ../libs/${ARCH}/fftw3)
 else ()
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(FFTW3 REQUIRED fftw3)

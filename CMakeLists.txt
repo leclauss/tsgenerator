@@ -58,8 +58,8 @@ if (WIN32)
     set(ARCH win64)
   endif()
 
-  set(TSG_INCLUDE_DIR tsgenerator/include)
-  set(FFTW3_INCLUDE_DIR libs/${ARCH}/fftw3)
+  set(TSG_INCLUDEDIR tsgenerator/include)
+  set(FFTW3_INCLUDEDIR libs/${ARCH}/fftw3)
 
   file(GLOB FFTW3_LIB_NAME "../libs/${ARCH}/fftw3/libfftw3-*.lib")
   string(REGEX MATCH "libfftw3-.*.lib" FFTW3_LIB_NAME ${FFTW3_LIB_NAME})
