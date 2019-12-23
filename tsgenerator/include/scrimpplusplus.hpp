@@ -31,6 +31,8 @@ using namespace std;
 ///\brief The Scrimp++ procedure.
 ///
 ///\param [in] &timeSeries Hands over the time series.
+///\param [in] &ASum_in Hands over the running sum.
+///\param [in] &ASumSq_in Hands over the running sum of squares.
 ///\param [out] &pos0_out Returns the position of the first subsequence.
 ///\param [out] &pos1_out Returns the position of the second subsequence.
 ///\param [in] windowSize_in Hands over the window size.
@@ -39,7 +41,8 @@ using namespace std;
 ///This is the Scrimp++ implementation edited to return the most similar
 ///subsequence pair in a time series.
 // ----------------------------------------------------------------------------
-void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
-    &pos1_out, int windowSize_in, double stepSize_in = -1.0);
+void scrimpPP(const vector<double> &timeSeries_in, const vector<double>
+    &ASum_in, const vector<double> &ASumSq_in, int &pos0_out, int &pos1_out,
+    int windowSize_in, double stepSize_in = -1.0);
 
 #endif

@@ -675,7 +675,8 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double> &d_out,
 
     //determine similarity of the top motif pair in the random synthetic time
     //series
-    scrimpPP(timeSeries_out, positionOne, positionTwo, window);
+    scrimpPP(timeSeries_out, sums, sumSquares, positionOne, positionTwo,
+        window);
     d = similarity(timeSeries_out, positionOne, positionTwo,
         numeric_limits<double>::max());
 
@@ -830,7 +831,7 @@ void TSGenerator::run(vector<double> &timeSeries_out, vector<double> &d_out,
   positionOne = 0;
   positionTwo = 0;
 
-  scrimpPP(timeSeries_out, positionOne, positionTwo, window);
+  scrimpPP(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
   d = similarity(timeSeries_out, positionOne, positionTwo,
       numeric_limits<double>::max());
   d_out.push_back(d);

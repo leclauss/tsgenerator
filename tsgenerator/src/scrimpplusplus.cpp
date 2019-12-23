@@ -14,8 +14,9 @@
 #include <scrimpplusplus.hpp>
 
 
-void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
-    &pos1_out, int window_in, double stepSize_in)
+void scrimpPP(const vector<double> &timeSeries_in, const vector<double>
+    &ASum_in, const vector<double> &ASumSq_in, int &pos0_out, int &pos1_out,
+    int window_in, double stepSize_in)
 {
   auto g = default_random_engine(random_device().entropy()
     ? random_device()()
@@ -39,25 +40,12 @@ void scrimpPP(const vector<double> &timeSeries_in, int &pos0_out, int
 
   // preprocess, statistics, get the mean and standard deviation of every
   // subsequence in the time series
-  vector<double> ASum;
-  ASum.push_back(timeSeries_in[0]);
-  for (int i = 1; i < window; i++)
-    ASum[0] += timeSeries_in[i];
-  for (int i = 0; i < timeSeriesLength - window; i++)
-    ASum.push_back(ASum[i] - timeSeries_in[i] + timeSeries_in[window + i]);
-  vector<double> ASumSq;
-  ASumSq.push_back(timeSeries_in[0] * timeSeries_in[0]);
-  for (int i = 1; i < window; i++)
-    ASumSq[0] += timeSeries_in[i] * timeSeries_in[i];
-  for (int i = 0; i < timeSeriesLength - window; i++)
-    ASumSq.push_back(ASumSq[i] - timeSeries_in[i] * timeSeries_in[i]
-        + timeSeries_in[i + window] * timeSeries_in[i + window]);
   vector<double> AMean;
   for (int i = 0; i < ProfileLength; i++)
-    AMean.push_back(ASum[i] * rWindow);
+    AMean.push_back(ASum_in[i] * rWindow);
   vector<double> ASigmaSq;
   for (int i = 0; i < ProfileLength; i++)
-    ASigmaSq.push_back(ASumSq[i] * rWindow - AMean[i] * AMean[i]);
+    ASigmaSq.push_back(ASumSq_in[i] * rWindow - AMean[i] * AMean[i]);
   vector<double> ASigma;
   for (int i = 0; i < ProfileLength; i++)
     ASigma.push_back(sqrt(ASigmaSq[i]));
