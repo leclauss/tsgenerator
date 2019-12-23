@@ -115,7 +115,7 @@ target_compile_options(${PROJECT_NAME} PUBLIC
   ${FFTW3_CFLAGS_OTHER})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-  STDCPPFS
+  ${STDCPPFS}
   TSG
   FFTW3)
 
@@ -135,7 +135,7 @@ target_compile_options(unittests PUBLIC
   ${FFTW3_CFLAGS_OTHER})
 
 target_link_libraries(unittests PUBLIC
-  STDCPPFS
+  ${STDCPPFS}
   TSG
   FFTW3)
 
