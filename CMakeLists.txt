@@ -140,5 +140,5 @@ if (WIN32)
     -E copy ${FFTW3_DLL_NAME} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
   add_custom_command(TARGET unittests POST_BUILD COMMAND ${CMAKE_COMMAND} -E
-    copy ${FFTW3_DLL_NAME} $<TARGET_FILE_DIR:unittest>)
+    copy ${FFTW3_DLL_NAME} $<TARGET_FILE_DIR:unittests>)
 endif ()
