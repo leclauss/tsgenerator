@@ -28,6 +28,26 @@ if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8)
   message(FATAL_ERROR "This project requires gcc version 8 or higher")
 endif ()
 
+option(BUILD_DOC "Build documentation" ON)
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+    set(DOXYGEN_CONF ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxygen.conf)
+    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    configure_file(${DOXYGEN_CONF} ${DOXYGEN_OUT} @ONLY)
+    message("Documentation build started")
+
+    add_custom_target(doc COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMENT "Doxygen started"
+      VERBATIM)
+else(DOXYGEN_FOUND)
+  message("Doxygen missing for documentation build")
+endif(DOXYGEN_FOUND)
+
+enable_testing()
+
+add_test(NAME "unit tests" COMMAND unittests)
+
 # check the dependencies
 if (WIN32)
   # build project
@@ -57,7 +77,7 @@ find_library(FFTW3_LOCATION NAMES fftw3 ${FFTW3_LIB_NAME}
   HINTS ../libs/${ARCH}/fftw3)
 
 if (FFTW3_LOCATION EQUAL "FFTW3_LOCATION-NOTFOUND")
-  message(FATAL "Cannot find FFTW3")
+  message(FATAL_ERROR "Cannot find FFTW3")
 endif ()
 
 add_library(FFTW3 STATIC IMPORTED)

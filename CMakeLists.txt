@@ -45,8 +45,6 @@ endif(DOXYGEN_FOUND)
 enable_testing()
 
 add_test(NAME "Unit_tests" COMMAND unittests)
-add_test(NAME "Help_text" COMMAND ${PROJECT_NAME} -h)
-add_test(NAME "Version_text" COMMAND ${PROJECT_NAME} -v)
 
 
 # check dependencies
