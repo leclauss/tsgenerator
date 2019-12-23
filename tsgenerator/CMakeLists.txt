@@ -3,9 +3,14 @@ cmake_minimum_required(VERSION 3.10.2)
 # setup project
 set(PROJECT_HOMEPAGE_URL
   "https://gitlab.com/r.moczalla/TSGenerator/tree/master")
-set(TSG_SOVERSION 1)
+set(TSG_SOVERSION 3)
 set(TSG_VERSION ${TSG_SOVERSION}.0.0)
-project(tsgenerator VERSION ${TSG_VERSION} DESCRIPTION "TSGenerator library"
+set(PROJECT_LIB_NAME tsgenerator)
+project(${PROJECT_LIB_NAME}-dev
+  VERSION ${TSG_VERSION}
+  DESCRIPTION
+"Synthetic time series generator for evaluation purposes of time series \
+motif discovery algorithms."
   LANGUAGES CXX)
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -28,25 +33,9 @@ if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8)
   message(FATAL_ERROR "This project requires gcc version 8 or higher")
 endif ()
 
-option(BUILD_DOC "Build documentation" ON)
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-    set(DOXYGEN_CONF ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxygen.conf)
-    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-
-    configure_file(${DOXYGEN_CONF} ${DOXYGEN_OUT} @ONLY)
-    message("Documentation build started")
-
-    add_custom_target(doc COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMENT "Doxygen started"
-      VERBATIM)
-else(DOXYGEN_FOUND)
-  message("Doxygen missing for documentation build")
-endif(DOXYGEN_FOUND)
-
 enable_testing()
 
-add_test(NAME "unit tests" COMMAND unittests)
+add_test(NAME "unit_tests" COMMAND unittests)
 
 # check the dependencies
 if (WIN32)
@@ -103,7 +92,7 @@ target_compile_options(shared PUBLIC
   ${FFTW3_CFLAGS_OTHER})
 
 set_target_properties(shared PROPERTIES
-  OUTPUT_NAME ${PROJECT_NAME}
+  OUTPUT_NAME ${PROJECT_LIB_NAME}
   VERSION ${TSG_VERSION}
   SOVERSION ${TSG_SOVERSION})
 
@@ -115,7 +104,7 @@ add_library(static STATIC
   src/tsgenerator)
 
 set_target_properties(static PROPERTIES
-  OUTPUT_NAME ${PROJECT_NAME}
+  OUTPUT_NAME ${PROJECT_LIB_NAME}
   VERSION ${TSG_VERSION}
   SOVERSION ${TSG_SOVERSION})
 
@@ -147,7 +136,7 @@ target_link_libraries(unittests PUBLIC
 # install
 include(GNUInstallDirs)
 
-configure_file(tsgenerator.pc.in tsgenerator.pc @ONLY)
+configure_file(share/pkgconfig/tsgenerator.pc.in tsgenerator.pc @ONLY)
 
 install(TARGETS shared
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -165,11 +154,10 @@ install(FILES
   include/freepositions.hpp
   include/motifsetcollection.hpp
   include/scrimpplusplus.hpp
-  DESTINATION
-  ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_LIB_NAME})
 
-install(FILES ${CMAKE_BINARY_DIR}/tsgenerator.pc DESTINATION
-  ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
+install(FILES ${CMAKE_BINARY_DIR}/tsgenerator.pc
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
 
 
 # package

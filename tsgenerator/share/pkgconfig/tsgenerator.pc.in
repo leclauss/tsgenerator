@@ -1,13 +1,13 @@
 prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=${prefix}
 libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
-includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@/@PROJECT_NAME@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@/@PROJECT_LIB_NAME@
 
-Name: @PROJECT_NAME@
+Name: @PROJECT_LIB_NAME@
 Description: @PROJECT_DESCRIPTION@
 Version: @PROJECT_VERSION@
 
 Requires: fftw3
-Libs: -L${libdir} -l@PROJECT_NAME@
+Libs: -L${libdir} -l@PROJECT_LIB_NAME@
 Cflags: -I${includedir}
 URL: @PROJECT_HOMEPAGE_URL@

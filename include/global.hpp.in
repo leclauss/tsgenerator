@@ -20,14 +20,14 @@ using namespace std;
 ///
 ///Makro that defines the name of the program.
 // ----------------------------------------------------------------------------
-#define PROGNAME "TSGenerator"
+#define PROGNAME "@PROJECT_NAME@"
 
 // ----------------------------------------------------------------------------
 ///\brief Defines the program version.
 ///
 ///Makro that defines the version of the program.
 // ----------------------------------------------------------------------------
-#define VERSION  "3.0.0.8"
+#define VERSION "@PROJECT_VERSION@"
 
 // ----------------------------------------------------------------------------
 ///\brief Checks if string represents float.

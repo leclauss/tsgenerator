@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-set(TSG_SOVERSION 1)
+set(TSG_SOVERSION 2)
 set(TSG_VERSION ${TSG_SOVERSION}.0.0)
 set(LIB_NAME tsgenerator)
-project(TSGenerator VERSION ${TSG_VERSION} DESCRIPTION "TSGenerator library"
+project(tsgenerator VERSION ${TSG_VERSION}
+  DESCRIPTION
+"Synthetic time series generator for evaluation purposes of time series \
+motif discovery algorithms."
   LANGUAGES CXX)
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -29,22 +32,22 @@ endif ()
 option(BUILD_DOC "Build documentation" ON)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-    set(DOXYGEN_CONF ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxygen.conf)
-    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+  message("Documentation build started")
 
-    configure_file(${DOXYGEN_CONF} ${DOXYGEN_OUT} @ONLY)
-    message("Documentation build started")
+  configure_file(share/doc/Doxygen.in Doxygen @ONLY)
 
-    add_custom_target(doc COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMENT "Doxygen started"
-      VERBATIM)
+  add_custom_target(doc
+    COMMAND ${DOXYGEN_EXECUTABLE} Doxygen
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Doxygen started"
+    VERBATIM)
 else(DOXYGEN_FOUND)
   message("Doxygen missing for documentation build")
 endif(DOXYGEN_FOUND)
 
 enable_testing()
 
-add_test(NAME "Unit_tests" COMMAND unittests)
+add_test(NAME "unit_tests" COMMAND unittests)
 
 
 # check dependencies
@@ -89,7 +92,7 @@ find_library(FFTW3_LOCATION NAMES fftw3 ${FFTW3_LIB_NAME}
   HINTS libs/${ARCH}/fftw3)
 
 if (FFTW3_LOCATION EQUAL "FFTW3_LOCATION-NOTFOUND")
-  message(FATAL "Cannot find FFTW3")
+  message(FATAL_ERROR "Cannot find FFTW3")
 endif ()
 
 add_library(FFTW3 STATIC IMPORTED)
@@ -97,6 +100,8 @@ set_target_properties(FFTW3 PROPERTIES
   IMPORTED_LOCATION ${FFTW3_LOCATION})
 
 # build
+configure_file(include/global.hpp.in global.hpp @ONLY)
+
 add_executable(${PROJECT_NAME}
   src/main.cpp
   src/global.cpp
@@ -105,6 +110,7 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PRIVATE
   include src
   PUBLIC
+  ${CMAKE_CURRENT_BINARY_DIR}
   ${TSG_INCLUDEDIR}
   ${FFTW3_INCLUDEDIR})
 
@@ -118,13 +124,14 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   FFTW3)
 
 add_executable(unittests
-  src/unittests.cpp
+  test/unittests.cpp
   src/global.cpp
   src/outputgenerator.cpp)
 
 target_include_directories(unittests PRIVATE
-  include src
+  test include src
   PUBLIC
+  ${CMAKE_CURRENT_BINARY_DIR}
   ${TSG_INCLUDEDIR}
   ${FFTW3_INCLUDEDIR})
 
@@ -136,6 +143,29 @@ target_link_libraries(unittests PUBLIC
   ${STDCPPFS}
   TSG
   FFTW3)
+
+
+# install
+include(GNUInstallDirs)
+
+configure_file(share/man/tsgenerator.3.in tsgenerator.3 @ONLY)
+
+install(TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(FILES ${CMAKE_BINARY_DIR}/tsgenerator.3
+  DESTINATION ${CMAKE_INSTALL_MANDIR}/man3)
+
+
+# package
+set(CPACK_GENERATOR DEB)
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION})
+set(CPACK_PACKAGE_CONTACT "Rafael Moczalla")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libfftw3-dev,tsgenerator-dev")
+
+include(CPack)
 
 if (WIN32)
   add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
