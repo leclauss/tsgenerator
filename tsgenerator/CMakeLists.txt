@@ -102,7 +102,7 @@ set_target_properties(static PROPERTIES
 target_include_directories(static PRIVATE
   api include src
   PUBLIC
-  ../libs/${ARCH}/fftw3)
+  ${FFTW3_INCLUDEDIR})
 
 target_link_libraries(static
   fftw3)
