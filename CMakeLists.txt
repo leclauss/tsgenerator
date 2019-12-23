@@ -58,88 +58,86 @@ if (WIN32)
     set(ARCH win64)
   endif()
 
-  add_library(fftw STATIC IMPORTED)
-  set_target_properties(fftw PROPERTIES IMPORTED_LOCATION
-    ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3/libfftw3-3.lib)
+  set(TSG_INCLUDE_DIR tsgenerator/include)
+  set(FFTW3_INCLUDE_DIR libs/${ARCH}/fftw3)
 
-  include_directories(${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3)
-  link_directories(${PROJECT_SOURCE_DIR}/src)
+  file(GLOB FFTW3_LIB_NAME "../libs/${ARCH}/fftw3/libfftw3-*.lib")
+  string(REGEX MATCH "libfftw3-.*.lib" FFTW3_LIB_NAME ${FFTW3_LIB_NAME})
 
-  add_executable(${PROJECT_NAME} main.cpp global.cpp motifsetcollection.cpp
-    outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
-    tsgenerator.cpp)
-  target_link_libraries(${PROJECT_NAME} fftw)
-  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
-    -E copy "${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3/libfftw3-3.dll"
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-
-  add_executable(unittests unittests.cpp global.cpp motifsetcollection.cpp
-    outputgenerator.cpp freepositions.cpp basets.cpp scrimpplusplus.cpp
-    tsgenerator.cpp)
-  target_link_libraries(unittests fftw)
-  add_custom_command(TARGET unittests POST_BUILD COMMAND ${CMAKE_COMMAND} -E
-    copy "${PROJECT_SOURCE_DIR}/libs/${ARCH}/fftw3/libfftw3-3.dll"
-    $<TARGET_FILE_DIR:unittests>)
+  file(GLOB FFTW3_DLL_NAME "../libs/${ARCH}/fftw3/libfftw3-*.dll")
 else ()
+  set(STDCPPFS stdc++fs)
 
-  # check dependencies
   find_package(PkgConfig REQUIRED)
-
-  pkg_check_modules(TSG REQUIRED tsgenerator)
   pkg_check_modules(FFTW3 REQUIRED fftw3)
+endif ()
 
-  # add the libraries
-  find_library(TSG_LOCATION NAMES tsgenerator)
+# check dependencies
+find_package(PkgConfig REQUIRED)
 
-  add_library(TSG SHARED IMPORTED)
-  set_target_properties(TSG PROPERTIES
-    IMPORTED_LOCATION ${TSG_LOCATION})
+pkg_check_modules(TSG REQUIRED tsgenerator)
+pkg_check_modules(FFTW3 REQUIRED fftw3)
 
-  find_library(FFTW3_LOCATION NAMES fftw3)
+# add the libraries
+find_library(TSG_LOCATION NAMES tsgenerator
+  HINTS libs/${ARCH}/tsgenerator)
 
-  add_library(FFTW3 STATIC IMPORTED)
-  set_target_properties(FFTW3 PROPERTIES
-    IMPORTED_LOCATION ${FFTW3_LOCATION})
+add_library(TSG SHARED IMPORTED)
+set_target_properties(TSG PROPERTIES
+  IMPORTED_LOCATION ${TSG_LOCATION})
 
-  # build
-  add_executable(${PROJECT_NAME}
-    src/main.cpp
-    src/global.cpp
-    src/outputgenerator.cpp)
+find_library(FFTW3_LOCATION NAMES fftw3 ${FFTW3_LIB_NAME}
+  HINTS libs/${ARCH}/fftw3)
 
-  target_include_directories(${PROJECT_NAME} PRIVATE
-    include src
-    PUBLIC
-    ${TSG_INCLUDEDIR}
-    ${FFTW3_INCLUDEDIR})
+add_library(FFTW3 STATIC IMPORTED)
+set_target_properties(FFTW3 PROPERTIES
+  IMPORTED_LOCATION ${FFTW3_LOCATION})
 
-  target_compile_options(${PROJECT_NAME} PUBLIC
-    ${TSG_CFLAGS_OTHER}
-    ${FFTW3_CFLAGS_OTHER})
+# build
+add_executable(${PROJECT_NAME}
+  src/main.cpp
+  src/global.cpp
+  src/outputgenerator.cpp)
 
-  target_link_libraries(${PROJECT_NAME} PUBLIC
-    stdc++fs
-    TSG
-    FFTW3)
+target_include_directories(${PROJECT_NAME} PRIVATE
+  include src
+  PUBLIC
+  ${TSG_INCLUDEDIR}
+  ${FFTW3_INCLUDEDIR})
 
-  add_executable(unittests
-    src/unittests.cpp
-    src/global.cpp
-    src/outputgenerator.cpp)
+target_compile_options(${PROJECT_NAME} PUBLIC
+  ${TSG_CFLAGS_OTHER}
+  ${FFTW3_CFLAGS_OTHER})
 
-  target_include_directories(unittests PRIVATE
-    include src
-    PUBLIC
-    ${TSG_INCLUDEDIR}
-    ${FFTW3_INCLUDEDIR})
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  STDCPPFS
+  TSG
+  FFTW3)
 
-  target_compile_options(unittests PUBLIC
-    ${TSG_CFLAGS_OTHER}
-    ${FFTW3_CFLAGS_OTHER})
+add_executable(unittests
+  src/unittests.cpp
+  src/global.cpp
+  src/outputgenerator.cpp)
 
-  target_link_libraries(unittests PUBLIC
-    stdc++fs
-    TSG
-    FFTW3)
+target_include_directories(unittests PRIVATE
+  include src
+  PUBLIC
+  ${TSG_INCLUDEDIR}
+  ${FFTW3_INCLUDEDIR})
+
+target_compile_options(unittests PUBLIC
+  ${TSG_CFLAGS_OTHER}
+  ${FFTW3_CFLAGS_OTHER})
+
+target_link_libraries(unittests PUBLIC
+  STDCPPFS
+  TSG
+  FFTW3)
+
+if (WIN32)
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
+    -E copy ${FFTW3_DLL_NAME} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+
+  add_custom_command(TARGET unittests POST_BUILD COMMAND ${CMAKE_COMMAND} -E
+    copy ${FFTW3_DLL_NAME} $<TARGET_FILE_DIR:unittest>)
 endif ()
