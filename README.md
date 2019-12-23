@@ -17,32 +17,42 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
  sudo apt-get install build-essential
  ```
 
-2. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website").
+2. Download and install [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/ "pkg-config website").
+ ```bash
+ sudo apt-get install pkg-config
+ ```
+
+3. Download and install [FFTW](http://www.fftw.org/ "FFTW website").
+ ```bash
+ sudo apt-get install libfftw3-dev
+ ```
+
+4. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website").
  ```bash
  sudo apt-get install graphviz
  ```
 
-3. Download and install [Doxygen](http://doxygen.org/ "Doxygen website").
+5. Download and install [Doxygen](http://doxygen.org/ "Doxygen website").
  ```bash
  sudo apt-get install doxygen
  ```
 
-4. Download and install [CMake](https://cmake.org/ "CMake website").
+6. Download and install [CMake](https://cmake.org/ "CMake website").
  ```bash
  sudo apt-get install cmake
  ```
 
-5. Download and install [Git](https://git-scm.com/ "open source Website maintained by members of the Git community").
+7. Download and install [Git](https://git-scm.com/ "open source Website maintained by members of the Git community").
  ```bash
  sudo apt-get install git
  ```
 
-6. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website").
+8. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website").
  ```bash
  sudo apt-get install gnuplot
  ```
 
-7. Download and install [GCC](https://gcc.gnu.org/ "GNU Compiler Collection") version 8 if your gcc version is smaller.
+9. Download and install [GCC](https://gcc.gnu.org/ "GNU Compiler Collection") version 8 if your gcc version is smaller.
  ```bash
  sudo apt-get install gcc-8 g++-8
  ```
@@ -73,28 +83,38 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
  ln -s /usr/local/opt/llvm/bin/clang /usr/local/bin/clang
  ```
 
-2. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website").
+2. Download and install [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/ "pkg-config website").
+ ```bash
+ brew install pkg-config
+ ```
+
+3. Download and install [FFTW](http://www.fftw.org/ "FFTW website").
+ ```bash
+ brew install fftw
+ ```
+
+4. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website").
  ```bash
  brew install graphviz
  ```
 
-3. Download and install [Doxygen](http://doxygen.org/ "Doxygen website").
+5. Download and install [Doxygen](http://doxygen.org/ "Doxygen website").
  ```bash
  brew install doxygen
  ```
 
-4. Download and install [CMake](https://cmake.org/ "CMake website").
+6. Download and install [CMake](https://cmake.org/ "CMake website").
  ```bash
  brew install cmake
  ```
 
-5. Download and install [Git](https://git-scm.com/ "open source website maintained by members of the Git community") and [GNU Make](https://www.gnu.org/software/make/ "GNU Make website"), if Git or GNU Make is appropriate missing.
+7. Download and install [Git](https://git-scm.com/ "open source website maintained by members of the Git community") and [GNU Make](https://www.gnu.org/software/make/ "GNU Make website"), if Git or GNU Make is appropriate missing.
  ```bash
  brew install git
  brew install make
  ```
 
-6. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website").
+8. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website").
  ```bash
  brew install gnuplot
  ```
