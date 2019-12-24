@@ -154,6 +154,7 @@ install(FILES
   include/freepositions.hpp
   include/motifsetcollection.hpp
   include/scrimpplusplus.hpp
+  include/tsgtypes.hpp
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_LIB_NAME})
 
 install(FILES ${CMAKE_BINARY_DIR}/tsgenerator.pc

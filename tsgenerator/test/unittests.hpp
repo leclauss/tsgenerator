@@ -1425,7 +1425,7 @@ vector<double> testSequenceTwo = {
 ///The protected functions as well as the protected attributes of the test time
 ///series generator are made accessable.
 // --------------------------------------------------------------------------
-class TestTSGenerator : public TSGenerator {
+class TestTSGenerator : public tsg::TSGenerator {
 
 public:
   // --------------------------------------------------------------------------

@@ -11,21 +11,21 @@ void test_motifsetcollection() {
 
   TEST_GROUP_FUNCTION;
 
-  vector<double> subsequence;
+  tsg::rseq subsequence;
 
-  generateBoxMotif(subsequence, 1.0, 1.0, 10, 5.0);
+  tsg::generateBoxMotif(subsequence, 1.0, 1.0, 10, 5.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
   TEST(subsequence[5] == 5.0);
   TEST(subsequence[8] == 5.0);
-  generateBoxMotif(subsequence, 1.0, 1.0, 10, -7.0);
+  tsg::generateBoxMotif(subsequence, 1.0, 1.0, 10, -7.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
   TEST(subsequence[5] == -7.0);
   TEST(subsequence[8] == -7.0);
-  generateTriangleMotif(subsequence, 1.0, 1.0, 10, 5.0);
+  tsg::generateTriangleMotif(subsequence, 1.0, 1.0, 10, 5.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -33,7 +33,7 @@ void test_motifsetcollection() {
   TEST(subsequence[4] == subsequence[5]);
   TEST(subsequence[1] == subsequence[8]);
   TEST(subsequence[3] != subsequence[9]);
-  generateTriangleMotif(subsequence, 1.0, 1.0, 10, -7.0);
+  tsg::generateTriangleMotif(subsequence, 1.0, 1.0, 10, -7.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -41,7 +41,7 @@ void test_motifsetcollection() {
   TEST(subsequence[4] == subsequence[5]);
   TEST(subsequence[1] == subsequence[8]);
   TEST(subsequence[3] != subsequence[9]);
-  generateSemicircleMotif(subsequence, 1.0, 1.0, 10, 5.0);
+  tsg::generateSemicircleMotif(subsequence, 1.0, 1.0, 10, 5.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -49,7 +49,7 @@ void test_motifsetcollection() {
   TEST(subsequence[4] == subsequence[5]);
   TEST(subsequence[1] == subsequence[8]);
   TEST(subsequence[3] != subsequence[9]);
-  generateSemicircleMotif(subsequence, 1.0, 1.0, 10, -7.0);
+  tsg::generateSemicircleMotif(subsequence, 1.0, 1.0, 10, -7.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -57,7 +57,7 @@ void test_motifsetcollection() {
   TEST(subsequence[4] == subsequence[5]);
   TEST(subsequence[1] == subsequence[8]);
   TEST(subsequence[3] != subsequence[9]);
-  generateTrapezoidMotif(subsequence, 1.0, 1.0, 10, 5.0);
+  tsg::generateTrapezoidMotif(subsequence, 1.0, 1.0, 10, 5.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -65,7 +65,7 @@ void test_motifsetcollection() {
   TEST(subsequence[4] == subsequence[5]);
   TEST(subsequence[1] == subsequence[8]);
   TEST(subsequence[3] != subsequence[9]);
-  generateTrapezoidMotif(subsequence, 1.0, 1.0, 10, -7.0);
+  tsg::generateTrapezoidMotif(subsequence, 1.0, 1.0, 10, -7.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -73,7 +73,7 @@ void test_motifsetcollection() {
   TEST(subsequence[4] == subsequence[5]);
   TEST(subsequence[1] == subsequence[8]);
   TEST(subsequence[3] != subsequence[9]);
-  generatePositiveFlankMotif(subsequence, 1.0, 1.0, 10, 5.0);
+  tsg::generatePositiveFlankMotif(subsequence, 1.0, 1.0, 10, 5.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -81,7 +81,7 @@ void test_motifsetcollection() {
   TEST(subsequence[2] < subsequence[3]);
   TEST(subsequence[5] < subsequence[6]);
   TEST(subsequence[9] < subsequence[8]);
-  generatePositiveFlankMotif(subsequence, 1.0, 1.0, 10, -7.0);
+  tsg::generatePositiveFlankMotif(subsequence, 1.0, 1.0, 10, -7.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -89,7 +89,7 @@ void test_motifsetcollection() {
   TEST(subsequence[2] > subsequence[3]);
   TEST(subsequence[5] > subsequence[6]);
   TEST(subsequence[9] > subsequence[8]);
-  generateNegativeFlankMotif(subsequence, 1.0, 1.0, 10, 5.0);
+  tsg::generateNegativeFlankMotif(subsequence, 1.0, 1.0, 10, 5.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -97,7 +97,7 @@ void test_motifsetcollection() {
   TEST(subsequence[2] > subsequence[3]);
   TEST(subsequence[5] > subsequence[6]);
   TEST(subsequence[0] < subsequence[1]);
-  generateNegativeFlankMotif(subsequence, 1.0, 1.0, 10, -7.0);
+  tsg::generateNegativeFlankMotif(subsequence, 1.0, 1.0, 10, -7.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -105,7 +105,7 @@ void test_motifsetcollection() {
   TEST(subsequence[2] < subsequence[3]);
   TEST(subsequence[5] < subsequence[6]);
   TEST(subsequence[0] > subsequence[1]);
-  generateSineMotif(subsequence, 1.0, 1.0, 10, 5.0);
+  tsg::generateSineMotif(subsequence, 1.0, 1.0, 10, 5.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -115,7 +115,7 @@ void test_motifsetcollection() {
   TEST(subsequence[1] < subsequence[3]);
   TEST(abs(subsequence[1] + subsequence[8]) < 0.001);
   TEST(abs(subsequence[3] + subsequence[6]) < 0.001);
-  generateSineMotif(subsequence, 1.0, 1.0, 10, -7.0);
+  tsg::generateSineMotif(subsequence, 1.0, 1.0, 10, -7.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -125,7 +125,7 @@ void test_motifsetcollection() {
   TEST(subsequence[1] > subsequence[3]);
   TEST(abs(subsequence[1] + subsequence[8]) < 0.001);
   TEST(abs(subsequence[3] + subsequence[6]) < 0.001);
-  generateCosineMotif(subsequence, 1.0, 1.0, 10, 5.0);
+  tsg::generateCosineMotif(subsequence, 1.0, 1.0, 10, 5.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -133,7 +133,7 @@ void test_motifsetcollection() {
   TEST(abs(subsequence[4] - subsequence[5]) < 0.001);
   TEST(abs(subsequence[3] - subsequence[6]) < 0.001);
   TEST(subsequence[3] != subsequence[9]);
-  generateCosineMotif(subsequence, 1.0, 1.0, 10, -7.0);
+  tsg::generateCosineMotif(subsequence, 1.0, 1.0, 10, -7.0);
   TEST(subsequence.size() == 10);
   TEST(subsequence.front() == 0.0);
   TEST(subsequence.back() == 0.0);
@@ -151,7 +151,7 @@ void test_freepositions() {
 
     auto length = 10;
     auto window = 3;
-    FreePositions freePos(length, window);
+    tsg::FreePositions freePos(length, window);
 
     for (int x = 0; x < 300; x++) {
 
@@ -166,8 +166,8 @@ void test_freepositions() {
   for (int x = 0; x < 20; x++) {
     auto length = 44;
     auto window = 3;
-    FreePositions freePos(length, window);
-    vector<int> pos;
+    tsg::FreePositions freePos(length, window);
+    tsg::iseq pos;
 
     for (int i = 0; i < 4; i++) {
 
@@ -187,7 +187,7 @@ void test_freepositions() {
   { //test failure
     auto length = 3;
     auto window = 3;
-    FreePositions freePos(length, window);
+    tsg::FreePositions freePos(length, window);
 
     auto pos = freePos.calculateRandomPosition();
     freePos.removePosition();
@@ -211,9 +211,9 @@ void test_basets() {
 
   TEST_GROUP_FUNCTION;
 
-  BaseTS baseTS;
+  tsg::BaseTS baseTS;
 
-  vector<double> ts;
+  tsg::rseq ts;
 
   //simple random walk
   baseTS.simpleRandomWalk(ts, 100, 1.0, 0.0);
@@ -474,7 +474,7 @@ void test_tsgenerator() {
 
     rWindow = 0.05;
     generator.setWindow(20);
-    vector<double> subsequence(testTimeSeries.begin() + topMotifSetPos[0],
+    tsg::rseq subsequence(testTimeSeries.begin() + topMotifSetPos[0],
         testTimeSeries.begin() + topMotifSetPos[0] + 20);
     generator.testMeanStdDev(subsequence, mean, stdDev);
     TEST(mean <= topMotifSetMeans[0] + 0.0000001 && mean >= topMotifSetMeans[0]
@@ -482,7 +482,7 @@ void test_tsgenerator() {
     TEST(stdDev <= topMotifSetStdDevs[0] + 0.0000001 && stdDev >=
         topMotifSetStdDevs[0] - 0.0000001);
 
-    vector<double> subsequence1(testTimeSeries.begin() + topMotifSetPos[1],
+    tsg::rseq subsequence1(testTimeSeries.begin() + topMotifSetPos[1],
         testTimeSeries.begin() + topMotifSetPos[1] + 20);
     generator.testMeanStdDev(subsequence1, mean, stdDev);
     TEST(mean <= topMotifSetMeans[1] + 0.0000001 && mean >= topMotifSetMeans[1]
@@ -500,8 +500,8 @@ void test_tsgenerator() {
 
 
     //test running sum and sum of squares
-    vector<double> sums;
-    vector<double> sumSquares;
+    tsg::rseq sums;
+    tsg::rseq sumSquares;
     double std;
     bool flagMeansStdsTest = true;
 
@@ -545,7 +545,7 @@ void test_tsgenerator() {
     //test update running sum and sum of square
     {
       int pos = 59;
-      vector<double> testSeries(testTimeSeries);
+      tsg::rseq testSeries(testTimeSeries);
 
       //compute running sum and sum of square
       generator.testCalcRunnings(testSeries);
@@ -667,7 +667,7 @@ void test_tsgenerator() {
 
     try {
 
-      generator.testSimilarity(testTimeSeries, vector<double>(),
+      generator.testSimilarity(testTimeSeries, tsg::rseq(),
           topMotifSetMeans[0], topMotifSetStdDevs[0], topMotifSetPos[0],
           numeric_limits<double>::max());
       TEST(!"Has to throw an error!");
@@ -860,7 +860,7 @@ void test_tsgenerator() {
 
     generator.testCalculateSubsequence(subsequence, 1, 10.0);
     generator.testMeanStdDev(subsequence, mean, stdDev);
-    vector<double> sequenceTwo;
+    tsg::rseq sequenceTwo;
     double meanTwo;
     double stdDevTwo;
     generator.testCalculateSubsequence(sequenceTwo, 7, 10.0);
@@ -897,10 +897,10 @@ void test_tsgenerator() {
     //test synthetic time series motif set generation function
     TestTSGenerator simGenerator(3000, 100, 20, 0.0, 2, 3, 50.0);
     TestTSGenerator generator(3000, 100, 20, 0.0, 2, 3, 50.0);
-    vector<double> timeSeries_out;
-    vector<double> d_out;
-    vector<int> windowSize_out;
-    vector<vector<int>> positions_out;
+    tsg::rseq timeSeries_out;
+    tsg::rseq d_out;
+    tsg::iseq windowSize_out;
+    tsg::iseqs positions_out;
 
 
     for (int itr = 0; itr < 3; itr++) {
