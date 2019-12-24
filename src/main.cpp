@@ -6,6 +6,7 @@
 ///configuration file for the time series configuration.
 
 #include <tsgenerator.hpp>
+#include <tsgtypes.hpp>
 #include <outputgenerator.hpp>
 #include <global.hpp>
 #include <iostream>
@@ -251,12 +252,12 @@ int main(int argc, char *argv[]) {
       }
 
       //generate the time series
-      vector<double> timeSeries;
-      vector<double> dVector;
-      vector<int> windows;
-      vector<vector<int>> motifPositions;
-      TSGenerator tSGenerator(length, window, delta, noise, type, size, height,
-          step, times, method, maxi);
+      tsg::rseq timeSeries;
+      tsg::rseq dVector;
+      tsg::iseq windows;
+      tsg::iseqs motifPositions;
+      tsg::TSGenerator tSGenerator(length, window, delta, noise, type, size,
+          height, step, times, method, maxi);
       tSGenerator.run(timeSeries, dVector, windows, motifPositions);
 
       //output stuff
