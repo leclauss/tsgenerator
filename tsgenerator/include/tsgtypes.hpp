@@ -55,6 +55,25 @@ namespace tsg {
     int position = 0;
     int length = 0;
   };
+
+  ///\brief This is a time series.
+  ///
+  ///The time series is a seuqence of subsequences.
+  typedef std::vector<subsequence> subsequences;
+
+  ///\brief This struct an interval of the time series.
+  ///
+  ///The time series interval consists of a postion and length.
+  struct interval {
+
+    int start = 0;
+    int end = 0;
+  };
+
+  ///\brief This is a interval sequence.
+  ///
+  ///The interval sequence is a seuqence of intervals.
+  typedef std::vector<interval> intervals;
 }
 
 #endif

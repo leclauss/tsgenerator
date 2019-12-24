@@ -11,7 +11,6 @@
 
 #include <random>
 #include <chrono>
-#include <vector>
 #include <tsgtypes.hpp>
 
 
@@ -24,17 +23,6 @@ namespace tsg {
   ///functions one starts the time series generation by calling the run
   ///function.
   class FreePositions {
-
-  public:
-
-    ///\brief This struct an interval of the time series.
-    ///
-    ///The time series interval consists of a postion and length.
-    struct interval {
-
-      int start = 0;
-      int end = 0;
-    };
 
   protected:
 
@@ -53,7 +41,7 @@ namespace tsg {
     ///
     ///This variable stores the positions of free subsequences in the time
     ///series between the motif sets subsequences.
-    std::vector<interval> freePositions;
+    intervals freePositions;
 
     ///\brief This variable stores the random engine.
     ///

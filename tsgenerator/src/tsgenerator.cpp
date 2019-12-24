@@ -504,7 +504,7 @@ namespace tsg {
 
     sort(positions.begin(), positions.end());
 
-    std::vector<subsequence> overlapping;
+    subsequences overlapping;
 
 
     //get all positions of time series subsequences overlapping the injected

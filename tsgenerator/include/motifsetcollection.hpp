@@ -10,7 +10,6 @@
 
 #define _USE_MATH_DEFINES
 
-#include <vector>
 #include <cmath>
 #include <list>
 #include <tsgtypes.hpp>
