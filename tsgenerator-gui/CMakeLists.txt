@@ -48,7 +48,7 @@ if (WIN32)
   set(FFTW3_INCLUDEDIR ../libs/${ARCH}/fftw3)
 
   file(GLOB FFTW3_LIB_NAME "../libs/${ARCH}/fftw3/libfftw3-*.lib")
-  string(REGEX MATCH "../libfftw3-.*.lib" FFTW3_LIB_NAME ${FFTW3_LIB_NAME})
+  string(REGEX MATCH "libfftw3-.*.lib" FFTW3_LIB_NAME ${FFTW3_LIB_NAME})
 
   file(GLOB FFTW3_DLL_NAME "../libs/${ARCH}/fftw3/libfftw3-*.dll")
 
@@ -60,7 +60,11 @@ if (WIN32)
 else ()
   set(STDCPPFS stdc++fs)
 
-  file(GLOB_RECURSE MAC_QT5 LIST_DIRECTORIES true "/usr/local/Cellar/qt/Qt5")
+  if (NOT Qt5_PATH)
+    file(GLOB_RECURSE MAC_QT5 LIST_DIRECTORIES true "/usr/local/Cellar/qt/Qt5")
+  else ()
+    file(GLOB_RECURSE MAC_QT5 LIST_DIRECTORIES true "${Qt5_PATH}/Qt5")
+  endif ()
   set(QT5_CFLAGS -fPIC)
 
   find_package(PkgConfig REQUIRED)
