@@ -29,10 +29,6 @@ if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8)
   message(FATAL_ERROR "This project requires gcc version 8 or higher")
 endif ()
 
-enable_testing()
-
-add_test(NAME "unit_tests" COMMAND unittests)
-
 
 # check dependencies
 if (WIN32)
@@ -55,10 +51,17 @@ if (WIN32)
   string(REGEX MATCH "../libfftw3-.*.lib" FFTW3_LIB_NAME ${FFTW3_LIB_NAME})
 
   file(GLOB FFTW3_DLL_NAME "../libs/${ARCH}/fftw3/libfftw3-*.dll")
+
+  if (EMPTY Qt5_PATH)
+    file(GLOB_RECURSE WIN_QT5 LIST_DIRECTORIES true "C:/Qt/Qt5")
+  else ()
+    file(GLOB_RECURSE WIN_QT5 LIST_DIRECTORIES true "${Qt5_PATH}/Qt5")
+  endif ()
 else ()
   set(STDCPPFS stdc++fs)
 
   file(GLOB_RECURSE MAC_QT5 LIST_DIRECTORIES true "/usr/local/Cellar/qt/Qt5")
+  set(QT5_CFLAGS -fPIC)
 
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(TSG REQUIRED tsgenerator)
@@ -108,7 +111,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
   ${FFTW3_INCLUDEDIR})
 
 target_compile_options(${PROJECT_NAME} PUBLIC
-  -fPIC ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}
+  ${Qt5_CFLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}
   ${TSG_CFLAGS_OTHER}
   ${FFTW3_CFLAGS_OTHER})
 
@@ -139,7 +142,4 @@ include(CPack)
 if (WIN32)
   add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
     -E copy ${FFTW3_DLL_NAME} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-
-  add_custom_command(TARGET unittests POST_BUILD COMMAND ${CMAKE_COMMAND} -E
-    copy ${FFTW3_DLL_NAME} $<TARGET_FILE_DIR:unittests>)
 endif ()
