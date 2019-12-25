@@ -17,44 +17,49 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
  sudo apt-get install build-essential
  ```
 
-2. Download and install [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/ "pkg-config website").
+2. Download and install [GCC](https://gcc.gnu.org/ "GNU Compiler Collection") version 8 if your gcc version is smaller.
+ ```bash
+ sudo apt-get install gcc-8 g++-8
+ ```
+
+3. Download and install [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/ "pkg-config website").
  ```bash
  sudo apt-get install pkg-config
  ```
 
-3. Download and install [FFTW](http://www.fftw.org/ "FFTW website").
+4. Download and install [FFTW](http://www.fftw.org/ "FFTW website").
  ```bash
  sudo apt-get install libfftw3-dev
  ```
 
-4. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website").
+5. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website").
  ```bash
  sudo apt-get install graphviz
  ```
 
-5. Download and install [Doxygen](http://doxygen.org/ "Doxygen website").
+6. Download and install [Doxygen](http://doxygen.org/ "Doxygen website").
  ```bash
  sudo apt-get install doxygen
  ```
 
-6. Download and install [CMake](https://cmake.org/ "CMake website").
+7. Download and install [CMake](https://cmake.org/ "CMake website").
  ```bash
  sudo apt-get install cmake
  ```
 
-7. Download and install [Git](https://git-scm.com/ "open source Website maintained by members of the Git community").
+8. Download and install [Git](https://git-scm.com/ "open source Website maintained by members of the Git community").
  ```bash
  sudo apt-get install git
  ```
 
-8. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website").
+9. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website").
  ```bash
  sudo apt-get install gnuplot
  ```
 
-9. Download and install [GCC](https://gcc.gnu.org/ "GNU Compiler Collection") version 8 if your gcc version is smaller.
+10. Download and install [Qt5](https://www.qt.io/ "Qt website").
  ```bash
- sudo apt-get install gcc-8 g++-8
+ sudo apt-get install qt5-default
  ```
 
 **Windows:**
@@ -66,11 +71,13 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
 3. Download and install [CMake](https://cmake.org/ "CMake website"). Choose the option **Add to system path** during the installation.
 
 4. Download and install [Visual Studio-IDE](https://www.visualstudio.com/
-   "Microsoft Visual Studio website"). Make sure you download an IDE like Visual Studio Community, Visual Studio Professional or Visual Studio Enterprise. Visual Studio Code is an editor and not an IDE. Choose the option **Desktop development with C++** option and in the second tab the **C++ Clang Compiler for Windows**, **C++ Clang-cl for ... build tools (x64/x86)** as well as **CMake** during the installation.
+   "Microsoft Visual Studio website"). Make sure you download an IDE like Visual Studio Community, Visual Studio Professional or Visual Studio Enterprise. Visual Studio Code is an editor and not an IDE. Choose the option **Desktop development with C++** option during the installation.
 
 5. Download and install [Git](https://git-scm.com/ "open source Website maintained by members of the Git community"). Choose the option **Use Git from Git Bash only** as well as the option **MinTTY** during installation.
 
 6. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website"). Make sure to hit **Add to system path** during the installation.
+
+7. Download and install [Qt5](https://www.qt.io/ "Qt website").
 
 **Mac:**
 
@@ -117,6 +124,11 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
 8. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website").
  ```bash
  brew install gnuplot
+ ```
+
+9. Download and install [Qt5](https://www.qt.io/ "Qt website").
+ ```bash
+ brew install qt5
  ```
 
 ### Installation Guide
@@ -177,6 +189,11 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
  mkdir "build"
  cd "build"
  cmake ..
+ ```
+ If you installed [Qt5](https://www.qt.io/ "Qt website") in another location
+than ***C:/Qt*** than specify the location ***LOC*** exclusive.
+ ```bash
+ cmake -DQt5_PATH="LOC" ..
  ```
 
 3. Open the **TSGenerator.sln** file with Visual Studio and rightclick on the target TSGenerator in the projectmap explorer. Hit the option **Select as Startproject** and press the f5 key to build the project.
