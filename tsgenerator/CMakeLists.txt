@@ -64,7 +64,7 @@ if (WIN32)
     set(ARCH win64)
   endif()
 
-  set(TSG_INCLUDEDIR tsgenerator/include)
+  set(TSG_INCLUDEDIR ../tsgenerator-dev/include)
   set(FFTW3_INCLUDEDIR ../libs/${ARCH}/fftw3)
 
   file(GLOB FFTW3_LIB_NAME "../libs/${ARCH}/fftw3/libfftw3-*.lib")

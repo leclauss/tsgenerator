@@ -44,7 +44,7 @@ if (WIN32)
     set(ARCH win64)
   endif()
 
-  set(TSG_INCLUDEDIR tsgenerator/include)
+  set(TSG_INCLUDEDIR ../tsgenerator-dev/include)
   set(FFTW3_INCLUDEDIR ../libs/${ARCH}/fftw3)
 
   file(GLOB FFTW3_LIB_NAME "../libs/${ARCH}/fftw3/libfftw3-*.lib")
@@ -74,7 +74,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS Widgets REQUIRED
-  HINTS ${MAC_QT5})
+  HINTS ${MAC_QT5}
+  ${WIN_QT5})
 
 find_library(TSG_LOCATION NAMES tsgenerator
   HINTS ../libs/${ARCH}/tsgenerator)
