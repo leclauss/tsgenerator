@@ -58,6 +58,8 @@ if (WIN32)
 else ()
   set(STDCPPFS stdc++fs)
 
+  file(GLOB_RECURSE MAC_QT5 LIST_DIRECTORIES true "/usr/local/Cellar/qt/Qt5"
+
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(TSG REQUIRED tsgenerator)
   pkg_check_modules(FFTW3 REQUIRED fftw3)
@@ -68,7 +70,8 @@ endif ()
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Widgets REQUIRED
+  HINTS ${MAC_QT5})
 
 find_library(TSG_LOCATION NAMES tsgenerator
   HINTS ../libs/${ARCH}/tsgenerator)
