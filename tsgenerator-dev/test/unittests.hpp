@@ -10,8 +10,9 @@
 #define UNITTESTS_HPP
 
 #include <stest.hpp>
-#include <global.hpp>
-#include <outputgenerator.hpp>
+#include <tsgenerator.hpp>
+#include <freepositions.hpp>
+#include <basets.hpp>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -1419,135 +1420,241 @@ vector<double> testSequenceTwo = {
 
 
 // --------------------------------------------------------------------------
-///\brief This class represents a test version of the output generator.
+///\brief This class represents a test version of the time series generator.
 ///
-///The protected functions as well as the protected attributes of the output
-///generator are made accessable.
+///The protected functions as well as the protected attributes of the test time
+///series generator are made accessable.
 // --------------------------------------------------------------------------
-class TestOutputGenerator : public OutputGenerator {
+class TestTSGenerator : public tsg::TSGenerator {
 
 public:
-
   // --------------------------------------------------------------------------
-  ///\brief Close the output file stream of the time series.
+  ///\brief The constructor initializes the TSGenerator.
   ///
-  ///This functions closes the content of the variable that stores the pointer
-  ///pointing at the time series output file.
-  // --------------------------------------------------------------------------
-  void closeOutputFileStream() {
-
-    outputFile.close();
-  };
-
-  // --------------------------------------------------------------------------
-  ///\brief Close the output file stream of the motif set.
+  ///\param [in] length_in Hands over the time series length.
+  ///\param [in] window_in Hands over the window size.
+  ///\param [in] delta_in Hands over the maximum difference between two
+  ///consecutive values in the time series.
+  ///\param [in] noise_in Hands over the noise option, i.e., +-noise_in 2 will
+  ///be added to each value of the time series.
+  ///\param [in] type_in Hands over the motif type, i.e., the motif shape.
+  ///\param [in] size_in Hands over the number of subsequences non-self matched
+  ///by the motif.
+  ///\param [in] height_in Hands over the maximum difference between two values
+  ///of the motif.
   ///
-  ///This functions closes the content of the variable that stores the pointer
-  ///pointing at the motif set output file.
+  ///The constructor checks whether a true random engine is available and
+  ///stores the result in the trueRandomEngineAvailable variable.
   // --------------------------------------------------------------------------
-  void closeOutputFileMotifSetStream() {
-
-    outputFileMotifSets.close();
-  };
+  TestTSGenerator(int length_in, int window_in, double delta_in, double
+      noise_in, int type_in, int size_in, double height_in)
+    : TSGenerator(length_in, window_in, delta_in, noise_in, type_in, size_in,
+        height_in) { }
 
   // --------------------------------------------------------------------------
-  ///\brief Close the output file stream of the GNUPlot script file.
+  ///\brief Sets the length of the time series.
   ///
-  ///This functions closes the content of the variable that stores the pointer
-  ///pointing at the GNUPlot script file.
-  // --------------------------------------------------------------------------
-  void closeOutputFileGNUPlotScriptStream() {
-
-    outputFileGNUPlotScript.close();
-  };
-
-  // --------------------------------------------------------------------------
-  ///\brief Returns the name of the motif sets output file.
+  ///\param [in] length_in The legnth of the time series.
   ///
-  ///\return The output file name.
-  ///
-  ///This function returns the content of the variable that stores the name of
-  ///the file containing the motif sets distances and positions.
+  ///This function sets the content of the variable that stores the length
+  ///of the time series.
   // --------------------------------------------------------------------------
-  string getOutputFileMotifSetsName() {
+  void setLength(int length_in) {
 
-    return outputFileMotifSetsName;
-  };
-
-  // --------------------------------------------------------------------------
-  ///\brief Returns the name of the GNUPlot script output file.
-  ///
-  ///\return The output file name.
-  ///
-  ///This function returns the content of the variable that stores the name of
-  ///the GNUPlot script output file.
-  // --------------------------------------------------------------------------
-  string getOutputFileGNUPlotScriptName() {
-
-    return outputFileGNUPlotScriptName;
-  };
-
-  // --------------------------------------------------------------------------
-  ///\brief Returns the name of the time series output file.
-  ///
-  ///\return The output file name.
-  ///
-  ///This function returns the content of the variable that stores the name of
-  ///the time series output file.
-  // --------------------------------------------------------------------------
-  string getOutputFileName() {
-
-    return outputFileName;
-  };
-
-  // --------------------------------------------------------------------------
-  ///\brief Returns the stem of the output file names.
-  ///
-  ///\return The output file name.
-  ///
-  ///This function returns the content of the variable that stores the stem of
-  ///the output file names.
-  // --------------------------------------------------------------------------
-  string getBasicOutputFileName() {
-
-    return basicOutputFileName;
+    length = length_in;
   }
 
   // --------------------------------------------------------------------------
-  ///\brief Returns the time series name.
+  ///\brief Sets the window size for the motif detection.
   ///
-  ///\return The time series name.
+  ///\param [in] window_in The window size.
   ///
-  ///This function returns the content of the variable that stores the time
-  ///series name.
+  ///This function sets the content of the variable that stores the window
+  ///size for the motif detection.
   // --------------------------------------------------------------------------
-  string getTimeSeriesName() {
+  void setWindow(int window_in) {
 
-    return timeSeriesName;
+    window = window_in;
   }
 
   // --------------------------------------------------------------------------
-  ///\brief Returns the output folder number.
+  ///\brief Returns the running sum of the time series.
   ///
-  ///\return The output folder number.
+  ///\return The running sums of the time series.
   ///
-  ///This function returns the content of the variable that stores the output
-  ///folder number.
+  ///This function returns the content of the variable that stores the sums of
+  ///the time series.
   // --------------------------------------------------------------------------
-  int getOutputFolderNumber() {
+  vector<double> &getSums() {
 
-    return outputFolderNumber;
+    return sums;
   }
 
   // --------------------------------------------------------------------------
-  ///\brief Runs the protected open file function.
+  ///\brief Returns the running sum of square of the time series.
   ///
-  ///This function runs the open file function since the open file function is
-  ///protected.
+  ///\return The sum of squares of the time series.
+  ///
+  ///This function returns the content of the variable that stores the
+  ///sum of squares of the time series.
   // --------------------------------------------------------------------------
-  void testOpenFile() {
+  vector<double> &getSumSquares() {
 
-    openFile();
+    return sumSquares;
+  }
+
+  // --------------------------------------------------------------------------
+  ///\brief Runs the running sum and sum of square function.
+  ///
+  ///\param [in] &sequence_in Hands over the sequence.
+  ///
+  ///This function runs the running sum and sum of square function since the
+  ///function is protected.
+  // --------------------------------------------------------------------------
+  void testCalcRunnings(const vector<double> &sequence_in) {
+
+    calcRunnings(sequence_in);
+  }
+
+  // --------------------------------------------------------------------------
+  ///\brief Runs the mean and variance function.
+  ///
+  ///\param [in] &sequence_in Hands over the sequence.
+  ///\param [in] pos_in Hands over the position of changed subsequence.
+  ///
+  ///This function runs the update running sum and sum of square function since
+  ///the function is protected.
+  // --------------------------------------------------------------------------
+  void testUpdateRunnings(const vector<double> &sequence_in, const int pos_in)
+    {
+
+    updateRunnings(sequence_in, pos_in);
+  }
+
+  // --------------------------------------------------------------------------
+  ///\brief Runs the similarity function.
+  ///
+  ///\param [in] &timeSeriesOne_in Hands over the time series.
+  ///\param [in] subsequenceOnePos_in Hands over the position of the first
+  ///subsequence in the time series.
+  ///\param [in] subsequenceTwoPos_in Hands over the position of the second
+  ///subsequence in the time series.
+  ///\param [in] bestSoFar_in Hands over the best similarity so far.
+  ///
+  ///\return The similarity of the two z-normalized time series.
+  ///
+  ///This function runs the similarity function since the similarity function
+  ///is protected.
+  // --------------------------------------------------------------------------
+  double testSimilarity(const vector<double> &timeSeries_in, const int
+      subsequenceOnePos_in, const int subsequenceTwoPos_in, const double
+      bestSoFar_in) {
+
+    return similarity(timeSeries_in, subsequenceOnePos_in,
+        subsequenceTwoPos_in, bestSoFar_in);
+  }
+
+  // --------------------------------------------------------------------------
+  ///\brief Runs the mean and standard deviation function.
+  ///
+  ///\param [in] &sequence_in Hands over the sequence.
+  ///\param [out] &mean_out The mean of the sequence.
+  ///\param [out] &stdDev_out The standard deviation of the sequence.
+  ///
+  ///This function runs the mean and standard deviation function since the mean
+  ///and standard deviation function is protected.
+  // --------------------------------------------------------------------------
+  void testMeanStdDev(const vector<double> &sequence_in, double &mean_out,
+      double &stdDev_out) {
+
+    meanStdDev(sequence_in, mean_out, stdDev_out);
+  }
+
+  // --------------------------------------------------------------------------
+  ///\brief Runs the similarity function.
+  ///
+  ///\param [in] &timeSeriesOne_in Hands over the time series.
+  ///\param [in] &subsequenceOne_in Hands over the first subsequence in the
+  ///time series.
+  ///\param [in] meanOne_in Hands over the mean of timeSeriesOne_in.
+  ///\param [in] stdDevOne_in Hands over the standard deviation of
+  ///timeSeriesOne_in.
+  ///\param [in] subsequenceTwoPos_in Hands over the position of the second
+  ///subsequence in the time series.
+  ///\param [in] bestSoFar_in Hands over the best similarity so far.
+  ///
+  ///\return The similarity of the two z-normalized time series.
+  ///
+  ///This function runs the similarity function since the similarity function
+  ///is protected.
+  // --------------------------------------------------------------------------
+  double testSimilarity(const vector<double> &timeSeries_in, const
+      vector<double> &subsequenceOne_in, const double meanOne_in, const double
+      stdDevOne_in, const int subsequenceTwoPos_in, const double bestSoFar_in)
+    {
+
+    return similarity(timeSeries_in, subsequenceOne_in, meanOne_in,
+        stdDevOne_in, subsequenceTwoPos_in, bestSoFar_in);
+  }
+
+  // --------------------------------------------------------------------------
+  ///\brief Runs the calculate motif set subsequence function.
+  ///
+  ///\param [out] subsequence_out Hands over the calculated raw subsequence.
+  ///\param [in] type_in Hands over the motif set type.
+  ///\param [in] height_in Hands over the height of the subsequence.
+  ///
+  ///This function runs the calculate motif set subsequence function since the
+  ///calculate raw motif set subsequence function is protected.
+  // --------------------------------------------------------------------------
+  void testCalculateSubsequence(vector<double> &subsequence_out, int type_in,
+      double height_in) {
+
+    calculateSubsequence(subsequence_out, type_in, height_in);
+  }
+
+  // --------------------------------------------------------------------------
+  ///\brief Runs the search for unintentional matches in the time series
+  ///function.
+  ///
+  ///\param [in] &timeSereis_in Hands over the time series.
+  ///\param [in] &subsequencePositions_in Hands over the position of the new
+  ///subsequence.
+  ///\param [in] similarity_in Hands over the similarity to break.
+  ///
+  ///\return true if there exists an unintentional subsequence match with the
+  ///new subequence.
+  ///
+  ///This function runs the search for unintentional matches in the time series
+  ///function since the function is protected.
+  // --------------------------------------------------------------------------
+  bool testSearchForUnintentionalMatches(const vector<double> &timeSeries_in,
+      const vector<int> &motifSetPositions_in, double similarity_in) {
+
+    return searchForUnintentionalMatches(timeSeries_in, motifSetPositions_in,
+        similarity_in);
+  }
+
+  // --------------------------------------------------------------------------
+  ///\brief Runs the larger motif set check function.
+  ///
+  ///\param [in] &timeSereis_in Hands over the time series.
+  ///\param [in] &subsequencePositions_in Hands over the position of the new
+  ///subsequence.
+  ///\param [in] range_in Hands over the motif set range.
+  ///
+  ///\return true if there exists an unintentional subsequence match with the
+  ///new subequence.
+  ///
+  ///This function runs the larger motif set in the set of motif set positions
+  ///including all overlapping subsequences in the time series check function
+  ///since the function is protected.
+  // --------------------------------------------------------------------------
+  bool testCheckIfThereIsALargerMotifSet(const vector<double> &timeSeries_in,
+      const vector<int> &motifSetPositions_in,  double range_in) {
+
+    return checkIfThereIsALargerMotifSet(timeSeries_in, motifSetPositions_in,
+        range_in);
   }
 };
 

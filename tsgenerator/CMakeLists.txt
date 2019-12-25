@@ -1,13 +1,9 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-# setup project
-set(PROJECT_HOMEPAGE_URL
-  "https://gitlab.com/r.moczalla/TSGenerator/tree/master")
-set(TSG_SOVERSION 3)
+set(TSG_SOVERSION 2)
 set(TSG_VERSION ${TSG_SOVERSION}.0.0)
-set(PROJECT_LIB_NAME tsgenerator)
-project(${PROJECT_LIB_NAME}-dev
-  VERSION ${TSG_VERSION}
+set(LIB_NAME tsgenerator)
+project(tsgenerator VERSION ${TSG_VERSION}
   DESCRIPTION
 "Synthetic time series generator for evaluation purposes of time series \
 motif discovery algorithms."
@@ -17,8 +13,8 @@ if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif ()
 
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
-# check requirements
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if (WIN32)
@@ -33,11 +29,28 @@ if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8)
   message(FATAL_ERROR "This project requires gcc version 8 or higher")
 endif ()
 
+option(BUILD_DOC "Build documentation" ON)
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+  message("Documentation build started")
+
+  configure_file(share/doc/Doxygen.in Doxygen @ONLY)
+
+  add_custom_target(doc
+    COMMAND ${DOXYGEN_EXECUTABLE} Doxygen
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Doxygen started"
+    VERBATIM)
+else(DOXYGEN_FOUND)
+  message("Doxygen missing for documentation build")
+endif(DOXYGEN_FOUND)
+
 enable_testing()
 
 add_test(NAME "unit_tests" COMMAND unittests)
 
-# check the dependencies
+
+# check dependencies
 if (WIN32)
   # build project
   set(ARCH win32)
@@ -51,17 +64,30 @@ if (WIN32)
     set(ARCH win64)
   endif()
 
+  set(TSG_INCLUDEDIR tsgenerator/include)
+  set(FFTW3_INCLUDEDIR ../libs/${ARCH}/fftw3)
+
   file(GLOB FFTW3_LIB_NAME "../libs/${ARCH}/fftw3/libfftw3-*.lib")
   string(REGEX MATCH "libfftw3-.*.lib" FFTW3_LIB_NAME ${FFTW3_LIB_NAME})
 
-  set(FFTW3_INCLUDEDIR ../libs/${ARCH}/fftw3)
+  file(GLOB FFTW3_DLL_NAME "../libs/${ARCH}/fftw3/libfftw3-*.dll")
 else ()
+  set(STDCPPFS stdc++fs)
+
   find_package(PkgConfig REQUIRED)
+  pkg_check_modules(TSG REQUIRED tsgenerator)
   pkg_check_modules(FFTW3 REQUIRED fftw3)
 endif ()
 
 
-# build
+# add the libraries
+find_library(TSG_LOCATION NAMES tsgenerator
+  HINTS ../libs/${ARCH}/tsgenerator)
+
+add_library(TSG STATIC IMPORTED)
+set_target_properties(TSG PROPERTIES
+  IMPORTED_LOCATION ${TSG_LOCATION})
+
 find_library(FFTW3_LOCATION NAMES fftw3 ${FFTW3_LIB_NAME}
   HINTS ../libs/${ARCH}/fftw3)
 
@@ -73,112 +99,78 @@ add_library(FFTW3 STATIC IMPORTED)
 set_target_properties(FFTW3 PROPERTIES
   IMPORTED_LOCATION ${FFTW3_LOCATION})
 
-add_library(shared SHARED
-  src/motifsetcollection
-  src/freepositions
-  src/basets
-  src/scrimpplusplus
-  src/tsgenerator)
+# build
+configure_file(include/global.hpp.in global.hpp @ONLY)
 
-target_include_directories(shared PRIVATE
-  api include src
+add_executable(${PROJECT_NAME}
+  src/main.cpp
+  src/global.cpp
+  src/outputgenerator.cpp)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+  include src
   PUBLIC
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${TSG_INCLUDEDIR}
   ${FFTW3_INCLUDEDIR})
 
-target_link_libraries(shared PUBLIC
-  FFTW3)
-
-target_compile_options(shared PUBLIC
+target_compile_options(${PROJECT_NAME} PUBLIC
+  ${TSG_CFLAGS_OTHER}
   ${FFTW3_CFLAGS_OTHER})
 
-set_target_properties(shared PROPERTIES
-  OUTPUT_NAME ${PROJECT_LIB_NAME}
-  VERSION ${TSG_VERSION}
-  SOVERSION ${TSG_SOVERSION})
-
-add_library(static STATIC
-  src/motifsetcollection
-  src/freepositions
-  src/basets
-  src/scrimpplusplus
-  src/tsgenerator)
-
-set_target_properties(static PROPERTIES
-  OUTPUT_NAME ${PROJECT_LIB_NAME}
-  VERSION ${TSG_VERSION}
-  SOVERSION ${TSG_SOVERSION})
-
-target_include_directories(static PRIVATE
-  api include src
-  PUBLIC
-  ${FFTW3_INCLUDEDIR})
-
-target_link_libraries(static PUBLIC
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  ${STDCPPFS}
+  TSG
   FFTW3)
 
 add_executable(unittests
-  test/unittests.cpp)
+  test/unittests.cpp
+  src/global.cpp
+  src/outputgenerator.cpp)
 
 target_include_directories(unittests PRIVATE
   test include src
   PUBLIC
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${TSG_INCLUDEDIR}
   ${FFTW3_INCLUDEDIR})
 
 target_compile_options(unittests PUBLIC
+  ${TSG_CFLAGS_OTHER}
   ${FFTW3_CFLAGS_OTHER})
 
 target_link_libraries(unittests PUBLIC
   ${STDCPPFS}
-  shared
+  TSG
   FFTW3)
 
 
 # install
 include(GNUInstallDirs)
 
-configure_file(share/pkgconfig/tsgenerator.pc.in tsgenerator.pc @ONLY)
+configure_file(share/man/tsgenerator.3.in tsgenerator.3 @ONLY)
 
-install(TARGETS shared
+install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-install(TARGETS static
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-
-install(FILES
-  include/tsgenerator.hpp
-  include/basets.hpp
-  include/freepositions.hpp
-  include/motifsetcollection.hpp
-  include/scrimpplusplus.hpp
-  include/tsgtypes.hpp
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_LIB_NAME})
-
-install(FILES ${CMAKE_BINARY_DIR}/tsgenerator.pc
-  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
+install(FILES ${CMAKE_BINARY_DIR}/tsgenerator.3
+  DESTINATION ${CMAKE_INSTALL_MANDIR}/man3)
 
 
 # package
 set(CPACK_GENERATOR DEB)
-set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${TSG_VERSION})
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION})
 set(CPACK_PACKAGE_CONTACT "Rafael Moczalla")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS libfftw3-dev)
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libfftw3-dev,tsgenerator-dev")
 
 include(CPack)
 
+if (WIN32)
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
+    -E copy ${FFTW3_DLL_NAME} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
-# uninstall
-if (NOT TARGET uninstall)
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
-
-  add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND} -P
-    ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+  add_custom_command(TARGET unittests POST_BUILD COMMAND ${CMAKE_COMMAND} -E
+    copy ${FFTW3_DLL_NAME} $<TARGET_FILE_DIR:unittests>)
 endif ()
-
