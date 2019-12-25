@@ -52,7 +52,7 @@ if (WIN32)
 
   file(GLOB FFTW3_DLL_NAME "../libs/${ARCH}/fftw3/libfftw3-*.dll")
 
-  if (EMPTY Qt5_PATH)
+  if (NOT Qt5_PATH)
     file(GLOB_RECURSE WIN_QT5 LIST_DIRECTORIES true "C:/Qt/Qt5")
   else ()
     file(GLOB_RECURSE WIN_QT5 LIST_DIRECTORIES true "${Qt5_PATH}/Qt5")
