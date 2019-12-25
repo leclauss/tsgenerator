@@ -53,9 +53,15 @@ if (WIN32)
   file(GLOB FFTW3_DLL_NAME "../libs/${ARCH}/fftw3/libfftw3-*.dll")
 
   if (NOT Qt5_PATH)
-    file(GLOB_RECURSE WIN_QT5 LIST_DIRECTORIES true "C:/Qt/Qt5")
+    file(GLOB_RECURSE WIN_QT5 LIST_DIRECTORIES true "C:/Qt/5.*.*/Qt5")
+    file(GLOB_RECURSE WIN_QT5_WIDGETS_DLL "C:/Qt/5.*.*/Qt5Widgets.dll")
+    file(GLOB_RECURSE WIN_QT5_CORE_DLL "C:/Qt/5.*.*/Qt5Core.dll")
+    file(GLOB_RECURSE WIN_QT5_GUI_DLL "C:/Qt/5.*.*/Qt5Gui.dll")
   else ()
-    file(GLOB_RECURSE WIN_QT5 LIST_DIRECTORIES true "${Qt5_PATH}/Qt5")
+    file(GLOB_RECURSE WIN_QT5 LIST_DIRECTORIES true "${Qt5_PATH}/5.*.*/Qt5")
+    file(GLOB_RECURSE WIN_QT5_WIDGETS_DLL "${Qt5_PATH}/5.*.*/Qt5Widgets.dll")
+    file(GLOB_RECURSE WIN_QT5_CORE_DLL "${Qt5_PATH}/5.*.*/Qt5Core.dll")
+    file(GLOB_RECURSE WIN_QT5_GUI_DLL "${Qt5_PATH}/5.*.*/Qt5Gui.dll")
   endif ()
 else ()
   set(STDCPPFS stdc++fs)
@@ -147,4 +153,10 @@ include(CPack)
 if (WIN32)
   add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
     -E copy ${FFTW3_DLL_NAME} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
+    -E copy ${WIN_QT5_WIDGETS_DLL} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
+    -E copy ${WIN_QT5_CORE_DLL} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
+    -E copy ${WIN_QT5_GUI_DLL} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 endif ()
