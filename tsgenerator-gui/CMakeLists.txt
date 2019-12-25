@@ -58,7 +58,7 @@ if (WIN32)
 else ()
   set(STDCPPFS stdc++fs)
 
-  file(GLOB_RECURSE MAC_QT5 LIST_DIRECTORIES true "/usr/local/Cellar/qt/Qt5"
+  file(GLOB_RECURSE MAC_QT5 LIST_DIRECTORIES true "/usr/local/Cellar/qt/Qt5")
 
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(TSG REQUIRED tsgenerator)
