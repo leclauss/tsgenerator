@@ -59,7 +59,7 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
 
 10. Download and install [Qt5](https://www.qt.io/ "Qt website").
  ```bash
- sudo apt-get install qt5-default
+ sudo apt-get install qt5-default libqt5charts5-dev
  ```
 
 **Windows:**
