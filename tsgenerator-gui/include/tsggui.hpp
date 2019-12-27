@@ -62,9 +62,31 @@ private:
   //gui components
   QMainWindow gui;
   QMenuBar menuBar;
-  QMenu genMenu;
+  QMenu helpMenu;
   QAction genAct;
   QMessageBox genMes;
+  QAction typeAct;
+  QMessageBox typeMes;
+  QAction methodAct;
+  QMessageBox methodMes;
+  QAction lengthAct;
+  QMessageBox lengthMes;
+  QAction windowAct;
+  QMessageBox windowMes;
+  QAction sizeAct;
+  QMessageBox sizeMes;
+  QAction noiseAct;
+  QMessageBox noiseMes;
+  QAction deltaAct;
+  QMessageBox deltaMes;
+  QAction heightAct;
+  QMessageBox heightMes;
+  QAction stepAct;
+  QMessageBox stepMes;
+  QAction timesAct;
+  QMessageBox timesMes;
+  QAction maxiAct;
+  QMessageBox maxiMes;
   QWidget pane;
   QGridLayout layout;
   QtCharts::QChartView tsChartView;
@@ -147,5 +169,60 @@ public slots:
   ///This function opens a message box with a help text for the generator
   ///option.
   void showGenHelp();
+
+  ///\brief This function opens the type help.
+  ///
+  ///This function opens a message box with a help text for the type option.
+  void showTypeHelp();
+
+  ///\brief This function opens the method help.
+  ///
+  ///This function opens a message box with a help text for the method option.
+  void showMethodHelp();
+
+  ///\brief This function opens the length help.
+  ///
+  ///This function opens a message box with a help text for the length option.
+  void showLengthHelp();
+
+  ///\brief This function opens the window help.
+  ///
+  ///This function opens a message box with a help text for the window option.
+  void showWindowHelp();
+
+  ///\brief This function opens the size help.
+  ///
+  ///This function opens a message box with a help text for the size option.
+  void showSizeHelp();
+
+  ///\brief This function opens the noise help.
+  ///
+  ///This function opens a message box with a help text for the noise option.
+  void showNoiseHelp();
+
+  ///\brief This function opens the delta help.
+  ///
+  ///This function opens a message box with a help text for the delta option.
+  void showDeltaHelp();
+
+  ///\brief This function opens the height help.
+  ///
+  ///This function opens a message box with a help text for the height option.
+  void showHeightHelp();
+
+  ///\brief This function opens the step help.
+  ///
+  ///This function opens a message box with a help text for the step option.
+  void showStepHelp();
+
+  ///\brief This function opens the times help.
+  ///
+  ///This function opens a message box with a help text for the times option.
+  void showTimesHelp();
+
+  ///\brief This function opens the maxi help.
+  ///
+  ///This function opens a message box with a help text for the maxi option.
+  void showMaxiHelp();
 };
 

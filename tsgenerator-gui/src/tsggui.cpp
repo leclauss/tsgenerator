@@ -11,12 +11,58 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
 
   //help message box
 
-  //set initial widgets
-  genMenu.setTitle("Help");
+  //set initialize widgets
+  helpMenu.setTitle("Help");
   genAct.setText("generator");
   genMes.setWindowTitle("generator option");
   genMes.setText("The generator option specifies the method for injecting "
       "sequences into the time series matching the synthetic motif.");
+  typeAct.setText("type");
+  typeMes.setWindowTitle("type option");
+  typeMes.setText("The type option specifies the shape of the injected motif "
+      "and the inserted sequences.");
+  methodAct.setText("method");
+  methodMes.setWindowTitle("method option");
+  methodMes.setText("The method option sets the method for generating the "
+      "base time series.");
+  lengthAct.setText("length");
+  lengthMes.setWindowTitle("length option");
+  lengthMes.setText("The length option specifies the length of the time "
+      "series. The length is the number of values in the time series.");
+  windowAct.setText("window");
+  windowMes.setWindowTitle("window option");
+  windowMes.setText("The window option sets the sequence size of the "
+      "sequences injected into the time series non-self matching the motif.");
+  sizeAct.setText("size");
+  sizeMes.setWindowTitle("size option");
+  sizeMes.setText("The size option sets the number of subsequences matching "
+      "the motif sequence.");
+  noiseAct.setText("noise");
+  noiseMes.setWindowTitle("noise option");
+  noiseMes.setText("The noise option option is the value added to the base "
+      "time series and the injected sequences.");
+  deltaAct.setText("delta");
+  deltaMes.setWindowTitle("delta option");
+  deltaMes.setText("The delta option is the difference between two "
+      "consecutive values in the time series.");
+  heightAct.setText("height");
+  heightMes.setWindowTitle("height option");
+  heightMes.setText("The height option sets the height of the motif, i.e. the "
+      "maximum difference between two values of the base motif.");
+  stepAct.setText("step");
+  stepMes.setWindowTitle("step option");
+  stepMes.setText("The step option sets the maximal step size from two "
+      "consecutive values when creating a linear approximating or splining "
+      "base time series.");
+  timesAct.setText("times");
+  timesMes.setWindowTitle("times option");
+  timesMes.setText("The times option sets the number of values of the "
+      "repeating pattern when linear approximating of splining a base time "
+      "series");
+  maxiAct.setText("maxi");
+  maxiMes.setWindowTitle("maxi option");
+  maxiMes.setText("The maxi option sets the maximal absolute value of the "
+      "base time series.");
   idxLabel.setText("Motif Locations");
   startButton.setText("start");
   saveButton.setText("save");
@@ -44,10 +90,32 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
 
   //connect the message boxes to the actions
   connect(&genAct, SIGNAL(triggered()), this, SLOT(showGenHelp()));
+  connect(&typeAct, SIGNAL(triggered()), this, SLOT(showTypeHelp()));
+  connect(&methodAct, SIGNAL(triggered()), this, SLOT(showMethodHelp()));
+  connect(&lengthAct, SIGNAL(triggered()), this, SLOT(showLengthHelp()));
+  connect(&windowAct, SIGNAL(triggered()), this, SLOT(showWindowHelp()));
+  connect(&sizeAct, SIGNAL(triggered()), this, SLOT(showSizeHelp()));
+  connect(&noiseAct, SIGNAL(triggered()), this, SLOT(showNoiseHelp()));
+  connect(&deltaAct, SIGNAL(triggered()), this, SLOT(showDeltaHelp()));
+  connect(&heightAct, SIGNAL(triggered()), this, SLOT(showHeightHelp()));
+  connect(&stepAct, SIGNAL(triggered()), this, SLOT(showStepHelp()));
+  connect(&timesAct, SIGNAL(triggered()), this, SLOT(showTimesHelp()));
+  connect(&maxiAct, SIGNAL(triggered()), this, SLOT(showMaxiHelp()));
 
   //create menus
-  genMenu.addAction(&genAct);
-  menuBar.addMenu(&genMenu);
+  helpMenu.addAction(&genAct);
+  helpMenu.addAction(&typeAct);
+  helpMenu.addAction(&methodAct);
+  helpMenu.addAction(&lengthAct);
+  helpMenu.addAction(&windowAct);
+  helpMenu.addAction(&sizeAct);
+  helpMenu.addAction(&noiseAct);
+  helpMenu.addAction(&deltaAct);
+  helpMenu.addAction(&heightAct);
+  helpMenu.addAction(&stepAct);
+  helpMenu.addAction(&timesAct);
+  helpMenu.addAction(&maxiAct);
+  menuBar.addMenu(&helpMenu);
 
   gui.setMenuBar(&menuBar);
 
@@ -396,5 +464,60 @@ void TsgGui::plotMotif() {
 void TsgGui::showGenHelp() {
 
   genMes.show();
+}
+
+void TsgGui::showTypeHelp() {
+
+  typeMes.show();
+}
+
+void TsgGui::showMethodHelp() {
+
+  methodMes.show();
+}
+
+void TsgGui::showLengthHelp() {
+
+  lengthMes.show();
+}
+
+void TsgGui::showWindowHelp() {
+
+  windowMes.show();
+}
+
+void TsgGui::showSizeHelp() {
+
+  sizeMes.show();
+}
+
+void TsgGui::showNoiseHelp() {
+
+  noiseMes.show();
+}
+
+void TsgGui::showDeltaHelp() {
+
+  deltaMes.show();
+}
+
+void TsgGui::showHeightHelp() {
+
+  heightMes.show();
+}
+
+void TsgGui::showStepHelp() {
+
+  stepMes.show();
+}
+
+void TsgGui::showTimesHelp() {
+
+  timesMes.show();
+}
+
+void TsgGui::showMaxiHelp() {
+
+  maxiMes.show();
 }
 
