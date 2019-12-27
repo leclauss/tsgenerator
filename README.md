@@ -1,10 +1,10 @@
-# TSGenerator
+# tsgenerator
 
 Generator of synthetic time series specialized for evaluation purposes of motif discovery algorithms.
 
 ## Introduction
 
-This generator of synthetic time series is the result of a student research project. The idea was born, since the range of implementations generating time series specialized for evaluation of motif discovery algorithms was non-existing. This project is intended as a cross platform implementation. Therefore, the TSGenerator was tested on Ubuntu 18.04.3 LTS, Windows 10 and macOS 10.14.3 Mojave. Installation guides for each platform follow in the sections **Prerequisites** and **Installion**.
+This generator of synthetic time series is the result of a student research project. The idea was born, since the range of implementations generating time series specialized for evaluation of motif discovery algorithms was non-existing. This project is intended as a cross platform implementation. Therefore, the tsgenerator was tested on Ubuntu 18.04.3 LTS, Windows 10 and macOS 10.14.3 Mojave. Installation guides for each platform follow in the sections **Prerequisites** and **Installion**.
 
 ### Prerequisites
 
@@ -161,7 +161,7 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
 
 **Linux:**
 
-1. Open a terminal window. Clone the [TSGenerator](https://gitlab.com/r.moczalla/TSGenerator.git "TSGenerator project website") project directory and make the created folder the current folder.
+1. Open a terminal window. Clone the [tsgenerator](https://gitlab.com/r.moczalla/TSGenerator.git "tsgenerator project website") project directory and make the created folder the current folder.
  ```bash
  git clone "https://gitlab.com/r.moczalla/TSGenerator.git"
  cd "TSGenerator"
@@ -176,7 +176,7 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
  cd "build"
  ```
 
-2. Create the TSGenerator project with CMake and build the project by executing
+2. Create the tsgenerator project with CMake and build the project by executing
    [GNU Make](https://www.gnu.org/software/make/ "GNU Make website"). If your default [GCC](https://gcc.gnu.org/ "GNU Compiler Collection") is at least version 8 just build the project with
  ```bash
  cmake ..
@@ -192,22 +192,22 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
  ```bash
  make doc
  ```
- We offer a man page for the TSGenerator in the folder **build/doc/man/**. One may open the **TSGenerator.3** man file with the **man** command as follows.
+ We offer a man page for the tsgenerator in the folder **build/doc/man/**. One may open the **TSGenerator.3** man file with the **man** command as follows.
  ```bash
- man doc/man/TSGenerator.3
+ man doc/man/tsgenerator.3
  ```
 
 To generate the tsgenerator binary repeat the steps in the directory **tsgenerator** and to generate the gui tool reapet the steps in the directory **tsgenerator-gui**.
 
 **Windows:**
 
-1. Open a terminal window. Clone the [TSGenerator](https://gitlab.com/r.moczalla/TSGenerator.git "TSGenerator project website") project directory and make the created folder the current folder.
+1. Open a terminal window. Clone the [tsgenerator](https://gitlab.com/r.moczalla/TSGenerator.git "tsgenerator project website") project directory and make the created folder the current folder.
  ```bash
  git clone "https://gitlab.com/r.moczalla/TSGenerator.git"
  cd "TSGenerator"
  ```
 
-2. Create a build directory, make the created folder the current folder and build the visual studio project of TSGenerator project.
+2. Create a build directory, make the created folder the current folder and build the visual studio project of tsgenerator project.
  ```bash
  mkdir "build"
  cd "build"
@@ -229,7 +229,7 @@ To generate the tsgenerator binary repeat the steps in the directory **tsgenerat
 
 **Mac:**
 
-1. Open a terminal window. Clone the [TSGenerator](https://gitlab.com/r.moczalla/TSGenerator.git "TSGenerator project website") project directory and make the created folder the current folder.
+1. Open a terminal window. Clone the [tsgenerator](https://gitlab.com/r.moczalla/TSGenerator.git "tsgenerator project website") project directory and make the created folder the current folder.
  ```bash
  git clone "https://gitlab.com/r.moczalla/TSGenerator.git"
  cd "TSGenerator"
@@ -241,7 +241,7 @@ To generate the tsgenerator binary repeat the steps in the directory **tsgenerat
  cd "build"
  ```
 
-3. Create the TSGenerator project with CMake and build the project by executing make.
+3. Create the tsgenerator project with CMake and build the project by executing make.
  ```bash
  cmake ..
  make
@@ -251,7 +251,7 @@ To generate the tsgenerator binary repeat the steps in the directory **tsgenerat
  ```bash
  make doc
  ```
- We offer a man page for the TSGenerator in the folder **build/doc/man/**. One may open the **TSGenerator.3** man file with the **man** command as follows.
+ We offer a man page for the tsgenerator in the folder **build/doc/man/**. One may open the **TSGenerator.3** man file with the **man** command as follows.
  ```bash
  man doc/man/TSGenerator.3
  ```
@@ -269,7 +269,7 @@ make test
 
 **Windows:**
 
-1. Build with Visual Studio the target TSGeneratorTest.
+1. Build with Visual Studio the target tsgeneratorTest.
 
 2. Open the git bash, navigate into the build directory and run the following command.
  ```bash
@@ -285,14 +285,14 @@ make test
 
 ### Quick Usage
 
-1. One may generate a synthetic time series with a length of 10000, time series top latent motif attributes type sine, 3 top latent motif matching subseqeunces, window size 50, top latent motif height 100.0 and a randomization factor of 0.01 by running the TSGenerator with the following command. On Linux and Mac in the **build/** directory and on Windows in the **build/src/** directory.
+1. One may generate a synthetic time series with a length of 10000, time series top latent motif attributes type sine, 3 top latent motif matching subseqeunces, window size 50, top latent motif height 100.0 and a randomization factor of 0.01 by running the tsgenerator with the following command. On Linux and Mac in the **build/** directory and on Windows in the **build/src/** directory.
  ```bash
- ./TSGenerator -l 10000 -w 50 -rd 0.01 -lm sine 3 100.0
+ ./tsgenerator -l 10000 -w 50 -rd 0.01 -lm sine 3 100.0
  ```
 
-2. TSGenerator command has the following syntax.
+2. tsgenerator command has the following syntax.
  ```bash
- ./TSGenerator -l INTEGER -w INTEGER -rd FLOAT [Options]
+ ./tsgenerator -l INTEGER -w INTEGER -rd FLOAT [Options]
  ```
 
  The argument **-l** sets the length of the synthetic time series.
@@ -312,7 +312,7 @@ make test
 
 ### Output
 
-The TSGenerator creates a new output folder called output and four files. A **time_series.csv** file, a **time_series_meta.csv** file and a **time_series_plot.plt** file.
+The tsgenerator creates a new output folder called output and four files. A **time_series.csv** file, a **time_series_meta.csv** file and a **time_series_plot.plt** file.
 1. **time_series.csv**
  Contains the synthetic time series values.
 
