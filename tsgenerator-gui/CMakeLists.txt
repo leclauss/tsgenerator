@@ -67,9 +67,15 @@ else ()
   set(STDCPPFS stdc++fs)
 
   if (NOT Qt5_PATH)
-    file(GLOB_RECURSE MAC_QT5 LIST_DIRECTORIES true "/usr/local/Cellar/qt/Qt5")
+    if (APPLE)
+      file(GLOB_RECURSE UNIX_QT5 LIST_DIRECTORIES true
+        "/usr/local/Cellar/qt/Qt5")
+    else ()
+      file(GLOB_RECURSE UNIX_QT5 LIST_DIRECTORIES true
+        "$ENV{HOME}/Qt5.*.*/5.*.*/gcc_*/Qt5")
+    endif ()
   else ()
-    file(GLOB_RECURSE MAC_QT5 LIST_DIRECTORIES true "${Qt5_PATH}/Qt5")
+    file(GLOB_RECURSE UNIX_QT5 LIST_DIRECTORIES true "${Qt5_PATH}/Qt5")
   endif ()
   set(QT5_CFLAGS -fPIC)
 
@@ -83,8 +89,8 @@ endif ()
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-find_package(Qt5 COMPONENTS Widgets REQUIRED
-  HINTS ${MAC_QT5}
+find_package(Qt5 COMPONENTS Widgets Charts REQUIRED
+  HINTS ${UNIX_QT5}
   ${WIN_QT5})
 
 find_library(TSG_LOCATION NAMES tsgenerator
@@ -110,6 +116,7 @@ configure_file(include/global.hpp.in global.hpp @ONLY)
 
 add_executable(${PROJECT_NAME}
   src/main.cpp
+  src/tsggui.cpp
   src/global.cpp
   src/outputgenerator.cpp)
 
@@ -118,17 +125,19 @@ target_include_directories(${PROJECT_NAME} PRIVATE
   PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR}
   ${Qt5Widgets_INCLUDE_DIRS}
+  ${Qt5Charts_INCLUDE_DIRS}
   ${TSG_INCLUDEDIR}
   ${FFTW3_INCLUDEDIR})
 
 target_compile_options(${PROJECT_NAME} PUBLIC
-  ${Qt5_CFLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}
+  ${Qt5_CFLAGS}
   ${TSG_CFLAGS_OTHER}
   ${FFTW3_CFLAGS_OTHER})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
   ${STDCPPFS}
-  ${Qt5Widgets_LIBRARIES}
+  Qt5::Widgets
+  Qt5::Charts
   TSG
   FFTW3)
 
