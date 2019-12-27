@@ -9,7 +9,14 @@
 
 TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
 
+  //help message box
+
   //set initial widgets
+  genMenu.setTitle("Help");
+  genAct.setText("generator");
+  genMes.setWindowTitle("generator option");
+  genMes.setText("The generator option specifies the method for injecting "
+      "sequences into the time series matching the synthetic motif.");
   idxLabel.setText("Motif Locations");
   startButton.setText("start");
   saveButton.setText("save");
@@ -34,6 +41,15 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   typeLabel.setText("type");
   methodLabel.setText("method");
   genLabel.setText("generator");
+
+  //connect the message boxes to the actions
+  connect(&genAct, SIGNAL(triggered()), this, SLOT(showGenHelp()));
+
+  //create menus
+  genMenu.addAction(&genAct);
+  menuBar.addMenu(&genMenu);
+
+  gui.setMenuBar(&menuBar);
 
   //add the types
   types.append("box");
@@ -375,5 +391,10 @@ void TsgGui::plotMotif() {
 
     running = false;
   }
+}
+
+void TsgGui::showGenHelp() {
+
+  genMes.show();
 }
 

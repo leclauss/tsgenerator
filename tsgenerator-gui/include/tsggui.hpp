@@ -25,6 +25,10 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QRectF>
+#include <QMenuBar>
+#include <QMenu>
+#include <QAction>
+#include <QMessageBox>
 
 
 class TsgGui : public QApplication {
@@ -57,6 +61,10 @@ private:
 
   //gui components
   QMainWindow gui;
+  QMenuBar menuBar;
+  QMenu genMenu;
+  QAction genAct;
+  QMessageBox genMes;
   QWidget pane;
   QGridLayout layout;
   QtCharts::QChartView tsChartView;
@@ -133,5 +141,11 @@ public slots:
   ///
   ///This function replots the selected motif subsequence in the time series.
   void plotMotif();
+
+  ///\brief This function opens the generator help.
+  ///
+  ///This function opens a message box with a help text for the generator
+  ///option.
+  void showGenHelp();
 };
 
