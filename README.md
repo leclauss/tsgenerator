@@ -12,6 +12,8 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
 
 **Linux:**
 
+*For creating the tsgenerator-dev library*
+
 1. Open a terminal window. Download and install the essential building tools, if they are missing.
  ```bash
  sudo apt-get install build-essential
@@ -22,64 +24,80 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
  sudo apt-get install gcc-8 g++-8
  ```
 
-3. Download and install [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/ "pkg-config website").
- ```bash
- sudo apt-get install pkg-config
- ```
-
-4. Download and install [FFTW](http://www.fftw.org/ "FFTW website").
- ```bash
- sudo apt-get install libfftw3-dev
- ```
-
-5. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website").
- ```bash
- sudo apt-get install graphviz
- ```
-
-6. Download and install [Doxygen](http://doxygen.org/ "Doxygen website").
- ```bash
- sudo apt-get install doxygen
- ```
-
-7. Download and install [CMake](https://cmake.org/ "CMake website").
- ```bash
- sudo apt-get install cmake
- ```
-
-8. Download and install [Git](https://git-scm.com/ "open source Website maintained by members of the Git community").
+3. Download and install [Git](https://git-scm.com/ "open source Website maintained by members of the Git community").
  ```bash
  sudo apt-get install git
  ```
 
-9. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website").
+4. Download and install [CMake](https://cmake.org/ "CMake website").
+ ```bash
+ sudo apt-get install cmake
+ ```
+
+5. Download and install [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/ "pkg-config website").
+ ```bash
+ sudo apt-get install pkg-config
+ ```
+
+6. Download and install [FFTW](http://www.fftw.org/ "FFTW website").
+ ```bash
+ sudo apt-get install libfftw3-dev
+ ```
+
+*[Optional] Tools for documentation generation*
+
+1. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website").
+ ```bash
+ sudo apt-get install graphviz
+ ```
+
+2. Download and install [Doxygen](http://doxygen.org/ "Doxygen website").
+ ```bash
+ sudo apt-get install doxygen
+ ```
+
+*[Optional] Tool for plotting with gnuplot*
+
+1. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website").
  ```bash
  sudo apt-get install gnuplot
  ```
 
-10. Download and install [Qt5](https://www.qt.io/ "Qt website").
+*[Optional] For the GUI version of the tsgenerator (inc. plotting)*
+
+1. Download and install [Qt5](https://www.qt.io/ "Qt website").
  ```bash
  sudo apt-get install qt5-default libqt5charts5-dev
  ```
 
 **Windows:**
 
+*For creating the tsgenerator-dev library*
+
+1. Download and install [Visual Studio-IDE](https://www.visualstudio.com/
+   "Microsoft Visual Studio website"). Make sure you download an IDE like Visual Studio Community, Visual Studio Professional or Visual Studio Enterprise. Visual Studio Code is an editor and not an IDE. Choose the option **Desktop development with C++** option during the installation.
+
+2. Download and install [Git](https://git-scm.com/ "open source Website maintained by members of the Git community"). Choose the option **Use Git from Git Bash only** as well as the option **MinTTY** during installation.
+
+3. Download and install [CMake](https://cmake.org/ "CMake website"). Choose the option **Add to system path** during the installation.
+
+*[Optional] Tools for documentation generation*
+
 1. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website"). Make sure you add Graphviz to the system path.
 
 2. Download and install [Doxygen](http://doxygen.org/ "Doxygen website"). Choose the option **Add to system path** during the installation.
 
-3. Download and install [CMake](https://cmake.org/ "CMake website"). Choose the option **Add to system path** during the installation.
+*[Optional] Tool for plotting with gnuplot*
 
-4. Download and install [Visual Studio-IDE](https://www.visualstudio.com/
-   "Microsoft Visual Studio website"). Make sure you download an IDE like Visual Studio Community, Visual Studio Professional or Visual Studio Enterprise. Visual Studio Code is an editor and not an IDE. Choose the option **Desktop development with C++** option during the installation.
+1. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website"). Make sure to hit **Add to system path** during the installation.
 
-5. Download and install [Git](https://git-scm.com/ "open source Website maintained by members of the Git community"). Choose the option **Use Git from Git Bash only** as well as the option **MinTTY** during installation.
+*[Optional] For the GUI version of the tsgenerator (inc. plotting)*
 
-6. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website"). Make sure to hit **Add to system path** during the installation.
-
-7. Download and install [Qt5](https://www.qt.io/ "Qt website"). Make sure to install the library **5.x.x** and **the QtCharts** component.
+1. Download and install [Qt5](https://www.qt.io/ "Qt website"). Make sure to install the library **5.x.x** and **the QtCharts** component.
 
 **Mac:**
+
+*For creating the tsgenerator-dev library*
 
 1. Download and install [Homebrew](https://brew.sh/index_de/ "Homebrew website"). Open a new terminal and run the following commands. If you downloaded a newer version of gcc change the number 8 to the appropriate version.
  ```bash
@@ -90,43 +108,49 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
  ln -s /usr/local/opt/llvm/bin/clang /usr/local/bin/clang
  ```
 
-2. Download and install [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/ "pkg-config website").
- ```bash
- brew install pkg-config
- ```
-
-3. Download and install [FFTW](http://www.fftw.org/ "FFTW website").
- ```bash
- brew install fftw
- ```
-
-4. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website").
- ```bash
- brew install graphviz
- ```
-
-5. Download and install [Doxygen](http://doxygen.org/ "Doxygen website").
- ```bash
- brew install doxygen
- ```
-
-6. Download and install [CMake](https://cmake.org/ "CMake website").
- ```bash
- brew install cmake
- ```
-
-7. Download and install [Git](https://git-scm.com/ "open source website maintained by members of the Git community") and [GNU Make](https://www.gnu.org/software/make/ "GNU Make website"), if Git or GNU Make is appropriate missing.
+2. Download and install [Git](https://git-scm.com/ "open source website maintained by members of the Git community") and [GNU Make](https://www.gnu.org/software/make/ "GNU Make website"), if Git or GNU Make is appropriate missing.
  ```bash
  brew install git
  brew install make
  ```
 
-8. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website").
+3. Download and install [CMake](https://cmake.org/ "CMake website").
+ ```bash
+ brew install cmake
+ ```
+
+4. Download and install [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/ "pkg-config website").
+ ```bash
+ brew install pkg-config
+ ```
+
+5. Download and install [FFTW](http://www.fftw.org/ "FFTW website").
+ ```bash
+ brew install fftw
+ ```
+
+*[Optional] Tools for documentation generation*
+
+1. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website").
+ ```bash
+ brew install graphviz
+ ```
+
+2. Download and install [Doxygen](http://doxygen.org/ "Doxygen website").
+ ```bash
+ brew install doxygen
+ ```
+
+*[Optional] Tool for plotting with gnuplot*
+
+1. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website").
  ```bash
  brew install gnuplot
  ```
 
-9. Download and install [Qt5](https://www.qt.io/ "Qt website").
+*[Optional] For the GUI version of the tsgenerator (inc. plotting)*
+
+1. Download and install [Qt5](https://www.qt.io/ "Qt website").
  ```bash
  brew install qt5
  ```
@@ -143,13 +167,16 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
  cd "TSGenerator"
  ```
 
-2. Create a build directory and make the created folder the current folder.
+*Build the tsgenerator-dev library*
+
+1. Create a build directory and make the created folder the current folder.
  ```bash
+ cd tsgenerator-dev
  mkdir "build"
  cd "build"
  ```
 
-3. Create the TSGenerator project with CMake and build the project by executing
+2. Create the TSGenerator project with CMake and build the project by executing
    [GNU Make](https://www.gnu.org/software/make/ "GNU Make website"). If your default [GCC](https://gcc.gnu.org/ "GNU Compiler Collection") is at least version 8 just build the project with
  ```bash
  cmake ..
@@ -161,13 +188,7 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
  make
  ```
 
-4. TSGenerator is located in the subfolder **bin**. Make the created subfolder the current folder in the Git Bash and run the TSGenerator.
- ```bash
- cd "bin"
- ./TSGenerator [Options]
- ```
-
-5. Optionally: Create the documentation by executing the **doc** target with GNU Make. The documentation is located in the subfolder **build/doc/**.
+3. Create the documentation by executing the **doc** target with GNU Make. The documentation is located in the subfolder **build/doc/**.
  ```bash
  make doc
  ```
@@ -175,6 +196,8 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
  ```bash
  man doc/man/TSGenerator.3
  ```
+
+To generate the tsgenerator binary repeat the steps in the directory **tsgenerator** and to generate the gui tool reapet the steps in the directory **tsgenerator-gui**.
 
 **Windows:**
 
@@ -190,21 +213,19 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
  cd "build"
  cmake ..
  ```
- If you installed [Qt5](https://www.qt.io/ "Qt website") in another location
-than ***C:/Qt*** than specify the location ***LOC*** exclusive.
+ If you installed [Qt5](https://www.qt.io/ "Qt website") in another location than ***C:/Qt*** than specify the location ***LOC*** exclusive.
  ```bash
  cmake -DQt5_PATH="LOC" ..
  ```
 
-3. Open the **TSGenerator.sln** file with Visual Studio and rightclick on the target TSGenerator in the projectmap explorer. Hit the option **Select as Startproject** and press the f5 key to build the project.
-
-4. TSGenerator is located in the subfolder **bin**. Make the created subfolder the current folder in the Git Bash and run the TSGenerator.
+3. Build the release version of the project.
  ```bash
- cd "bin"
- ./TSGenerator [Options]
+ cmake --build . --config Release
  ```
 
-5. Optionally: Create the documentation by building the target **doc** in the Visual Studio IDE. The documentation is located in the subfolder **build/doc/**.
+4. Optionally: Create the documentation by building the target **doc** in the Visual Studio IDE. The documentation is located in the subfolder **build/doc/**.
+
+To generate the tsgenerator binary repeat the steps in the directory **tsgenerator** and to generate the gui tool reapet the steps in the directory **tsgenerator-gui**.
 
 **Mac:**
 
@@ -226,13 +247,7 @@ than ***C:/Qt*** than specify the location ***LOC*** exclusive.
  make
  ```
 
-4. TSGenerator is located in the subfolder **bin**. Make the created subfolder the current folder in the Git Bash and run the TSGenerator.
- ```bash
- cd "bin"
- ./TSGenerator [Options]
- ```
-
-5. Optionally: Create the documentation by executing the **doc** target with make. The documentation is located in the subfolder **build/doc/**.
+4. Optionally: Create the documentation by executing the **doc** target with make. The documentation is located in the subfolder **build/doc/**.
  ```bash
  make doc
  ```
@@ -240,6 +255,8 @@ than ***C:/Qt*** than specify the location ***LOC*** exclusive.
  ```bash
  man doc/man/TSGenerator.3
  ```
+
+To generate the tsgenerator binary repeat the steps in the directory **tsgenerator** and to generate the gui tool reapet the steps in the directory **tsgenerator-gui**.
 
 ## Running Tests
 
@@ -272,16 +289,16 @@ make test
  ```bash
  ./TSGenerator -l 10000 -w 50 -rd 0.01 -lm sine 3 100.0
  ```
- 
+
 2. TSGenerator command has the following syntax.
  ```bash
  ./TSGenerator -l INTEGER -w INTEGER -rd FLOAT [Options]
  ```
- 
+
  The argument **-l** sets the length of the synthetic time series.
  The argument **-w** sets the window size of the synthetic time series motif sets subsequences.
  The argument **-rd FLOAT** sets the randomization factor that is used to generate the sythetic time series values as well as the synthetic time series top pair motifs or the time series top latent motif matching subsequences.
- 
+
  The available options are -db, -pm, -lm, -o, -tsn, -ho, -r, -rd, -h and -v.
  * **-db** sets the operating mode to data base.
  * **-pm** sets the operating mode to top pair motif and the subsequences type as well as height. The default operating mode is the top pair motif mode, the default type is BOX and the default height is 200. The synthax is STRING FLOAT.
@@ -295,13 +312,13 @@ make test
 
 ### Output
 
-The TSGenerator creates a new output folder called output and four files. A **time_series.csv** file, a **time_series_meta.csv** file and a **time_series_plot.plt** file. 
+The TSGenerator creates a new output folder called output and four files. A **time_series.csv** file, a **time_series_meta.csv** file and a **time_series_plot.plt** file.
 1. **time_series.csv**
  Contains the synthetic time series values.
- 
+
 2. **time_series_meta.csv**
  Contains the synthetic time series motif meta data. Each data set first value is the similarity of the synthetic time series top pair motif or the range of the synthetic time series top latent motif. The second value is the window size of the synthetic time series top pair motif or the synthetic time series top latent motif followed by all the positions of the subsequences in the synthetic time series top pair motif or the synthetic time series top latent motif matching subseqeunces positions in the synthetic time series.
- 
+
 3. **time_series_plot.plt**
  Contains a [Gnuplot](http://www.gnuplot.info/ "Gnuplot website") script file script file that plots the **time_series.csv** file.
 
