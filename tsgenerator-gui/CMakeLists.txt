@@ -157,7 +157,8 @@ install(TARGETS ${PROJECT_NAME}
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION})
 set(CPACK_PACKAGE_CONTACT "Rafael Moczalla")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "qt5-default,libfftw3-dev,tsgenerator-dev")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS
+  "qt5-default,libqt5charts5-dev,libfftw3-dev,tsgenerator-dev")
 
 include(CPack)
 

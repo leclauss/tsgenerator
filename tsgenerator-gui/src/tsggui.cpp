@@ -33,6 +33,7 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   maxiText.setPlaceholderText(std::to_string(maxi).c_str());
   typeLabel.setText("type");
   methodLabel.setText("method");
+  genLabel.setText("generator");
 
   //add the types
   types.append("box");
@@ -63,6 +64,14 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   methodDrop.addItems(methods);
   methodDrop.setCurrentIndex(6);
 
+  //add the generators
+  gens.append("pair motif");
+  gens.append("set motif");
+  gens.append("latent motif");
+
+  genDrop.addItems(gens);
+  genDrop.setCurrentIndex(2);
+
   //setup buttons
   connect(&startButton, SIGNAL(clicked()), this, SLOT(generateTS()));
   connect(&saveButton, SIGNAL(clicked()), this, SLOT(saveTS()));
@@ -91,28 +100,30 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   connect(&motifList, SIGNAL(itemSelectionChanged()), this, SLOT(plotMotif()));
 
   //layout all items
-  layout.addWidget(&typeLabel, 0, 0);
-  layout.addWidget(&typeDrop, 1, 0);
-  layout.addWidget(&methodLabel, 0, 1);
-  layout.addWidget(&methodDrop, 1, 1);
-  layout.addWidget(&lengthLabel, 0, 2);
-  layout.addWidget(&lengthText, 1, 2);
-  layout.addWidget(&windowLabel, 0, 3);
-  layout.addWidget(&windowText, 1, 3);
-  layout.addWidget(&sizeLabel, 0, 4);
-  layout.addWidget(&sizeText, 1, 4);
-  layout.addWidget(&noiseLabel, 0, 5);
-  layout.addWidget(&noiseText, 1, 5);
-  layout.addWidget(&deltaLabel, 2, 0);
-  layout.addWidget(&deltaText, 3, 0);
-  layout.addWidget(&heightLabel, 2, 1);
-  layout.addWidget(&heightText, 3, 1);
-  layout.addWidget(&stepLabel, 2, 2);
-  layout.addWidget(&stepText, 3, 2);
-  layout.addWidget(&timesLabel, 2, 3);
-  layout.addWidget(&timesText, 3, 3);
-  layout.addWidget(&maxiLabel, 2, 4);
-  layout.addWidget(&maxiText, 3, 4);
+  layout.addWidget(&genLabel, 0, 0);
+  layout.addWidget(&genDrop, 1, 0);
+  layout.addWidget(&typeLabel, 0, 1);
+  layout.addWidget(&typeDrop, 1, 1);
+  layout.addWidget(&methodLabel, 0, 2);
+  layout.addWidget(&methodDrop, 1, 2);
+  layout.addWidget(&lengthLabel, 0, 3);
+  layout.addWidget(&lengthText, 1, 3);
+  layout.addWidget(&windowLabel, 0, 4);
+  layout.addWidget(&windowText, 1, 4);
+  layout.addWidget(&sizeLabel, 0, 5);
+  layout.addWidget(&sizeText, 1, 5);
+  layout.addWidget(&noiseLabel, 2, 0);
+  layout.addWidget(&noiseText, 3, 0);
+  layout.addWidget(&deltaLabel, 2, 1);
+  layout.addWidget(&deltaText, 3, 1);
+  layout.addWidget(&heightLabel, 2, 2);
+  layout.addWidget(&heightText, 3, 2);
+  layout.addWidget(&stepLabel, 2, 3);
+  layout.addWidget(&stepText, 3, 3);
+  layout.addWidget(&timesLabel, 2, 4);
+  layout.addWidget(&timesText, 3, 4);
+  layout.addWidget(&maxiLabel, 2, 5);
+  layout.addWidget(&maxiText, 3, 5);
   layout.addWidget(&startButton, 4, 4);
   layout.addWidget(&saveButton, 4, 5);
   layout.addWidget(&tsChartView, 5, 0, 1, -1);
@@ -186,6 +197,10 @@ void TsgGui::generateTS() {
     in = methodDrop.currentText().toStdString();
     if (in.length())
       method = in;
+
+    in = genDrop.currentText().toStdString();
+    if (in.length())
+      gen = in;
 
     in = maxiText.text().toStdString();
     if (check_if_float(in))

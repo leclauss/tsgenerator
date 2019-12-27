@@ -46,6 +46,7 @@ private:
   int times = 3;
   double maxi = 20.0;
   tsg::word method = "boundedNormalRandomWalk";
+  tsg::word gen = "latent motif";
   int selMotif = 0;
 
   //final product
@@ -93,6 +94,9 @@ private:
   QLabel methodLabel;
   QComboBox methodDrop;
   QStringList methods;
+  QLabel genLabel;
+  QComboBox genDrop;
+  QStringList gens;
 
 public:
 
