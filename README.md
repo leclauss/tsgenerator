@@ -77,7 +77,7 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
 
 6. Download and install [Gnuplot](http://gnuplot.info/ "Gnuplot website"). Make sure to hit **Add to system path** during the installation.
 
-7. Download and install [Qt5](https://www.qt.io/ "Qt website").
+7. Download and install [Qt5](https://www.qt.io/ "Qt website"). Make sure to install the library **5.x.x** and **the QtCharts** component.
 
 **Mac:**
 
