@@ -128,8 +128,8 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   layout.addWidget(&saveButton, 4, 5);
   layout.addWidget(&tsChartView, 5, 0, 1, -1);
   layout.addWidget(&motifChartView, 6, 0, 2, 3);
-  layout.addWidget(&idxLabel, 6, 3, 1, 3);
-  layout.addWidget(&motifList, 7, 3, 1, 3);
+  layout.addWidget(&idxLabel, 6, 3);
+  layout.addWidget(&motifList, 7, 3);
 
   pane.setLayout(&layout);
 
@@ -210,7 +210,7 @@ void TsgGui::generateTS() {
 
       //generate the time series
       tsg::TSGenerator tSGenerator(length, window, delta, noise, type,
-          motifSize, height, step, times, method, maxi);
+          motifSize, height, step, times, method, maxi, gen);
       tSGenerator.run(timeSeries, dVector, windows, motifPositions);
 
       success = true;

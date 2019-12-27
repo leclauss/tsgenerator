@@ -16,11 +16,11 @@ namespace tsg {
   TSGenerator::TSGenerator(const int length_in, const int window_in, const
       double delta_in, const double noise_in, const int type_in, const int
       size_in, const double height_in, const double step_in, const int
-      times_in, const int method_in, const double maxi_in)
+      times_in, const int method_in, const double maxi_in, const int gen_in)
     : length(abs(length_in)), window(window_in), delta(delta_in),
     noise(noise_in), type(abs(type_in)), size(abs(size_in)), height(height_in),
     step(abs(step_in)), times(abs(times_in)), method(method_in),
-    maxi(abs(maxi_in)), freePositions(length, window),
+    maxi(abs(maxi_in)), gen(abs(gen_in)), freePositions(length, window),
     randomEngine(std::random_device().entropy()
       ? std::random_device()()
       : (unsigned
@@ -47,6 +47,13 @@ namespace tsg {
       throw(EXIT_FAILURE);
     }
 
+    //check if the generator type is set properly
+    if (gen > 2) {
+
+      std::cerr << "ERROR: Wrong generator type: " << gen_in << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
     //check if the time series length can handle all motif subsequences
     if (length < (2 * size - 1) * window) {
 
@@ -59,7 +66,7 @@ namespace tsg {
   TSGenerator::TSGenerator(const int length_in, const int window_in, const
       double delta_in, const double noise_in, const word type_in, const int
       size_in, const double height_in, const double step_in, const int
-      times_in, const word method_in, const double maxi_in)
+      times_in, const word method_in, const double maxi_in, const word gen_in)
     : length(abs(length_in)), window(window_in), delta(delta_in),
     noise(noise_in), size(abs(size_in)), height(height_in), step(abs(step_in)),
     times(abs(times_in)), maxi(abs(maxi_in)), freePositions(length, window),
@@ -83,10 +90,21 @@ namespace tsg {
     method = (int)(std::distance(methods.begin(), std::find(methods.begin(),
             methods.end(), method_in)));
 
-    // check if type exists
+    // check if method exists
     if (method >= (int) methods.size()) {
 
       std::cerr << "ERROR: Unknown method: " << method_in << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    // get the generator
+    gen = (int)(std::distance(gens.begin(), std::find(gens.begin(), gens.end(),
+            gen_in)));
+
+    // check if generator exists
+    if (gen >= (int) gens.size()) {
+
+      std::cerr << "ERROR: Unknown generator: " << gen_in << std::endl;
       throw(EXIT_FAILURE);
     }
 
@@ -636,29 +654,20 @@ namespace tsg {
     return false;
   }
 
-  void TSGenerator::run(rseq &timeSeries_out, rseq &d_out, iseq &window_out,
-      iseqs &motifPositions_out) {
+  void TSGenerator::injectPairMotif(rseq &timeSeries_out, rseq &d_out, iseq
+      &window_out, iseqs &motifPositions_out) {
 
-    //clear the output buffers
-    if (!d_out.empty()) {
+    std::cout << "pair motif not yet implemented" << std::endl;
+  }
 
-      d_out.clear();
-      d_out.resize(0);
-    }
+  void TSGenerator::injectSetMotif(rseq &timeSeries_out, rseq &d_out, iseq
+      &window_out, iseqs &motifPositions_out) {
 
-    if (!window_out.empty()) {
+    std::cout << "set motif not yet implemented" << std::endl;
+  }
 
-      window_out.clear();
-      window_out.resize(0);
-    }
-
-    if (!motifPositions_out.empty()) {
-
-      motifPositions_out.clear();
-      motifPositions_out.resize(2);
-    }
-    else
-      motifPositions_out.resize(2);
+  void TSGenerator::injectLatentMotif(rseq &timeSeries_out, rseq &d_out, iseq
+      &window_out, iseqs &motifPositions_out) {
 
     //declaration stuff
     int positionOne = -1;
@@ -718,7 +727,6 @@ namespace tsg {
         }
       }
     }
-
 
     //declaration stuff
     int position;
@@ -834,17 +842,60 @@ namespace tsg {
     }
 
     d_out.push_back(d / 2.0);
+  }
+
+  void TSGenerator::run(rseq &timeSeries_out, rseq &d_out, iseq &window_out,
+      iseqs &motifPositions_out) {
+
+    //clear the output buffers
+    if (!d_out.empty()) {
+
+      d_out.clear();
+      d_out.resize(0);
+    }
+
+    if (!window_out.empty()) {
+
+      window_out.clear();
+      window_out.resize(0);
+    }
+
+    if (!motifPositions_out.empty()) {
+
+      motifPositions_out.clear();
+      motifPositions_out.resize(2);
+    }
+    else
+      motifPositions_out.resize(2);
+
+
+    //choose correct generator
+    switch (gen) {
+
+      case 0:
+        injectPairMotif(timeSeries_out, d_out, window_out, motifPositions_out);
+        break;
+      case 1:
+        injectSetMotif(timeSeries_out, d_out, window_out, motifPositions_out);
+        break;
+      case 2:
+        injectLatentMotif(timeSeries_out, d_out, window_out,
+            motifPositions_out);
+        break;
+      default:
+        std::cerr << "ERROR: Unknown motif generator: " << gen << std::endl;
+        throw(EXIT_FAILURE);
+    }
 
 
     //add top motif pair to output
-    positionOne = 0;
-    positionTwo = 0;
+    int positionOne = 0;
+    int positionTwo = 0;
 
     scrimpPP(timeSeries_out, sums, sumSquares, positionOne, positionTwo,
         window);
-    d = similarity(timeSeries_out, positionOne, positionTwo,
-        std::numeric_limits<double>::max());
-    d_out.push_back(d);
+    d_out.push_back(similarity(timeSeries_out, positionOne, positionTwo,
+        std::numeric_limits<double>::max()));
 
     motifPositions_out[1].push_back(positionOne);
     motifPositions_out[1].push_back(positionTwo);

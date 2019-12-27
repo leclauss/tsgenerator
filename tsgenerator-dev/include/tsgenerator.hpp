@@ -110,6 +110,13 @@ namespace tsg
     ///have.
     double maxi = 20.0;
 
+    ///\brief This variable contains the generator type.
+    ///
+    ///This variable stores the generator type. Currently there are the box
+    ///motif, set motif and latent motif generator types available for time
+    ///series generation.
+    int gen = 2;
+
     ///\brief This variable contains the free positions.
     ///
     ///This variable stores the positions of free subsequences in the time
@@ -159,6 +166,12 @@ namespace tsg
       "linearRandomWalk", "boundedSimpleRandomWalk", "boundedRealRandomWalk",
       "boundedNormalRandomWalk", "boundedLinearRandomWalk", "uniformRandom",
       "normalRandom", "piecewiseLinearRandom", "splineRepeated"};
+
+    ///\brief This list contains all available motif generation types.
+    ///
+    ///This variable stores the names of all motif generation types currently
+    ///available.
+    par gens{"pair motif", "set motif", "latent motif"};
 
 
     ///\brief Calculates the running sum and sum of squares of a sequence.
@@ -289,6 +302,46 @@ namespace tsg
     bool checkIfThereIsALargerMotifSet(const rseq &timeSeries_in, const iseq
         &motifPositions_in, double range_in);
 
+    ///\brief Injects a pair motif into the time series.
+    ///
+    ///\param [out] &timeSeries_out Hands over the time series.
+    ///\param [out] &d_out Hands over the range of each the motif sets.
+    ///\param [out] &window_out Hands over the window size of each motif set.
+    ///\param [out] &motifPositions_out Hands over the positions of each motif
+    ///set.
+    ///
+    ///tbd
+    void injectPairMotif(rseq &timeSeries_out, rseq &d_out, iseq &window_out,
+        iseqs &motifPositions_out);
+
+    ///\brief Injects a set motif into the time series.
+    ///
+    ///\param [out] &timeSeries_out Hands over the time series.
+    ///\param [out] &d_out Hands over the range of each the motif sets.
+    ///\param [out] &window_out Hands over the window size of each motif set.
+    ///\param [out] &motifPositions_out Hands over the positions of each motif
+    ///set.
+    ///
+    ///tbd
+    void injectSetMotif(rseq &timeSeries_out, rseq &d_out, iseq &window_out,
+        iseqs &motifPositions_out);
+
+    ///\brief Injects a latent motif into the time series.
+    ///
+    ///\param [out] &timeSeries_out Hands over the time series.
+    ///\param [out] &d_out Hands over the range of each the motif sets.
+    ///\param [out] &window_out Hands over the window size of each motif set.
+    ///\param [out] &motifPositions_out Hands over the positions of each motif
+    ///set.
+    ///
+    ///First the distance d of a most similar subsequence pair is computed and
+    ///a random motif center sequence with similarity 3 / 2 d or more to all
+    ///other subsequences is generated. Than sequences are injected within
+    ///range d / 2 to any other subsequence. Finally the function checks wether
+    ///there is a larget latent motif.
+    void injectLatentMotif(rseq &timeSeries_out, rseq &d_out, iseq &window_out,
+        iseqs &motifPositions_out);
+
   public:
 
     ///\brief The constructor initializes the TSGenerator.
@@ -309,13 +362,15 @@ namespace tsg
     ///generation.
     ///\param [in] max_in Hands over the maximum absolute value of the time
     ///series.
+    ///\param [in] gen_in Hands over the motif generation type.
     ///
     ///The constructor checks whether a true random engine is available and
     ///stores the result in the trueRandomEngineAvailable variable.
     TSGenerator(const int length_in, const int window_in, const double
         delta_in, const double noise_in, const int type_in, const int size_in,
         const double height_in, const double step_in = 1.0, const int times_in
-        = 3, const int method_in = 5, const double maxi_in = 100.0);
+        = 3, const int method_in = 5, const double maxi_in = 100.0, const int
+        gen_in = 2);
 
     ///\brief The constructor initializes the TSGenerator.
     ///
@@ -335,6 +390,7 @@ namespace tsg
     ///generation.
     ///\param [in] maxi_in Hands over the maximum absolute value of the time
     ///series.
+    ///\param [in] gen_in Hands over the motif generation type.
     ///
     ///The constructor checks whether a true random engine is available and
     ///stores the result in the trueRandomEngineAvailable variable.
@@ -342,7 +398,7 @@ namespace tsg
         delta_in, const double noise_in, const word type_in, const int size_in,
         const double height_in, const double step_in = 1.0, const int times_in
         = 3, const word method_in = "boundedNormalRandomWalk", const double
-        maxi_in = 100.0);
+        maxi_in = 100.0, const word gen_in = "latent motif");
 
     ///\brief Frees the memory allocated by the TSGenerator.
     ///
@@ -351,17 +407,18 @@ namespace tsg
 
     ///\brief Generates a time series with defined time series motif sets.
     ///
-    ///\param [out] &timeSeries_in Hands over the time series.
-    ///\param [out] &d_in Hands over the range of each the motif sets.
+    ///\param [out] &timeSeries_out Hands over the time series.
+    ///\param [out] &d_out Hands over the range of each the motif sets.
     ///\param [out] &window_out Hands over the window size of each motif set.
-    ///\param [out] &motifPositions_in Hands over the positions of each motif
+    ///\param [out] &motifPositions_out Hands over the positions of each motif
     ///set.
     ///
-    ///First, this function checks all variables and pointers for validity. Some
-    ///random time series values are forwarded. Afterwards, the time series is
-    ///generated and the time series and the motif positions are written into
-    ///a file. A not defined motif tag is treated as a random motif. Therfore,
-    ///a ranodm motif type is chosen. The default motif type is the random motif.
+    ///First, this function checks all variables and pointers for validity.
+    ///Some random time series values are forwarded. Afterwards, the time
+    ///series is generated and the time series and the motif positions are
+    ///written into a file. A not defined motif tag is treated as a random
+    ///motif. Therfore, a ranodm motif type is chosen. The default motif type
+    ///is the random motif.
     void run(rseq &timeSeries_out, rseq &d_out, iseq &window_out, iseqs
         &motifPositions_out);
   };

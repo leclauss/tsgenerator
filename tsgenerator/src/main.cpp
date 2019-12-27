@@ -58,8 +58,22 @@ int main(int argc, char *argv[]) {
     int times = 3;
     double maxi = 20.0;
     tsg::word method("boundedNormalRandomWalk");
+    tsg::word gen("latent motif");
 
     try {
+
+      if (checkArg(argTokens, "-g", payload) || checkArg(argTokens,
+            "--generator",
+            payload)) {
+
+        if (payload.empty()) {
+
+          std::cerr << "ERROR: Generator is missing an argument." << std::endl;
+          exit(EXIT_FAILURE);
+        }
+
+        gen = std::stod(payload[0]);
+      }
 
       if (checkArg(argTokens, "-l", payload) || checkArg(argTokens, "--length",
             payload)) {
@@ -184,7 +198,7 @@ int main(int argc, char *argv[]) {
           throw(EXIT_FAILURE);
         }
 
-        height = std::stoll(payload[0]);
+        height = std::stoi(payload[0]);
       }
 
       if (checkArg(argTokens, "-st", payload) || checkArg(argTokens,
@@ -203,7 +217,7 @@ int main(int argc, char *argv[]) {
           throw(EXIT_FAILURE);
         }
 
-        step = std::stoll(payload[0]);
+        step = std::stoi(payload[0]);
       }
 
       if (checkArg(argTokens, "-ti", payload) || checkArg(argTokens,
@@ -253,7 +267,7 @@ int main(int argc, char *argv[]) {
           throw(EXIT_FAILURE);
         }
 
-        maxi = std::stoll(payload[0]);
+        maxi = std::stoi(payload[0]);
       }
 
       //generate the time series
@@ -262,7 +276,7 @@ int main(int argc, char *argv[]) {
       tsg::iseq windows;
       tsg::iseqs motifPositions;
       tsg::TSGenerator tSGenerator(length, window, delta, noise, type, size,
-          height, step, times, method, maxi);
+          height, step, times, method, maxi, gen);
       tSGenerator.run(timeSeries, dVector, windows, motifPositions);
 
       //output stuff
