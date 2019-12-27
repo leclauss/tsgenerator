@@ -8,11 +8,10 @@
 #ifndef MAIN_HPP
 #define MAIN_HPP
 
+#include <tsgtypes.hpp>
 #include <iostream>
 #include <vector>
 #include <algorithm>
-
-using namespace std;
 
 
 // ----------------------------------------------------------------------------
@@ -39,7 +38,7 @@ using namespace std;
 ///This function checks if the string is a float. Float representation of form
 ///[-](123456789)+[.(123456789)+] are accepted.
 // ----------------------------------------------------------------------------
-bool check_if_float(const string string_in);
+bool check_if_float(const tsg::word string_in);
 
 // ----------------------------------------------------------------------------
 ///\brief Parses arguments into a vector.
@@ -51,7 +50,7 @@ bool check_if_float(const string string_in);
 ///This is a argument parser function that parses arguments into a string
 ///vector.
 // ----------------------------------------------------------------------------
-void parseArgs(int argc, char **argv, vector<string> &argTokens);
+void parseArgs(int argc, char **argv, tsg::par &argTokens);
 
 // ----------------------------------------------------------------------------
 ///\brief Checks whether argument is contained in argument vector or not.
@@ -67,7 +66,7 @@ void parseArgs(int argc, char **argv, vector<string> &argTokens);
 ///true, if the argument was found and sets the payload string. Otherwise the
 ///function returns false.
 // ----------------------------------------------------------------------------
-bool checkArg(vector<string> &argTokens, const string arg_in, vector<string>
+bool checkArg(tsg::par &argTokens, const tsg::word arg_in, tsg::par
     &payload_out);
 
 // ----------------------------------------------------------------------------

@@ -9,22 +9,24 @@
 
 OutputGenerator::OutputGenerator() : OutputGenerator("time_series") {}
 
-OutputGenerator::OutputGenerator(const string &outputFileName_in)
+OutputGenerator::OutputGenerator(const std::string &outputFileName_in)
   : outputFileName("/" + outputFileName_in) {
 
-  string outputDirName = "./time_series_";
+  std::string outputDirName = "./time_series_";
 
-  while (exists(outputDirName + to_string(outputFolderNumber)))
+  while (std::filesystem::exists(outputDirName
+        + std::to_string(outputFolderNumber)))
     outputFolderNumber++;
 
-  create_directory(outputDirName + to_string(outputFolderNumber));
+  std::filesystem::create_directory(outputDirName
+      + std::to_string(outputFolderNumber));
 
   basicOutputFileName = outputFileName;
-  outputFileMotifSetsName = outputDirName + to_string(outputFolderNumber)
+  outputFileMotifSetsName = outputDirName + std::to_string(outputFolderNumber)
     + outputFileName + "_meta";
-  outputFileGNUPlotScriptName = outputDirName + to_string(outputFolderNumber)
-    + outputFileName + "_plot";
-  outputFileName = outputDirName + to_string(outputFolderNumber)
+  outputFileGNUPlotScriptName = outputDirName
+    + std::to_string(outputFolderNumber) + outputFileName + "_plot";
+  outputFileName = outputDirName + std::to_string(outputFolderNumber)
     + outputFileName;
 
   basicOutputFileName.erase(0, 1);
@@ -53,69 +55,70 @@ void OutputGenerator::openFile() {
   if (outputFileGNUPlotScript.is_open())
     outputFileGNUPlotScript.close();
 
-  string tmpTimeSeriesFileName = outputFileName + "_"
-    + to_string(outputFolderNumber) + ".csv";
-  string tmpFileMotifSetPositionsName = outputFileMotifSetsName + "_"
-    + to_string(outputFolderNumber) + ".csv";
-  string tmpGNUPlotScriptName = outputFileGNUPlotScriptName + "_"
-    + to_string(outputFolderNumber) + ".plt";
+  std::string tmpTimeSeriesFileName = outputFileName + "_"
+    + std::to_string(outputFolderNumber) + ".csv";
+  std::string tmpFileMotifSetPositionsName = outputFileMotifSetsName + "_"
+    + std::to_string(outputFolderNumber) + ".csv";
+  std::string tmpGNUPlotScriptName = outputFileGNUPlotScriptName + "_"
+    + std::to_string(outputFolderNumber) + ".plt";
 
-  if (exists(tmpTimeSeriesFileName)) {
+  if (std::filesystem::exists(tmpTimeSeriesFileName)) {
 
-    cerr << "ERROR: Time series file already exist!" << endl;
+    std::cerr << "ERROR: Time series file already exist!" << std::endl;
     throw(EXIT_FAILURE);
   }
 
-  if (exists(tmpFileMotifSetPositionsName)) {
+  if (std::filesystem::exists(tmpFileMotifSetPositionsName)) {
 
-    cerr << "ERROR: Motif positions file already exist!" << endl;
+    std::cerr << "ERROR: Motif positions file already exist!" << std::endl;
     throw(EXIT_FAILURE);
   }
 
-  if (exists(tmpGNUPlotScriptName)) {
+  if (std::filesystem::exists(tmpGNUPlotScriptName)) {
 
-    cerr << "ERROR: GNUPlot script file already exist!" << endl;
+    std::cerr << "ERROR: GNUPlot script file already exist!" << std::endl;
     throw(EXIT_FAILURE);
   }
 
-  outputFile.open(tmpTimeSeriesFileName, ios::out);
-  outputFileMotifSets.open(tmpFileMotifSetPositionsName, ios::out);
-  outputFileGNUPlotScript.open(tmpGNUPlotScriptName, ios::out);
+  outputFile.open(tmpTimeSeriesFileName, std::ios::out);
+  outputFileMotifSets.open(tmpFileMotifSetPositionsName, std::ios::out);
+  outputFileGNUPlotScript.open(tmpGNUPlotScriptName, std::ios::out);
 }
 
-void OutputGenerator::printTimeSeriesHorizontal(const vector<double>
-    &timeSeries_in, const vector<double> &d_in, const vector<int>
-    &windowSizes_in, const vector<vector<int>> &motifSetPositions_in) {
+void OutputGenerator::printTimeSeriesHorizontal(const std::vector<double>
+    &timeSeries_in, const std::vector<double> &d_in, const std::vector<int>
+    &windowSizes_in, const std::vector<std::vector<int>> &motifSetPositions_in)
+{
 
   if (timeSeries_in.size() == 0) {
 
-    cerr << "ERROR: Time series is empty." << endl;
+    std::cerr << "ERROR: Time series is empty." << std::endl;
     throw(EXIT_FAILURE);
   }
 
   if (d_in.size() == 0) {
 
-    cerr << "ERROR: Distance vector is empty." << endl;
+    std::cerr << "ERROR: Distance vector is empty." << std::endl;
     throw(EXIT_FAILURE);
   }
 
   if (d_in.size() != motifSetPositions_in.size()) {
 
-    cerr << "ERROR: Distance vector and motif set positions vector" <<
-      " have different size." << endl;
+    std::cerr << "ERROR: Distance vector and motif set positions vector" <<
+      " have different size." << std::endl;
     throw(EXIT_FAILURE);
   }
 
   if (windowSizes_in.size() == 0) {
 
-    cerr << "ERROR: Window size vector is empty." << endl;
+    std::cerr << "ERROR: Window size vector is empty." << std::endl;
     throw(EXIT_FAILURE);
   }
 
   if (windowSizes_in.size() != d_in.size()) {
 
-    cerr << "ERROR: Window size vector and distance vector have" <<
-      " different size." << endl;
+    std::cerr << "ERROR: Window size vector and distance vector have" <<
+      " different size." << std::endl;
     throw(EXIT_FAILURE);
   }
 
@@ -126,7 +129,7 @@ void OutputGenerator::printTimeSeriesHorizontal(const vector<double>
 
     if ((motifSetPositions_in[motifSetItr]).size() == 0) {
 
-      cerr << "ERROR: Motif set positions vector is empty." << endl;
+      std::cerr << "ERROR: Motif set positions vector is empty." << std::endl;
       throw(EXIT_FAILURE);
     }
     else if ((int)(motifSetPositions_in[motifSetItr]).size() > maxMSSize)
@@ -140,16 +143,16 @@ void OutputGenerator::printTimeSeriesHorizontal(const vector<double>
   int itr = 1;
   double valueMin = DBL_MAX, valueMax = DBL_MIN;
   double tmpOutputValue;
-  string tmpOutputString;
+  std::string tmpOutputString;
 
   tmpOutputValue = timeSeries_in[0];
-  tmpOutputString = to_string(tmpOutputValue);
+  tmpOutputString = std::to_string(tmpOutputValue);
   outputFile.write(tmpOutputString.c_str(), tmpOutputString.size());
 
   while (itr < (int)timeSeries_in.size()) {
 
     tmpOutputValue = timeSeries_in[itr];
-    tmpOutputString = ", " + to_string(tmpOutputValue);
+    tmpOutputString = ", " + std::to_string(tmpOutputValue);
     outputFile.write(tmpOutputString.c_str(), tmpOutputString.size());
 
     if (tmpOutputValue > valueMax)
@@ -165,7 +168,7 @@ void OutputGenerator::printTimeSeriesHorizontal(const vector<double>
 
   tmpOutputString = "\n";
 
-  string gnuplotCMD;
+  std::string gnuplotCMD;
 #ifdef _WIN32
   gnuplotCMD = "set terminal wxt size 1600, 300\n";
 #elif __APPLE__
@@ -174,11 +177,12 @@ void OutputGenerator::printTimeSeriesHorizontal(const vector<double>
   gnuplotCMD = "set terminal qt size 1600, 300 persist\n";
 #endif
   outputFileGNUPlotScript.write(gnuplotCMD.c_str(), gnuplotCMD.size());
-  gnuplotCMD = "set xrange[" + to_string(0) + ":" + to_string(itr - 1) + "]\n";
+  gnuplotCMD = "set xrange[" + std::to_string(0) + ":" + std::to_string(itr
+      - 1) + "]\n";
   outputFileGNUPlotScript.write(gnuplotCMD.c_str(), gnuplotCMD.size());
-  gnuplotCMD = "set yrange[" + to_string(valueMin - 0.2 * (valueMax
-        - valueMin)) + ":" + to_string(valueMax + 0.2 * (valueMax - valueMin))
-    + "]\n";
+  gnuplotCMD = "set yrange[" + std::to_string(valueMin - 0.2 * (valueMax
+        - valueMin)) + ":" + std::to_string(valueMax + 0.2 * (valueMax
+          - valueMin)) + "]\n";
   outputFileGNUPlotScript.write(gnuplotCMD.c_str(), gnuplotCMD.size());
   gnuplotCMD = "set grid\n";
   outputFileGNUPlotScript.write(gnuplotCMD.c_str(), gnuplotCMD.size());
@@ -186,7 +190,7 @@ void OutputGenerator::printTimeSeriesHorizontal(const vector<double>
 
   int maxMotifSetSize = 0;
 
-  for (vector<int> item : motifSetPositions_in)
+  for (std::vector<int> item : motifSetPositions_in)
     if ((int)item.size() > maxMotifSetSize)
       maxMotifSetSize = item.size();
 
@@ -198,7 +202,7 @@ void OutputGenerator::printTimeSeriesHorizontal(const vector<double>
 
   for (int vectorItr = 0; vectorItr < maxMotifSetSize; vectorItr++) {
 
-    tmpOutputString = ", \"position " + to_string(vectorItr) + "\"";
+    tmpOutputString = ", \"position " + std::to_string(vectorItr) + "\"";
     outputFileMotifSets.write(tmpOutputString.c_str(), tmpOutputString.size());
   }
 
@@ -213,30 +217,30 @@ void OutputGenerator::printTimeSeriesHorizontal(const vector<double>
       tmpOutputString = "\"Top Latent Motif Locations\"";
     outputFileMotifSets.write(tmpOutputString.c_str(), tmpOutputString.size());
 
-          ostringstream streamObj;
-          streamObj << fixed << setprecision(6) << ceil(1000000.0
-              * d_in[vectorItr]) / 1000000.0;
+          std::ostringstream streamObj;
+          streamObj << std::fixed << std::setprecision(6) <<
+            std::ceil(1000000.0 * d_in[vectorItr]) / 1000000.0;
 
     tmpOutputString = ", " + streamObj.str();
     outputFileMotifSets.write(tmpOutputString.c_str(), tmpOutputString.size());
 
-    tmpOutputString =  ", " + to_string(windowSizes_in[vectorItr]);
+    tmpOutputString =  ", " + std::to_string(windowSizes_in[vectorItr]);
     outputFileMotifSets.write(tmpOutputString.c_str(), tmpOutputString.size());
 
     for (int positionItr = 0; positionItr
         < (int)(motifSetPositions_in[vectorItr]).size(); positionItr++) {
 
       tmpOutputString = ", "
-        + to_string((motifSetPositions_in[vectorItr])[positionItr]);
+        + std::to_string((motifSetPositions_in[vectorItr])[positionItr]);
       outputFileMotifSets.write(tmpOutputString.c_str(),
           tmpOutputString.size());
 
       if (motifSetPositions_in[vectorItr].size() != 2) {
 
         gnuplotCMD = "set obj rect from "
-          + to_string(motifSetPositions_in[vectorItr][positionItr])
+          + std::to_string(motifSetPositions_in[vectorItr][positionItr])
           + ", graph 0 to "
-          + to_string(motifSetPositions_in[vectorItr][positionItr]
+          + std::to_string(motifSetPositions_in[vectorItr][positionItr]
               + windowSizes_in[vectorItr] - 1)
           + ", graph 1 back fc rgb \"#c5c5c5\" "
           + "fs border rgb \"#c5c5c5\"\n";
@@ -256,9 +260,9 @@ void OutputGenerator::printTimeSeriesHorizontal(const vector<double>
       if (motifSetPositions_in[vectorItr].size() == 2) {
 
         gnuplotCMD = "set obj rect from "
-          + to_string(motifSetPositions_in[vectorItr][positionItr])
+          + std::to_string(motifSetPositions_in[vectorItr][positionItr])
           + ", graph 0 to "
-          + to_string(motifSetPositions_in[vectorItr][positionItr]
+          + std::to_string(motifSetPositions_in[vectorItr][positionItr]
               + windowSizes_in[vectorItr] - 1)
           + ", graph 1 back fc rgb \"#656565\" "
           + "fs pattern 1 border rgb \"#656565\"\n";
@@ -269,8 +273,9 @@ void OutputGenerator::printTimeSeriesHorizontal(const vector<double>
 
 
   gnuplotCMD = "plot \"" + basicOutputFileName + "_"
-    + to_string(outputFolderNumber) + ".csv\" matrix title \"" + timeSeriesName
-    + " " + to_string(outputFolderNumber) + "\" with lines";
+    + std::to_string(outputFolderNumber) + ".csv\" matrix title \""
+    + timeSeriesName + " " + std::to_string(outputFolderNumber) + "\" with "
+    "lines";
   outputFileGNUPlotScript.write(gnuplotCMD.c_str(), gnuplotCMD.size());
 
 #ifdef _WIN32
@@ -284,39 +289,39 @@ void OutputGenerator::printTimeSeriesHorizontal(const vector<double>
   outputFileMotifSets.close();
 }
 
-void OutputGenerator::printTimeSeriesVertical(const vector<double>
-    &timeSeries_in, const vector<double> &d_in, const vector<int>
-    &windowSizes_in, const vector<vector<int>> &motifSetPositions_in) {
+void OutputGenerator::printTimeSeriesVertical(const std::vector<double>
+    &timeSeries_in, const std::vector<double> &d_in, const std::vector<int>
+    &windowSizes_in, const std::vector<std::vector<int>> &motifSetPositions_in) {
 
   if (timeSeries_in.size() == 0) {
 
-    cerr << "ERROR: Time series is empty." << endl;
+    std::cerr << "ERROR: Time series is empty." << std::endl;
     throw(EXIT_FAILURE);
   }
 
   if (d_in.size() == 0) {
 
-    cerr << "ERROR: Distance vector is empty." << endl;
+    std::cerr << "ERROR: Distance vector is empty." << std::endl;
     throw(EXIT_FAILURE);
   }
 
   if (d_in.size() != motifSetPositions_in.size()) {
 
-    cerr << "ERROR: Distance vector and motif set positions vector" <<
-      " have different size." << endl;
+    std::cerr << "ERROR: Distance vector and motif set positions vector" <<
+      " have different size." << std::endl;
     throw(EXIT_FAILURE);
   }
 
   if (windowSizes_in.size() == 0) {
 
-    cerr << "ERROR: Window size vector is empty." << endl;
+    std::cerr << "ERROR: Window size vector is empty." << std::endl;
     throw(EXIT_FAILURE);
   }
 
   if (windowSizes_in.size() != d_in.size()) {
 
-    cerr << "ERROR: Window size vector and distance vector have" <<
-      " different size." << endl;
+    std::cerr << "ERROR: Window size vector and distance vector have" <<
+      " different size." << std::endl;
     throw(EXIT_FAILURE);
   }
 
@@ -327,7 +332,7 @@ void OutputGenerator::printTimeSeriesVertical(const vector<double>
 
     if ((int)(motifSetPositions_in[motifSetItr]).size() == 0) {
 
-      cerr << "ERROR: Motif set positions vector is empty." << endl;
+      std::cerr << "ERROR: Motif set positions vector is empty." << std::endl;
       throw(EXIT_FAILURE);
     }
     else if ((int)(motifSetPositions_in[motifSetItr]).size() > maxMSSize)
@@ -341,12 +346,12 @@ void OutputGenerator::printTimeSeriesVertical(const vector<double>
   int itr = 0;
   double valueMin = DBL_MAX, valueMax = DBL_MIN;
   double tmpOutputValue;
-  string tmpOutputString;
+  std::string tmpOutputString;
 
   while (itr < (int)timeSeries_in.size()) {
 
     tmpOutputValue = timeSeries_in[itr];
-    tmpOutputString = to_string(tmpOutputValue) + "\n";
+    tmpOutputString = std::to_string(tmpOutputValue) + "\n";
     outputFile.write(tmpOutputString.c_str(), tmpOutputString.size());
 
     if (tmpOutputValue > valueMax)
@@ -360,7 +365,7 @@ void OutputGenerator::printTimeSeriesVertical(const vector<double>
   outputFile.close();
 
 
-  string gnuplotCMD;
+  std::string gnuplotCMD;
 #ifdef _WIN32
   gnuplotCMD = "set terminal wxt size 1600, 300\n";
 #elif __APPLE__
@@ -369,11 +374,12 @@ void OutputGenerator::printTimeSeriesVertical(const vector<double>
   gnuplotCMD = "set terminal qt size 1600, 300 persist\n";
 #endif
   outputFileGNUPlotScript.write(gnuplotCMD.c_str(), gnuplotCMD.size());
-  gnuplotCMD = "set xrange[" + to_string(0) + ":" + to_string(itr - 1) + "]\n";
+  gnuplotCMD = "set xrange[" + std::to_string(0) + ":" + std::to_string(itr
+      - 1) + "]\n";
   outputFileGNUPlotScript.write(gnuplotCMD.c_str(), gnuplotCMD.size());
-  gnuplotCMD = "set yrange[" + to_string(valueMin - 0.2 * (valueMax
-        - valueMin)) + ":" + to_string(valueMax + 0.2 * (valueMax - valueMin))
-    + "]\n";
+  gnuplotCMD = "set yrange[" + std::to_string(valueMin - 0.2 * (valueMax
+        - valueMin)) + ":" + std::to_string(valueMax + 0.2 * (valueMax
+          - valueMin)) + "]\n";
   outputFileGNUPlotScript.write(gnuplotCMD.c_str(), gnuplotCMD.size());
   gnuplotCMD = "set grid\n";
   outputFileGNUPlotScript.write(gnuplotCMD.c_str(), gnuplotCMD.size());
@@ -401,9 +407,9 @@ void OutputGenerator::printTimeSeriesVertical(const vector<double>
 
   for (int motifSetItr = 0; motifSetItr < (int)d_in.size(); motifSetItr++) {
 
-          ostringstream streamObj;
-          streamObj << fixed << setprecision(6) << ceil(1000000.0
-              * d_in[motifSetItr]) / 1000000.0;
+          std::ostringstream streamObj;
+          streamObj << std::fixed << std::setprecision(6) <<
+            std::ceil(1000000.0 * d_in[motifSetItr]) / 1000000.0;
 
     tmpOutputString = ", " + streamObj.str();
     outputFileMotifSets.write(tmpOutputString.c_str(), tmpOutputString.size());
@@ -419,7 +425,7 @@ void OutputGenerator::printTimeSeriesVertical(const vector<double>
   for (int motifSetItr = 0; motifSetItr < (int)windowSizes_in.size();
       motifSetItr++) {
 
-    tmpOutputString = ", " + to_string(windowSizes_in[motifSetItr]);
+    tmpOutputString = ", " + std::to_string(windowSizes_in[motifSetItr]);
     outputFileMotifSets.write(tmpOutputString.c_str(), tmpOutputString.size());
   }
 
@@ -429,7 +435,7 @@ void OutputGenerator::printTimeSeriesVertical(const vector<double>
 
   for (int positionItr = 0; positionItr < maxMSSize; positionItr++) {
 
-    tmpOutputString = "\"position " + to_string(positionItr) + "\"";
+    tmpOutputString = "\"position " + std::to_string(positionItr) + "\"";
     outputFileMotifSets.write(tmpOutputString.c_str(), tmpOutputString.size());
 
     for (int motifSetItr = 0; motifSetItr < (int)windowSizes_in.size();
@@ -438,16 +444,16 @@ void OutputGenerator::printTimeSeriesVertical(const vector<double>
       if (positionItr < (int)motifSetPositions_in[motifSetItr].size()) {
 
         tmpOutputString = ", "
-          + to_string(motifSetPositions_in[motifSetItr][positionItr]);
+          + std::to_string(motifSetPositions_in[motifSetItr][positionItr]);
         outputFileMotifSets.write(tmpOutputString.c_str(),
             tmpOutputString.size());
 
         if (motifSetPositions_in[motifSetItr].size() != 2) {
 
           gnuplotCMD = "set obj rect from "
-            + to_string(motifSetPositions_in[motifSetItr][positionItr])
+            + std::to_string(motifSetPositions_in[motifSetItr][positionItr])
             + ", graph 0 to "
-            + to_string(motifSetPositions_in[motifSetItr][positionItr]
+            + std::to_string(motifSetPositions_in[motifSetItr][positionItr]
                 + windowSizes_in[motifSetItr] - 1)
             + ", graph 1 back fc rgb \"#c5c5c5\" "
             + "fs border rgb \"#c5c5c5\"\n";
@@ -476,9 +482,9 @@ void OutputGenerator::printTimeSeriesVertical(const vector<double>
         if (motifSetPositions_in[motifSetItr].size() == 2) {
 
           gnuplotCMD = "set obj rect from "
-            + to_string(motifSetPositions_in[motifSetItr][positionItr])
+            + std::to_string(motifSetPositions_in[motifSetItr][positionItr])
             + ", graph 0 to "
-            + to_string(motifSetPositions_in[motifSetItr][positionItr]
+            + std::to_string(motifSetPositions_in[motifSetItr][positionItr]
                 + windowSizes_in[motifSetItr] - 1)
             + ", graph 1 back fc rgb \"#656565\" "
             + "fs pattern 1 border rgb \"#656565\"\n";
@@ -490,8 +496,8 @@ void OutputGenerator::printTimeSeriesVertical(const vector<double>
 
 
   gnuplotCMD = "plot \"" + basicOutputFileName + "_"
-    + to_string(outputFolderNumber) + ".csv\" title \"" + timeSeriesName
-    + " " + to_string(outputFolderNumber) + "\" with lines";
+    + std::to_string(outputFolderNumber) + ".csv\" title \"" + timeSeriesName
+    + " " + std::to_string(outputFolderNumber) + "\" with lines";
   outputFileGNUPlotScript.write(gnuplotCMD.c_str(), gnuplotCMD.size());
 
 #ifdef _WIN32
@@ -505,7 +511,7 @@ void OutputGenerator::printTimeSeriesVertical(const vector<double>
   outputFileMotifSets.close();
 }
 
-void OutputGenerator::setTimeSeriesName(const string &timeSeriesName_in) {
+void OutputGenerator::setTimeSeriesName(const std::string &timeSeriesName_in) {
 
   timeSeriesName = timeSeriesName_in;
 }

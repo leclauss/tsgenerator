@@ -7,7 +7,7 @@
 
 #include<global.hpp>
 
-bool check_if_float(const string string_in) {
+bool check_if_float(const tsg::word string_in) {
 
   bool isFloat = false;
   int stringItr = 0;
@@ -47,18 +47,18 @@ bool check_if_float(const string string_in) {
   return isFloat;
 }
 
-void parseArgs(int argc, char **argv, vector<string> &argTokens) {
+void parseArgs(int argc, char **argv, tsg::par &argTokens) {
 
   for (int i = 0; i < argc; i++) {
 
-    string token(argv[i]);
+    tsg::word token(argv[i]);
 
     if (token != "")
       argTokens.push_back(token);
   }
 }
 
-bool checkArg(vector<string> &argTokens, const string arg_in, vector<string>
+bool checkArg(tsg::par &argTokens, const tsg::word arg_in, tsg::par
     &payload_out) {
 
   if (!payload_out.empty()) {
@@ -67,8 +67,8 @@ bool checkArg(vector<string> &argTokens, const string arg_in, vector<string>
     payload_out.resize(0);
   }
 
-  vector<string>::iterator payload = find(argTokens.begin(), argTokens.end(),
-      arg_in);
+  tsg::par::iterator payload = std::find(argTokens.begin(),
+      argTokens.end(), arg_in);
 
   if (payload == argTokens.end() || check_if_float(*payload))
     return false;
@@ -88,46 +88,46 @@ bool checkArg(vector<string> &argTokens, const string arg_in, vector<string>
 
 void print_version() {
 
-  cout << PROGNAME << " " << VERSION << endl;
+  std::cout << PROGNAME << " " << VERSION << std::endl;
 
-  cout << "Copyright \302\251 2018 Rafael Moczalla" << endl;
-  cout << "Lizenz: Creative Commons - Attribution - Non-Commercial" <<
-    " - Share Alike" << endl;
-  cout << "There are no guarantees as far as the law permits." << endl
-    << endl;
-  cout << "Written by Rafael Moczalla" << endl;
+  std::cout << "Copyright \302\251 2018 Rafael Moczalla" << std::endl;
+  std::cout << "Lizenz: Creative Commons - Attribution - Non-Commercial" <<
+    " - Share Alike" << std::endl;
+  std::cout << "There are no guarantees as far as the law permits." <<
+    std::endl << std::endl;
+  std::cout << "Written by Rafael Moczalla" << std::endl;
 }
 
 void print_help() {
 
-  cout << "Call: " << endl;
-  cout << "    " << PROGNAME << " -l INTEGER -w INTEGER -rd FLOAT" <<
-    " [Options]" << endl;
-  cout << endl;
-  cout << "    -l,    --length INTEGER                           " <<
-    "       Sets the length of the time series." << endl;
-  cout << "    -w,    --windowSize INTEGER                       " <<
-    "       Sets the window size of the time series." << endl;
-  cout << "    -rd,   --randomness FLOAT                         " <<
-    "       Sets the randomness of the time series." << endl;
-  cout << endl;
-  cout << "Options:" << endl;
-  cout << "    -lm,   --latentMotif (STRING INTEGER FLOAT)+      " <<
-    "       Sets the operating mode to latent motif and" << endl;
-  cout << "                                                      " <<
-    "       the parameters for the latent motif namely" << endl;
-  cout << "                                                      " <<
-    "       type, count and height." << endl;
-  cout << "    -o,    --out NAME                                 " <<
-    "       Sets the output file name." << endl;
-  cout << "    -tsn,  --timeSeriesName NAME                      " <<
-    "       Sets the time series name." << endl;
-  cout << "    -ho,   --horizontalOutput                         " <<
-    "       Sets the output mode to horizontal." << endl;
-  cout << "    -r,    --range FLOAT FLOAT                        " <<
-    "       Sets the range of the time series values." << endl;
-  cout << "    -h,    --help                                     " <<
-    "       Prints these help text." << endl;
-  cout << "    -v,    --version                                  " <<
-    "       Prints the version information." << endl;
+  std::cout << "Call: " << std::endl;
+  std::cout << "    " << PROGNAME << " -l INTEGER -w INTEGER -rd FLOAT" <<
+    " [Options]" << std::endl;
+  std::cout << std::endl;
+  std::cout << "    -l,    --length INTEGER                           " <<
+    "       Sets the length of the time series." << std::endl;
+  std::cout << "    -w,    --windowSize INTEGER                       " <<
+    "       Sets the window size of the time series." << std::endl;
+  std::cout << "    -rd,   --randomness FLOAT                         " <<
+    "       Sets the randomness of the time series." << std::endl;
+  std::cout << std::endl;
+  std::cout << "Options:" << std::endl;
+  std::cout << "    -lm,   --latentMotif (STRING INTEGER FLOAT)+      " <<
+    "       Sets the operating mode to latent motif and" << std::endl;
+  std::cout << "                                                      " <<
+    "       the parameters for the latent motif namely" << std::endl;
+  std::cout << "                                                      " <<
+    "       type, count and height." << std::endl;
+  std::cout << "    -o,    --out NAME                                 " <<
+    "       Sets the output file name." << std::endl;
+  std::cout << "    -tsn,  --timeSeriesName NAME                      " <<
+    "       Sets the time series name." << std::endl;
+  std::cout << "    -ho,   --horizontalOutput                         " <<
+    "       Sets the output mode to horizontal." << std::endl;
+  std::cout << "    -r,    --range FLOAT FLOAT                        " <<
+    "       Sets the range of the time series values." << std::endl;
+  std::cout << "    -h,    --help                                     " <<
+    "       Prints these help text." << std::endl;
+  std::cout << "    -v,    --version                                  " <<
+    "       Prints the version information." << std::endl;
 }

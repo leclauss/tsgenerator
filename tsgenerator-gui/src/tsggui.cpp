@@ -14,23 +14,23 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   startButton.setText("start");
   saveButton.setText("save");
   lengthLabel.setText("length");
-  lengthText.setPlaceholderText(to_string(length).c_str());
+  lengthText.setPlaceholderText(std::to_string(length).c_str());
   windowLabel.setText("window");
-  windowText.setPlaceholderText(to_string(window).c_str());
+  windowText.setPlaceholderText(std::to_string(window).c_str());
   sizeLabel.setText("size");
-  sizeText.setPlaceholderText(to_string(motifSize).c_str());
+  sizeText.setPlaceholderText(std::to_string(motifSize).c_str());
   deltaLabel.setText("delta");
-  deltaText.setPlaceholderText(to_string(delta).c_str());
+  deltaText.setPlaceholderText(std::to_string(delta).c_str());
   noiseLabel.setText("noise");
-  noiseText.setPlaceholderText(to_string(noise).c_str());
+  noiseText.setPlaceholderText(std::to_string(noise).c_str());
   heightLabel.setText("height");
-  heightText.setPlaceholderText(to_string(height).c_str());
+  heightText.setPlaceholderText(std::to_string(height).c_str());
   stepLabel.setText("step");
-  stepText.setPlaceholderText(to_string(step).c_str());
+  stepText.setPlaceholderText(std::to_string(step).c_str());
   timesLabel.setText("times");
-  timesText.setPlaceholderText(to_string(times).c_str());
+  timesText.setPlaceholderText(std::to_string(times).c_str());
   maxiLabel.setText("maxi");
-  maxiText.setPlaceholderText(to_string(maxi).c_str());
+  maxiText.setPlaceholderText(std::to_string(maxi).c_str());
   typeLabel.setText("type");
   methodLabel.setText("method");
 
@@ -139,26 +139,26 @@ void TsgGui::generateTS() {
     bool first = false;
     bool success = false;
     double min, max;
-    string in;
+    std::string in;
 
     //read the input
     in = lengthText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        string::npos)
-      length = stoi(in);
+        std::string::npos)
+      length = std::stoi(in);
 
     in = windowText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        string::npos)
-      window = stoi(in);
+        std::string::npos)
+      window = std::stoi(in);
 
     in = deltaText.text().toStdString();
     if (check_if_float(in))
-      delta = stod(in);
+      delta = std::stod(in);
 
     in = noiseText.text().toStdString();
     if (check_if_float(in))
-      noise = stod(in);
+      noise = std::stod(in);
 
     in = typeDrop.currentText().toStdString();
     if (in.length())
@@ -166,22 +166,22 @@ void TsgGui::generateTS() {
 
     in = sizeText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        string::npos)
-      motifSize = stoi(in);
+        std::string::npos)
+      motifSize = std::stoi(in);
 
     in = heightText.text().toStdString();
     if (check_if_float(in))
-      height = stod(in);
+      height = std::stod(in);
 
     in = stepText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        string::npos)
-      step = stoi(in);
+        std::string::npos)
+      step = std::stoi(in);
 
     in = timesText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        string::npos)
-      times = stoi(in);
+        std::string::npos)
+      times = std::stoi(in);
 
     in = methodDrop.currentText().toStdString();
     if (in.length())
@@ -189,7 +189,7 @@ void TsgGui::generateTS() {
 
     in = maxiText.text().toStdString();
     if (check_if_float(in))
-      maxi = stod(in);
+      maxi = std::stod(in);
 
     try {
 
@@ -203,11 +203,11 @@ void TsgGui::generateTS() {
     catch (int e) {
 
       if (e != EXIT_FAILURE)
-        cerr << "ERROR: Something unexpected happened!" << endl;
+        std::cerr << "ERROR: Something unexpected happened!" << std::endl;
     }
     catch (...) {
 
-      cerr << "ERROR: Something unexpected happened!" << endl;
+      std::cerr << "ERROR: Something unexpected happened!" << std::endl;
     }
 
     if (success) {
@@ -309,13 +309,13 @@ void TsgGui::saveTS() {
         exit(e);
       else {
 
-        cerr << "ERROR: Something unexpected happened!" << endl;
+        std::cerr << "ERROR: Something unexpected happened!" << std::endl;
         exit(EXIT_FAILURE);
       }
     }
     catch (...) {
 
-      cerr << "ERROR: Something unexpected happened!" << endl;
+      std::cerr << "ERROR: Something unexpected happened!" << std::endl;
       exit(EXIT_FAILURE);
     }
 

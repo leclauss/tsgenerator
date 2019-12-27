@@ -13,10 +13,7 @@
 #include <vector>
 #include <string>
 
-using namespace std;
 
-
-// ----------------------------------------------------------------------------
 ///\brief Function called at program start.
 ///
 ///\param [in] argc Hands over the number of arguments to main.
@@ -27,12 +24,11 @@ using namespace std;
 ///initialized. We use the main function to parse the argument list to set up
 ///and to start the TSGenerator. Also a configuration file is created, if
 ///a configuration file do not exist.
-// ----------------------------------------------------------------------------
 int main(int argc, char *argv[]) {
 
   {
-    vector<string> argTokens;
-    vector<string> payload;
+    tsg::par argTokens;
+    tsg::par payload;
 
     parseArgs(argc, argv, argTokens);
 
@@ -55,13 +51,13 @@ int main(int argc, char *argv[]) {
     int window = 30;
     double delta = 1.0;
     double noise = 0.1;
-    string type("box");
+    tsg::word type("box");
     int size = 3;
     double height = 10.0;
     double step = 1.0;
     int times = 3;
     double maxi = 20.0;
-    string method("boundedNormalRandomWalk");
+    tsg::word method("boundedNormalRandomWalk");
 
     try {
 
@@ -70,17 +66,18 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: Length is missing an argument." << endl;
+          std::cerr << "ERROR: Length is missing an argument." << std::endl;
           exit(EXIT_FAILURE);
         }
 
-        if (payload[0].find_first_not_of("0123456789") != string::npos) {
+        if (payload[0].find_first_not_of("0123456789") != tsg::word::npos) {
 
-          cerr << "ERROR: " << (payload[0]) << " is not a valid number!" << endl;
+          std::cerr << "ERROR: " << (payload[0]) << " is not a valid number!"
+            << std::endl;
           exit(EXIT_FAILURE);
         }
 
-        length = stoi(payload[0]);
+        length = std::stoi(payload[0]);
       }
 
       if (checkArg(argTokens, "-w", payload) || checkArg(argTokens,
@@ -88,17 +85,19 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: Window size is missing an argument." << endl;
+          std::cerr << "ERROR: Window size is missing an argument." <<
+            std::endl;
           exit(EXIT_FAILURE);
         }
 
-        if (payload[0].find_first_not_of("0123456789") != string::npos) {
+        if (payload[0].find_first_not_of("0123456789") != tsg::word::npos) {
 
-          cerr << "ERROR: " << (payload[0]) << " is not a valid number!" << endl;
+          std::cerr << "ERROR: " << (payload[0]) << " is not a valid number!"
+            << std::endl;
           exit(EXIT_FAILURE);
         }
 
-        window = stoi(payload[0]);
+        window = std::stoi(payload[0]);
       }
 
       if (checkArg(argTokens, "-d", payload) || checkArg(argTokens, "--delta",
@@ -106,17 +105,17 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: Delta is missing an argument." << endl;
+          std::cerr << "ERROR: Delta is missing an argument." << std::endl;
           exit(EXIT_FAILURE);
         }
 
         if (!check_if_float(payload[0])) {
 
-          cerr << "ERROR: Delta is not a float." << endl;
+          std::cerr << "ERROR: Delta is not a float." << std::endl;
           exit(EXIT_FAILURE);
         }
 
-        delta = stod(payload[0]);
+        delta = std::stod(payload[0]);
       }
 
       if (checkArg(argTokens, "-no", payload) || checkArg(argTokens,
@@ -124,17 +123,18 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: Noise option is missing an argument." << endl;
+          std::cerr << "ERROR: Noise option is missing an argument." <<
+            std::endl;
           exit(EXIT_FAILURE);
         }
 
         if (!check_if_float(payload[0])) {
 
-          cerr << "ERROR: Noise argument is not a float." << endl;
+          std::cerr << "ERROR: Noise argument is not a float." << std::endl;
           exit(EXIT_FAILURE);
         }
 
-        noise = stod(payload[0]);
+        noise = std::stod(payload[0]);
       }
 
       if (checkArg(argTokens, "-ty", payload) || checkArg(argTokens,
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: Type is missing an argument." << endl;
+          std::cerr << "ERROR: Type is missing an argument." << std::endl;
           exit(EXIT_FAILURE);
         }
 
@@ -154,17 +154,18 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: Size is missing an argument." << endl;
+          std::cerr << "ERROR: Size is missing an argument." << std::endl;
           exit(EXIT_FAILURE);
         }
 
-        if (payload[0].find_first_not_of("0123456789") != string::npos) {
+        if (payload[0].find_first_not_of("0123456789") != tsg::word::npos) {
 
-          cerr << "ERROR: " << (payload[0]) << " is not a valid number!" << endl;
+          std::cerr << "ERROR: " << (payload[0]) << " is not a valid number!"
+            << std::endl;
           exit(EXIT_FAILURE);
         }
 
-        size = stoi(payload[0]);
+        size = std::stoi(payload[0]);
       }
 
       if (checkArg(argTokens, "-he", payload) || checkArg(argTokens,
@@ -172,17 +173,18 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: Height is missing an argument." << endl;
+          std::cerr << "ERROR: Height is missing an argument." << std::endl;
           exit(EXIT_FAILURE);
         }
 
         if (!check_if_float(payload[0])) {
 
-          cerr << "ERROR: " << payload[0] << " is not a valid float!" << endl;
+          std::cerr << "ERROR: " << payload[0] << " is not a valid float!" <<
+            std::endl;
           throw(EXIT_FAILURE);
         }
 
-        height = stoll(payload[0]);
+        height = std::stoll(payload[0]);
       }
 
       if (checkArg(argTokens, "-st", payload) || checkArg(argTokens,
@@ -190,17 +192,18 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: Step is missing an argument." << endl;
+          std::cerr << "ERROR: Step is missing an argument." << std::endl;
           exit(EXIT_FAILURE);
         }
 
         if (!check_if_float(payload[0])) {
 
-          cerr << "ERROR: " << payload[0] << " is not a valid float!" << endl;
+          std::cerr << "ERROR: " << payload[0] << " is not a valid float!" <<
+            std::endl;
           throw(EXIT_FAILURE);
         }
 
-        step = stoll(payload[0]);
+        step = std::stoll(payload[0]);
       }
 
       if (checkArg(argTokens, "-ti", payload) || checkArg(argTokens,
@@ -208,17 +211,18 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: Times is missing an argument." << endl;
+          std::cerr << "ERROR: Times is missing an argument." << std::endl;
           exit(EXIT_FAILURE);
         }
 
-        if (payload[0].find_first_not_of("0123456789") != string::npos) {
+        if (payload[0].find_first_not_of("0123456789") != tsg::word::npos) {
 
-          cerr << "ERROR: " << (payload[0]) << " is not a valid number!" << endl;
+          std::cerr << "ERROR: " << (payload[0]) << " is not a valid number!"
+            << std::endl;
           exit(EXIT_FAILURE);
         }
 
-        times = stoi(payload[0]);
+        times = std::stoi(payload[0]);
       }
 
       if (checkArg(argTokens, "-me", payload) || checkArg(argTokens,
@@ -226,7 +230,7 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: Type is missing an argument." << endl;
+          std::cerr << "ERROR: Type is missing an argument." << std::endl;
           exit(EXIT_FAILURE);
         }
 
@@ -238,17 +242,18 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: Maximum is missing an argument." << endl;
+          std::cerr << "ERROR: Maximum is missing an argument." << std::endl;
           exit(EXIT_FAILURE);
         }
 
         if (!check_if_float(payload[0])) {
 
-          cerr << "ERROR: " << payload[0] << " is not a valid float!" << endl;
+          std::cerr << "ERROR: " << payload[0] << " is not a valid float!" <<
+            std::endl;
           throw(EXIT_FAILURE);
         }
 
-        maxi = stoll(payload[0]);
+        maxi = std::stoll(payload[0]);
       }
 
       //generate the time series
@@ -268,7 +273,7 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: The output file name is unset." << endl;
+          std::cerr << "ERROR: The output file name is unset." << std::endl;
           exit(EXIT_FAILURE);
         }
         else
@@ -282,7 +287,7 @@ int main(int argc, char *argv[]) {
 
         if (payload.empty()) {
 
-          cerr << "ERROR: The time series name is unset." << endl;
+          std::cerr << "ERROR: The time series name is unset." << std::endl;
           exit(EXIT_FAILURE);
         }
         else
@@ -305,13 +310,13 @@ int main(int argc, char *argv[]) {
         exit(e);
       else {
 
-        cerr << "ERROR: Something unexpected happened!" << endl;
+        std::cerr << "ERROR: Something unexpected happened!" << std::endl;
         exit(EXIT_FAILURE);
       }
     }
     catch (...) {
 
-      cerr << "ERROR: Something unexpected happened!" << endl;
+      std::cerr << "ERROR: Something unexpected happened!" << std::endl;
       exit(EXIT_FAILURE);
     }
   }
