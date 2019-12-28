@@ -19,8 +19,8 @@ void test_check_if_float() {
 }
 
 char **argv;
-vector<string> argTokens;
-vector<string> payload;
+tsg::par argTokens;
+tsg::par payload;
 
 void test_parseArgs() {
 
@@ -34,7 +34,7 @@ void test_parseArgs() {
   char arg4[] = "-empty";
   char arg5[] = "--multiplePayload";
   char arg6[] = "-100.000";
-  char arg7[] = "string1 string2";
+  char arg7[] = "tsg::word1 tsg::word2";
   char arg8[] = "";
   char arg9[] = "end";
   argv = new char*[argc];
@@ -58,7 +58,7 @@ void test_parseArgs() {
   TEST(argTokens[4] == "-empty");
   TEST(argTokens[5] == "--multiplePayload");
   TEST(argTokens[6] == "-100.000");
-  TEST(argTokens[7] == "string1 string2");
+  TEST(argTokens[7] == "tsg::word1 tsg::word2");
   TEST(argTokens[8] == "end");
 }
 
@@ -79,7 +79,7 @@ void test_checkArg() {
   TEST(checkArg(argTokens, "--multiplePayload", payload));
   TEST(payload.size() == 3);
   TEST(payload[0] == "-100.000");
-  TEST(payload[1] == "string1 string2");
+  TEST(payload[1] == "tsg::word1 tsg::word2");
   TEST(payload[2] == "end");
 }
 
@@ -87,23 +87,23 @@ void test_print_version() {
 
   TEST_GROUP_FUNCTION;
 
-  ostringstream local;
-  ostringstream testStream;
+  std::ostringstream local;
+  std::ostringstream testStream;
 
-  auto cout_buff = cout.rdbuf(local.rdbuf());
+  auto cout_buff = std::cout.rdbuf(local.rdbuf());
 
   print_version();
 
-  testStream << PROGNAME << " " << VERSION << endl;
+  testStream << PROGNAME << " " << VERSION << std::endl;
 
-  testStream << "Copyright \302\251 2018 Rafael Moczalla" << endl;
+  testStream << "Copyright \302\251 2018 Rafael Moczalla" << std::endl;
   testStream << "Lizenz: Creative Commons - Attribution" <<
-    " - Non-Commercial - Share Alike" << endl;
+    " - Non-Commercial - Share Alike" << std::endl;
   testStream << "There are no guarantees as far as the law permits." <<
-    endl << endl;
-  testStream << "Written by Rafael Moczalla" << endl;
+    std::endl << std::endl;
+  testStream << "Written by Rafael Moczalla" << std::endl;
 
-  cout.rdbuf(cout_buff);
+  std::cout.rdbuf(cout_buff);
 
   TEST(testStream.str() == local.str());
 }
@@ -112,68 +112,134 @@ void test_print_help() {
 
   TEST_GROUP_FUNCTION;
 
-  ostringstream local;
-  ostringstream testStream;
+  std::ostringstream local;
+  std::ostringstream testStream;
 
-  auto cout_buff = cout.rdbuf(local.rdbuf());
+  auto cout_buff = std::cout.rdbuf(local.rdbuf());
 
   print_help();
 
-  testStream << "Call: " << endl;
-  testStream << "    " << PROGNAME <<
-    " -l INTEGER -w INTEGER -rd FLOAT [Options]" << endl;
-  testStream << endl;
-  testStream << "    -l,    --length INTEGER            " <<
-    "                      Sets the length of the time series." << endl;
-  testStream << "    -w,    --windowSize INTEGER        " <<
-    "                      Sets the window size of the time series." << endl;
-  testStream << "    -rd,   --randomness FLOAT          " <<
-    "                      Sets the randomness of the time series." << endl;
-  testStream << endl;
-  testStream << "Options:" << endl;
-  testStream << "    -lm,   --latentMotif (STRING INTEGER FLOAT)+" <<
-    "             Sets the operating mode to latent motif and" << endl;
-  testStream << "                                       " <<
-    "                      the parameters for the latent motif namely" << endl;
-  testStream << "                                       " <<
-    "                      type, count and height." << endl;
-  testStream << "    -o,    --out NAME                  " <<
-    "                      Sets the output file name." << endl;
-  testStream << "    -tsn,  --timeSeriesName NAME       " <<
-    "                      Sets the time series name." << endl;
-  testStream << "    -ho,   --horizontalOutput          " <<
-    "                      Sets the output mode to horizontal." << endl;
-  testStream << "    -r,    --range FLOAT FLOAT         " <<
-    "                      Sets the range of the time series values." << endl;
-  testStream << "    -h,    --help                      " <<
-    "                      Prints these help text." << endl;
-  testStream << "    -v,    --version                   " <<
-    "                      Prints the version information." << endl;
+  testStream << "Call: " << std::endl;
+  testStream << "    " << PROGNAME << " [Options]" << std::endl << std::endl;
+  testStream << "Options:" << std::endl;
+  testStream << "    -g,    --generator tsg::word  " <<
+    "         Sets the generator, the method for injecting sequences" <<
+    std::endl;
+  testStream << "                                  " <<
+    "       into the time series matching the synthetic motif. The" <<
+    std::endl;
+  testStream << "                                  " <<
+    "       available methods are pair motif, set motif and latent" <<
+    std::endl;
+  testStream << "                                  " <<
+    "       motif." << std::endl;
+  testStream << "    -ty,   --type tsg::word       " <<
+    "         Sets the motif type, the shape of the injected motif and" <<
+    std::endl;
+  testStream << "                                  " <<
+    "       the inserted sequences. The available methods are box," <<
+    std::endl;
+  testStream << "                                  " <<
+    "       triangle, semicircle, trapezoid, positiveflank," << std::endl;
+  testStream << "                                  " <<
+    "       negativeflank, sine and cosine." << std::endl;
+  testStream << "    -me,   --method tsg::word     " <<
+    "         Sets the motif type, the shape of the injected motif and" <<
+    std::endl;
+  testStream << "                                  " <<
+    "       the inserted sequences. The available methods are" << std::endl;
+  testStream << "                                  " <<
+    "       simpleRandomWalk, realRandomWalk, normalRandomWalk," << std::endl;
+  testStream << "                                  " <<
+    "       linearRandomWalk, boundedSimpleRandomWalk," << std::endl;
+  testStream << "                                  " <<
+    "       boundedRealRandomWalk, boundedNormalRandomWalk," << std::endl;
+  testStream << "                                  " <<
+    "       boundedLinearRandomWalk, uniformRandom, normalRandom," <<
+    std::endl;
+  testStream << "                                  " <<
+    "       piecewiseLinearRandom and splineRepeated." << std::endl;
+  testStream << "    -l,    --length INTEGER       " <<
+    "         Sets the length of the time series." << std::endl;
+  testStream << "    -w,    --windowSize INTEGER   " <<
+    "         Sets the window size of the time series." << std::endl;
+  testStream << "    -si,   --size INTEGER         " <<
+    "         Sets the size of the motif, the number of inserted" <<
+    std::endl;
+  testStream << "                                  " <<
+    "       sequences non-self matched by the motif." << std::endl;
+  testStream << "    -no,   --noise FLOAT          " <<
+    "         Sets the noise value. A random value in the range from" <<
+    std::endl;
+  testStream << "                                  " <<
+    "       -FLOAT to FLOAT is added to the base time series and the" <<
+    std::endl;
+  testStream << "                                  " <<
+    "       inserted sequences." << std::endl;
+  testStream << "    -d,    --delta FLOAT          " <<
+    "         Sets the maximum absolute difference between two" << std::endl;
+  testStream << "                                  " <<
+    "       consecutive values in the time series." << std::endl;
+  testStream << "    -he,   --delta FLOAT          " <<
+    "         Sets the maximum absolute difference between two values" <<
+    std::endl;
+  testStream << "                                  " <<
+    "       of the base motif." << std::endl;
+  testStream << "    -st,   --step FLOAT           " <<
+    "         Sets the maximum step size in x direction from two" << std::endl;
+  testStream << "                                  " <<
+    "       consecutive values when creating a splined base times" <<
+    std::endl;
+  testStream << "                                  " <<
+    "       series." << std::endl;
+  testStream << "    -ti,   --times INTEGER        " <<
+    "         Sets the number of values computed to generate a" << std::endl;
+  testStream << "                                  " <<
+    "       repeating" << std::endl;
+  testStream << "                                  " <<
+    "       pattern when generating a splined base time series." << std::endl;
+  testStream << "    -ma,   --maxi FLOAT           " <<
+    "         Sets the maximum absolute value in the base times series." <<
+    std::endl;
+  testStream << "    -o,    --out NAME             " <<
+    "         Sets the output file name." << std::endl;
+  testStream << "    -tsn,  --timeSeriesName NAME  " <<
+    "         Sets the time series name." << std::endl;
+  testStream << "    -ho,   --horizontalOutput     " <<
+    "         Sets the output mode to horizontal." << std::endl;
+  testStream << "    -r,    --range FLOAT FLOAT    " <<
+    "         Sets the range of the time series values." << std::endl;
+  testStream << "    -h,    --help                 " <<
+    "         Prints these help text." << std::endl;
+  testStream << "    -v,    --version              " <<
+    "         Prints the version information." << std::endl;
 
-  cout.rdbuf(cout_buff);
+  std::cout.rdbuf(cout_buff);
 
   TEST(testStream.str() == local.str());
 }
 
 void test_outputgenerator() {
 
-  //redirect cerr to keep test output clean
-  ostringstream local;
+  //redirect std::cerr to keep test output clean
+  std::ostringstream local;
 
-  auto cerr_buff = cerr.rdbuf(local.rdbuf());
+  auto cerr_buff = std::cerr.rdbuf(local.rdbuf());
 
   TEST_GROUP_FUNCTION;
   int folderNumber = 0;
   int secondFolderNumber;
 
-  while(exists("time_series_" + to_string(folderNumber)))
+  while(std::filesystem::exists("time_series_" + std::to_string(folderNumber)))
     folderNumber++;
 
-  create_directory("time_series_" + to_string(folderNumber));
+  std::filesystem::create_directory("time_series_"
+      + std::to_string(folderNumber));
 
   secondFolderNumber = folderNumber + 1;
 
-  while(exists("time_series_" + to_string(secondFolderNumber)))
+  while(std::filesystem::exists("time_series_"
+        + std::to_string(secondFolderNumber)))
     secondFolderNumber++;
 
 
@@ -197,32 +263,36 @@ void test_outputgenerator() {
 
   TEST(generator.getOutputFolderNumber() == secondFolderNumber);
   TEST(generator.getOutputFileName() == ("./time_series_"
-        + to_string(secondFolderNumber) + "/time_series"));
+        + std::to_string(secondFolderNumber) + "/time_series"));
   TEST(generator.getOutputFileMotifSetsName() == ("./time_series_"
-        + to_string(secondFolderNumber) + "/time_series_meta"));
+        + std::to_string(secondFolderNumber) + "/time_series_meta"));
   TEST(generator.getOutputFileGNUPlotScriptName() == ("./time_series_"
-        + to_string(secondFolderNumber) + "/time_series_plot"));
+        + std::to_string(secondFolderNumber) + "/time_series_plot"));
   TEST(generator.getTimeSeriesName() == ("Test Name"));
-  TEST(remove("time_series_" + to_string(secondFolderNumber) + "/time_series_"
-        + to_string(secondFolderNumber) + ".csv"));
-  TEST(remove("time_series_" + to_string(secondFolderNumber)
-        + "/time_series_meta_" + to_string(secondFolderNumber) + ".csv"));
-  TEST(remove("time_series_" + to_string(secondFolderNumber)
-        + "/time_series_plot_" + to_string(secondFolderNumber) + ".plt"));
-  TEST(remove("time_series_" + to_string(secondFolderNumber)));
+  TEST(std::filesystem::remove("time_series_"
+        + std::to_string(secondFolderNumber) + "/time_series_"
+        + std::to_string(secondFolderNumber) + ".csv"));
+  TEST(std::filesystem::remove("time_series_"
+        + std::to_string(secondFolderNumber)
+        + "/time_series_meta_" + std::to_string(secondFolderNumber) + ".csv"));
+  TEST(std::filesystem::remove("time_series_"
+        + std::to_string(secondFolderNumber)
+        + "/time_series_plot_" + std::to_string(secondFolderNumber) + ".plt"));
+  TEST(std::filesystem::remove("time_series_"
+        + std::to_string(secondFolderNumber)));
 
-  remove("time_series_" + to_string(folderNumber));
+  std::filesystem::remove("time_series_" + std::to_string(folderNumber));
 
 
   TestOutputGenerator generatorHorizontal;
 
   TEST(generatorHorizontal.getOutputFolderNumber() == folderNumber);
   TEST(generatorHorizontal.getOutputFileName() == ("./time_series_"
-        + to_string(folderNumber) + "/time_series"));
+        + std::to_string(folderNumber) + "/time_series"));
   TEST(generatorHorizontal.getOutputFileMotifSetsName() == ("./time_series_"
-        + to_string(folderNumber) + "/time_series_meta"));
+        + std::to_string(folderNumber) + "/time_series_meta"));
   TEST(generatorHorizontal.getOutputFileGNUPlotScriptName() ==
-      ("./time_series_" + to_string(folderNumber) + "/time_series_plot"));
+      ("./time_series_" + std::to_string(folderNumber) + "/time_series_plot"));
   TEST(generatorHorizontal.getTimeSeriesName() == ("Time Series"));
 
   //test if output generator throw exceptions correctly
@@ -295,18 +365,18 @@ void test_outputgenerator() {
   }
 
   //remove folder
-  TEST(remove("time_series_" + to_string(folderNumber)));
+  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)));
 
 
   TestOutputGenerator generatorVertical;
 
   TEST(generatorVertical.getOutputFolderNumber() == folderNumber);
   TEST(generatorVertical.getOutputFileName() == ("./time_series_"
-        + to_string(folderNumber) + "/time_series"));
+        + std::to_string(folderNumber) + "/time_series"));
   TEST(generatorVertical.getOutputFileMotifSetsName() == ("./time_series_"
-        + to_string(folderNumber) + "/time_series_meta"));
+        + std::to_string(folderNumber) + "/time_series_meta"));
   TEST(generatorVertical.getOutputFileGNUPlotScriptName() == ("./time_series_"
-        + to_string(folderNumber) + "/time_series_plot"));
+        + std::to_string(folderNumber) + "/time_series_plot"));
   TEST(generatorVertical.getTimeSeriesName() == ("Time Series"));
 
   //test if output generator throw exceptions correctly
@@ -379,18 +449,18 @@ void test_outputgenerator() {
   }
 
   //remove folder
-  TEST(remove("time_series_" + to_string(folderNumber)));
+  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)));
 
 
   TestOutputGenerator generatorHorizontalTwo;
 
   TEST(generatorHorizontalTwo.getOutputFolderNumber() == folderNumber);
   TEST(generatorHorizontalTwo.getOutputFileName() == ("./time_series_"
-        + to_string(folderNumber) + "/time_series"));
+        + std::to_string(folderNumber) + "/time_series"));
   TEST(generatorHorizontalTwo.getOutputFileMotifSetsName() == ("./time_series_"
-        + to_string(folderNumber) + "/time_series_meta"));
+        + std::to_string(folderNumber) + "/time_series_meta"));
   TEST(generatorHorizontalTwo.getOutputFileGNUPlotScriptName() ==
-      ("./time_series_" + to_string(folderNumber) + "/time_series_plot"));
+      ("./time_series_" + std::to_string(folderNumber) + "/time_series_plot"));
   TEST(generatorHorizontalTwo.getTimeSeriesName() == ("Time Series"));
 
   generatorHorizontalTwo.printTimeSeriesHorizontal(testTimeSeries,
@@ -398,8 +468,8 @@ void test_outputgenerator() {
       { topMotifSetPos, topMotifPairPos });
 
   //test if time series file has correct content
-  ostringstream correctStream;
-  correctStream << fixed;
+  std::ostringstream correctStream;
+  correctStream << std::fixed;
   correctStream.str("");
   correctStream.clear();
 
@@ -414,10 +484,10 @@ void test_outputgenerator() {
     else
       correctStream << ", " << item;
 
-  ifstream iTestTimeSeries("time_series_" + to_string(folderNumber)
-      + "/time_series_" + to_string(folderNumber) + ".csv");
+  std::ifstream iTestTimeSeries("time_series_" + std::to_string(folderNumber)
+      + "/time_series_" + std::to_string(folderNumber) + ".csv");
 
-  string line;
+  tsg::word line;
 
   if (TEST_IF(getline(iTestTimeSeries, line) ? true : false))
     TEST(line == correctStream.str());
@@ -427,10 +497,10 @@ void test_outputgenerator() {
   iTestTimeSeries.close();
 
   //test if motif positions file has correct content
-  ifstream iTestPositions("time_series_" + to_string(folderNumber)
-      + "/time_series_meta_" + to_string(folderNumber) + ".csv");
+  std::ifstream iTestPositions("time_series_" + std::to_string(folderNumber)
+      + "/time_series_meta_" + std::to_string(folderNumber) + ".csv");
 
-  correctStream << defaultfloat;
+  correctStream << std::defaultfloat;
   correctStream.str("");
   correctStream.clear();
 
@@ -443,9 +513,9 @@ void test_outputgenerator() {
   correctStream.str("");
   correctStream.clear();
 
-  correctStream << fixed << "\"Top Latent Motif Locations\", " <<
+  correctStream << std::fixed << "\"Top Latent Motif Locations\", " <<
     0.240684 << ", " << windowSize << ", ";
-  correctStream << defaultfloat << topMotifSetPos[0] << ", " <<
+  correctStream << std::defaultfloat << topMotifSetPos[0] << ", " <<
     topMotifSetPos[1] << ", " << topMotifSetPos[2];
 
   if(TEST_IF(getline(iTestPositions, line) ? true : false))
@@ -454,9 +524,9 @@ void test_outputgenerator() {
   correctStream.str("");
   correctStream.clear();
 
-  correctStream << fixed << "\"Top Pair Motif Locations\", " <<
+  correctStream << std::fixed << "\"Top Pair Motif Locations\", " <<
     0.000000 << ", " << windowSize << ", ";
-  correctStream << defaultfloat << topMotifPairPos[0] << ", " <<
+  correctStream << std::defaultfloat << topMotifPairPos[0] << ", " <<
     topMotifPairPos[1];
 
   if(TEST_IF(getline(iTestPositions, line) ? true : false))
@@ -466,8 +536,8 @@ void test_outputgenerator() {
 
   iTestPositions.close();
 
-  ifstream iTestPlot("time_series_" + to_string(folderNumber)
-      + "/time_series_plot_" + to_string(folderNumber) + ".plt");
+  std::ifstream iTestPlot("time_series_" + std::to_string(folderNumber)
+      + "/time_series_plot_" + std::to_string(folderNumber) + ".plt");
 
   if(TEST_IF(getline(iTestPlot, line) ? true : false))
 #ifdef _WIN32
@@ -501,9 +571,9 @@ void test_outputgenerator() {
         " graph 1 back fc rgb \"#656565\" "
         "fs pattern 1 border rgb \"#656565\"");
   if(TEST_IF(getline(iTestPlot, line) ? true : false))
-    TEST(line == ("plot \"time_series_" + to_string(folderNumber) + ".csv\""
-        " matrix title \"Time Series " + to_string(folderNumber) + "\" with"
-        " lines"));
+    TEST(line == ("plot \"time_series_" + std::to_string(folderNumber)
+          + ".csv\" matrix title \"Time Series " + std::to_string(folderNumber)
+          + "\" with lines"));
 #ifdef _WIN32
 #elif __APPLE__
 #else
@@ -517,24 +587,27 @@ void test_outputgenerator() {
   iTestPlot.close();
 
   //remove files and folder
-  TEST(remove("time_series_" + to_string(folderNumber) + "/time_series_"
-        + to_string(folderNumber) + ".csv"));
-  TEST(remove("time_series_" + to_string(folderNumber) + "/time_series_meta_"
-        + to_string(folderNumber) + ".csv"));
-  TEST(remove("time_series_" + to_string(folderNumber) + "/time_series_plot_"
-        + to_string(folderNumber) + ".plt"));
-  TEST(remove("time_series_" + to_string(folderNumber)));
+  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)
+        + "/time_series_"
+        + std::to_string(folderNumber) + ".csv"));
+  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)
+        + "/time_series_meta_"
+        + std::to_string(folderNumber) + ".csv"));
+  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)
+        + "/time_series_plot_"
+        + std::to_string(folderNumber) + ".plt"));
+  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)));
 
 
   TestOutputGenerator generatorVerticalTwo;
 
   TEST(generatorVerticalTwo.getOutputFolderNumber() == folderNumber);
   TEST(generatorVerticalTwo.getOutputFileName() == ("./time_series_"
-        + to_string(folderNumber) + "/time_series"));
+        + std::to_string(folderNumber) + "/time_series"));
   TEST(generatorVerticalTwo.getOutputFileMotifSetsName() == ("./time_series_"
-        + to_string(folderNumber) + "/time_series_meta"));
+        + std::to_string(folderNumber) + "/time_series_meta"));
   TEST(generatorVerticalTwo.getOutputFileGNUPlotScriptName() ==
-      ("./time_series_" + to_string(folderNumber) + "/time_series_plot"));
+      ("./time_series_" + std::to_string(folderNumber) + "/time_series_plot"));
   TEST(generatorVerticalTwo.getTimeSeriesName() == ("Time Series"));
 
   generatorVerticalTwo.printTimeSeriesVertical(testTimeSeries,
@@ -544,10 +617,10 @@ void test_outputgenerator() {
   //test if time series file has correct content
   correctStream.str("");
   correctStream.clear();
-  correctStream << fixed;
+  correctStream << std::fixed;
 
-  iTestTimeSeries.open("time_series_" + to_string(folderNumber)
-      + "/time_series_" + to_string(folderNumber) + ".csv");
+  iTestTimeSeries.open("time_series_" + std::to_string(folderNumber)
+      + "/time_series_" + std::to_string(folderNumber) + ".csv");
 
   for (double item : testTimeSeries) {
 
@@ -565,10 +638,10 @@ void test_outputgenerator() {
   iTestTimeSeries.close();
 
   //test if motif positions file has correct content
-  iTestPositions.open("time_series_" + to_string(folderNumber)
-      + "/time_series_meta_" + to_string(folderNumber) + ".csv");
+  iTestPositions.open("time_series_" + std::to_string(folderNumber)
+      + "/time_series_meta_" + std::to_string(folderNumber) + ".csv");
 
-  correctStream << defaultfloat;
+  correctStream << std::defaultfloat;
   correctStream.str("");
   correctStream.clear();
 
@@ -580,8 +653,8 @@ void test_outputgenerator() {
   correctStream.str("");
   correctStream.clear();
 
-  correctStream << fixed << "\"range/similarity\", " <<
-    0.240684 << ", " << 0.000000 << defaultfloat;
+  correctStream << std::fixed << "\"range/similarity\", " <<
+    0.240684 << ", " << 0.000000 << std::defaultfloat;
 
   if(TEST_IF(getline(iTestPositions, line) ? true : false))
     TEST(line == correctStream.str());
@@ -624,8 +697,8 @@ void test_outputgenerator() {
 
   iTestPositions.close();
 
-  iTestPlot.open("time_series_" + to_string(folderNumber)
-      + "/time_series_plot_" + to_string(folderNumber) + ".plt");
+  iTestPlot.open("time_series_" + std::to_string(folderNumber)
+      + "/time_series_plot_" + std::to_string(folderNumber) + ".plt");
 
   if(TEST_IF(getline(iTestPlot, line) ? true : false))
 #ifdef _WIN32
@@ -659,8 +732,9 @@ void test_outputgenerator() {
         " graph 1 back fc rgb \"#656565\" "
         "fs pattern 1 border rgb \"#656565\"");
   if(TEST_IF(getline(iTestPlot, line) ? true : false))
-    TEST(line == ("plot \"time_series_" + to_string(folderNumber) + ".csv\""
-        " title \"Time Series " + to_string(folderNumber) + "\" with lines"));
+    TEST(line == ("plot \"time_series_" + std::to_string(folderNumber)
+          + ".csv\" title \"Time Series " + std::to_string(folderNumber)
+          + "\" with lines"));
 #ifdef _WIN32
 #elif __APPLE__
 #else
@@ -674,24 +748,27 @@ void test_outputgenerator() {
   iTestPlot.close();
 
   //remove files and folder
-  TEST(remove("time_series_" + to_string(folderNumber) + "/time_series_"
-        + to_string(folderNumber) + ".csv"));
-  TEST(remove("time_series_" + to_string(folderNumber) + "/time_series_meta_"
-        + to_string(folderNumber) + ".csv"));
-  TEST(remove("time_series_" + to_string(folderNumber) + "/time_series_plot_"
-        + to_string(folderNumber) + ".plt"));
-  TEST(remove("time_series_" + to_string(folderNumber)));
+  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)
+        + "/time_series_"
+        + std::to_string(folderNumber) + ".csv"));
+  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)
+        + "/time_series_meta_"
+        + std::to_string(folderNumber) + ".csv"));
+  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)
+        + "/time_series_plot_"
+        + std::to_string(folderNumber) + ".plt"));
+  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)));
 
 
   TestOutputGenerator generatorHorizontalThree;
 
   TEST(generatorHorizontalThree.getOutputFolderNumber() == folderNumber);
   TEST(generatorHorizontalThree.getOutputFileName() == ("./time_series_"
-        + to_string(folderNumber) + "/time_series"));
+        + std::to_string(folderNumber) + "/time_series"));
   TEST(generatorHorizontalThree.getOutputFileMotifSetsName() ==
-      ("./time_series_" + to_string(folderNumber) + "/time_series_meta"));
+      ("./time_series_" + std::to_string(folderNumber) + "/time_series_meta"));
   TEST(generatorHorizontalThree.getOutputFileGNUPlotScriptName() ==
-      ("./time_series_" + to_string(folderNumber) + "/time_series_plot"));
+      ("./time_series_" + std::to_string(folderNumber) + "/time_series_plot"));
   TEST(generatorHorizontalThree.getTimeSeriesName() == ("Time Series"));
 
   //test if output generator throw exceptions correctly
@@ -763,18 +840,18 @@ void test_outputgenerator() {
   }
 
   //remove folder
-  TEST(remove("time_series_" + to_string(folderNumber)));
+  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)));
 
 
   TestOutputGenerator generatorVerticalThree;
 
   TEST(generatorVerticalThree.getOutputFolderNumber() == folderNumber);
   TEST(generatorVerticalThree.getOutputFileName() == ("./time_series_"
-        + to_string(folderNumber) + "/time_series"));
+        + std::to_string(folderNumber) + "/time_series"));
   TEST(generatorVerticalThree.getOutputFileMotifSetsName() == ("./time_series_"
-        + to_string(folderNumber) + "/time_series_meta"));
+        + std::to_string(folderNumber) + "/time_series_meta"));
   TEST(generatorVerticalThree.getOutputFileGNUPlotScriptName() ==
-      ("./time_series_" + to_string(folderNumber) + "/time_series_plot"));
+      ("./time_series_" + std::to_string(folderNumber) + "/time_series_plot"));
   TEST(generatorVerticalThree.getTimeSeriesName() == ("Time Series"));
 
   //test if output generator throw exceptions correctly
@@ -846,11 +923,11 @@ void test_outputgenerator() {
   }
 
   //remove folder
-  TEST(remove("time_series_" + to_string(folderNumber)));
+  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)));
 
 
   //reset cerr
-  cerr.rdbuf(cerr_buff);
+  std::cerr.rdbuf(cerr_buff);
 }
 
 int main() {

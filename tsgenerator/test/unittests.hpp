@@ -14,12 +14,7 @@
 #include <outputgenerator.hpp>
 #include <iostream>
 #include <sstream>
-#include <vector>
-#include <string>
 #include <filesystem>
-
-using namespace std;
-using namespace std::filesystem;
 
 
 // --------------------------------------------------------------------------
@@ -43,7 +38,7 @@ double topMotifPairSimilarity = 0.0;
 ///
 ///This variable stores the positions of the top motif pair subsequences.
 // --------------------------------------------------------------------------
-vector<int> topMotifPairPos = { 150, 250 };
+tsg::iseq topMotifPairPos = { 150, 250 };
 
 
 // --------------------------------------------------------------------------
@@ -67,14 +62,14 @@ double topMotifSetSize = 3;
 ///This variable stores the positions of the top motif set in the test time
 ///series.
 // --------------------------------------------------------------------------
-vector<int> topMotifSetPos = { 35, 150, 250 };
+tsg::iseq topMotifSetPos = { 35, 150, 250 };
 
 // --------------------------------------------------------------------------
 ///\brief This variable contains the means of the top motif set.
 ///
 ///This variable stores the means of the top motif set in the test time series.
 // --------------------------------------------------------------------------
-vector<double> topMotifSetMeans = { 31.7559967, 73.8733465, 73.8733465 };
+tsg::rseq topMotifSetMeans = { 31.7559967, 73.8733465, 73.8733465 };
 
 // --------------------------------------------------------------------------
 ///\brief This variable contains the standard deviations of the top motif set.
@@ -82,14 +77,14 @@ vector<double> topMotifSetMeans = { 31.7559967, 73.8733465, 73.8733465 };
 ///This variable stores the standard deviations of the top motif set in the
 ///test time series.
 // --------------------------------------------------------------------------
-vector<double> topMotifSetStdDevs = { 15.2633206, 16.6681750, 16.6681750 };
+tsg::rseq topMotifSetStdDevs = { 15.2633206, 16.6681750, 16.6681750 };
 
 // --------------------------------------------------------------------------
 ///\brief This variable contains the test time series.
 ///
 ///This variable stores the test times series.
 // --------------------------------------------------------------------------
-vector<double> testTimeSeries({
+tsg::rseq testTimeSeries({
     -10.768911,
     -18.433098,
     -11.754007,
@@ -397,7 +392,7 @@ vector<double> testTimeSeries({
 ///
 ///This variable stores the test times series rolling means.
 // --------------------------------------------------------------------------
-vector<double> testMeans({
+tsg::rseq testMeans({
     -22.631332,
     -22.980854,
     -23.018000,
@@ -687,7 +682,7 @@ vector<double> testMeans({
 ///
 ///This variable stores the test times series running standard deviations.
 // --------------------------------------------------------------------------
-vector<double> testStds({
+tsg::rseq testStds({
     8.620709,
     8.267129,
     8.248259,
@@ -977,7 +972,7 @@ vector<double> testStds({
 ///This variable stores the test times series to test the function that checks
 ///if there is a larger motif set.
 // --------------------------------------------------------------------------
-vector<double> testTimeSeriesCheckLargerMotifSet( {
+tsg::rseq testTimeSeriesCheckLargerMotifSet( {
     -10.768911,
     -18.433098,
     -11.754007,
@@ -1284,7 +1279,7 @@ vector<double> testTimeSeriesCheckLargerMotifSet( {
 ///
 ///This variable stores the test top motif set subsequences.
 // --------------------------------------------------------------------------
-vector<vector<double>> testMotifSetSubsequences = {
+tsg::rseqs testMotifSetSubsequences = {
   {
     -16.603681,
     39.386230,
@@ -1367,7 +1362,7 @@ double testSequencesSimilarty = 0.4813661;
 ///
 ///This variable stores the first test sequence.
 // --------------------------------------------------------------------------
-vector<double> testSequenceOne = {
+tsg::rseq testSequenceOne = {
   -3.1683588980060402,
   0.49990650723292546,
   0.31510976016894321,
@@ -1394,7 +1389,7 @@ vector<double> testSequenceOne = {
 ///
 ///This variable stores the second test sequence.
 // --------------------------------------------------------------------------
-vector<double> testSequenceTwo = {
+tsg::rseq testSequenceTwo = {
   -3.2390462337465022,
   0.5934775962570914,
   0.43983912080329196,
@@ -1469,7 +1464,7 @@ public:
   ///This function returns the content of the variable that stores the name of
   ///the file containing the motif sets distances and positions.
   // --------------------------------------------------------------------------
-  string getOutputFileMotifSetsName() {
+  tsg::word getOutputFileMotifSetsName() {
 
     return outputFileMotifSetsName;
   };
@@ -1482,7 +1477,7 @@ public:
   ///This function returns the content of the variable that stores the name of
   ///the GNUPlot script output file.
   // --------------------------------------------------------------------------
-  string getOutputFileGNUPlotScriptName() {
+  tsg::word getOutputFileGNUPlotScriptName() {
 
     return outputFileGNUPlotScriptName;
   };
@@ -1495,7 +1490,7 @@ public:
   ///This function returns the content of the variable that stores the name of
   ///the time series output file.
   // --------------------------------------------------------------------------
-  string getOutputFileName() {
+  tsg::word getOutputFileName() {
 
     return outputFileName;
   };
@@ -1508,7 +1503,7 @@ public:
   ///This function returns the content of the variable that stores the stem of
   ///the output file names.
   // --------------------------------------------------------------------------
-  string getBasicOutputFileName() {
+  tsg::word getBasicOutputFileName() {
 
     return basicOutputFileName;
   }
@@ -1521,7 +1516,7 @@ public:
   ///This function returns the content of the variable that stores the time
   ///series name.
   // --------------------------------------------------------------------------
-  string getTimeSeriesName() {
+  tsg::word getTimeSeriesName() {
 
     return timeSeriesName;
   }

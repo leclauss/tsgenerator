@@ -323,9 +323,6 @@ namespace tsg {
 
       value = delta_in * distribution(randomEngine) - 2 * delta_in;
 
-      if (noise_in / 2.0 > 0.0)
-        value += distributionNoise(randomEngine);
-
       //check if border is crossed
       if (timeSeries_out[i - 1] + value < -maxi_in)
         value = abs(value);
@@ -335,6 +332,10 @@ namespace tsg {
 
       timeSeries_out.push_back(timeSeries_out[i - 1] + value);
     }
+
+    //add noise
+    for (int i = 1; i < length_in; i++)
+      timeSeries_out[i] += distributionNoise(randomEngine);
   }
 
   void BaseTS::realRandomWalk(rseq &timeSeries_out, const int length_in, const
@@ -371,9 +372,6 @@ namespace tsg {
 
       value = distribution(randomEngine);
 
-      if (noise_in / 2.0 > 0.0)
-        value += distributionNoise(randomEngine);
-
       //check if border is crossed
       if (timeSeries_out[i - 1] + value < -maxi_in)
         value = abs(value);
@@ -383,6 +381,10 @@ namespace tsg {
 
       timeSeries_out.push_back(timeSeries_out[i - 1] + value);
     }
+
+    //add noise
+    for (int i = 1; i < length_in; i++)
+      timeSeries_out[i] += distributionNoise(randomEngine);
   }
 
   void BaseTS::normalRandomWalk(rseq &timeSeries_out, const int length_in,
@@ -418,13 +420,7 @@ namespace tsg {
     //add the remaining values
     for (int i = 1; i < length_in; i++) {
 
-      value = 0.0;
-
-      if (delta_in > 0.0)
-        value += distribution(randomEngine);
-
-      if (noise_in / 2.0 > 0.0)
-        value += distributionNoise(randomEngine);
+      value = distribution(randomEngine);
 
       //check if border is crossed
       if (timeSeries_out[i - 1] + value < -maxi_in)
@@ -435,6 +431,10 @@ namespace tsg {
 
       timeSeries_out.push_back(timeSeries_out[i - 1] + value);
     }
+
+    //add noise
+    for (int i = 0; i < length_in; i++)
+      timeSeries_out[i] += distributionNoise(randomEngine);
   }
 
   void BaseTS::linearRandomWalk(rseq &timeSeries_out, const int length_in,
@@ -504,10 +504,6 @@ namespace tsg {
 
         value = lValue + diff * rStep * (double)is;
 
-        //add noise
-        if (noise_in / 2.0 > 0.0)
-          value += distributionNoise(randomEngine);
-
         //update step iterator
         is++;
       }
@@ -516,8 +512,7 @@ namespace tsg {
         lValue = nValue;
 
         //compute next value
-        if (delta_in > 0.0)
-          value = distribution(randomEngine);
+        value = distribution(randomEngine);
 
         //check if border is crossed
         if (lValue + value < -maxi_in)
@@ -528,10 +523,6 @@ namespace tsg {
 
         nValue += value;
         value = lValue;
-
-        //add noise
-        if (noise_in / 2.0 > 0.0)
-          value += distributionNoise(randomEngine);
 
         //get next step
         step = distributionStep(randomEngine);
@@ -547,6 +538,10 @@ namespace tsg {
       //add the value
       timeSeries_out.push_back(value);
     }
+
+    //add noise
+    for (int i = 0; i < length_in; i++)
+      timeSeries_out[i] += distributionNoise(randomEngine);
   }
 
   void BaseTS::uniformRandom(rseq &timeSeries_out, const int length_in, const
@@ -567,21 +562,13 @@ namespace tsg {
     std::uniform_real_distribution<double> distribution(-delta_in / 2.0,
         delta_in / 2.0);
 
-    //add the first value
-    double value = 0.0;
+    //compute the values
+    for (int i = 0; i < length_in; i++)
+      timeSeries_out.push_back(distribution(randomEngine));
 
-    timeSeries_out.push_back(value);
-
-    //add the remaining values
-    for (int i = 1; i < length_in; i++) {
-
-      value = distribution(randomEngine);
-
-      if (noise_in / 2.0 > 0.0)
-        value += distributionNoise(randomEngine);
-
-      timeSeries_out.push_back(value);
-    }
+    //add noise
+    for (int i = 0; i < length_in; i++)
+      timeSeries_out[i] += distributionNoise(randomEngine);
   }
 
   void BaseTS::normalRandom(rseq &timeSeries_out, const int length_in, const
@@ -602,24 +589,13 @@ namespace tsg {
     std::normal_distribution<double> distribution(0.0, abs(delta_in) / 2.0
         > 0.0 ? delta_in / 2.0 : std::numeric_limits<double>::min());
 
-    //add the first value
-    double value = 0.0;
+    //compute the values
+    for (int i = 0; i < length_in; i++)
+      timeSeries_out.push_back(distribution(randomEngine));
 
-    timeSeries_out.push_back(value);
-
-    //add the remaining values
-    for (int i = 1; i < length_in; i++) {
-
-      value = 0.0;
-
-      if (delta_in / 2.0 > 0.0)
-        value += distribution(randomEngine);
-
-      if (noise_in / 2.0 > 0.0)
-        value += distributionNoise(randomEngine);
-
-      timeSeries_out.push_back(value);
-    }
+    //add noise
+    for (int i = 0; i < length_in; i++)
+      timeSeries_out[i] += distributionNoise(randomEngine);
   }
 
   void BaseTS::piecewiseLinearRandom(rseq &timeSeries_out, const int length_in,
@@ -644,21 +620,13 @@ namespace tsg {
     std::piecewise_linear_distribution<double> distribution(intervals.begin(),
         intervals.end(), weights.begin());
 
-    //add the first value
-    double value = 0.0;
+    //compute the values
+    for (int i = 0; i < length_in; i++)
+      timeSeries_out.push_back(distribution(randomEngine));
 
-    timeSeries_out.push_back(value);
-
-    //add the remaining values
-    for (int i = 1; i < length_in; i++) {
-
-      value = distribution(randomEngine);
-
-      if (noise_in / 2.0 > 0.0)
-        value += distributionNoise(randomEngine);
-
-      timeSeries_out.push_back(value);
-    }
+    //add noise
+    for (int i = 0; i < length_in; i++)
+      timeSeries_out[i] += distributionNoise(randomEngine);
   }
 
   void BaseTS::splineRepeated(rseq &timeSeries_out, const int length_in, const
@@ -730,12 +698,13 @@ namespace tsg {
           timeSeries_out.push_back(a[i] + b[i] * (j - x[i]) + c[i] * pow(j
                 - x[i], 2.0) + d[i] * pow(j - x[i], 3.0));
 
-          //add noise
-          timeSeries_out[t] += distributionNoise(randomEngine);
-
           t++;
         }
       }
     }
+
+    //add noise
+    for (int i = 0; i < length_in; i++)
+      timeSeries_out[i] += distributionNoise(randomEngine);
   }
 }

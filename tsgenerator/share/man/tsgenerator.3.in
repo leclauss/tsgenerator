@@ -13,8 +13,7 @@ The \fI@PROJECT_NAME@\fR is a generator of synthetic time series and the result 
 Sets the method for injecting sequences into the time series matching the synthetic motif.
 .TP
 .BR \-ty ", " \-\-type " \fITYPE\fR"
-Sets the motif type, the shape of the injected motif and the inserted
-sequences.
+Sets the motif type, the shape of the injected motif and the inserted sequences.
 .TP
 .BR \-me ", " \-\-method " \fIMETHOD\fR"
 Sets the method for generating the base time series.

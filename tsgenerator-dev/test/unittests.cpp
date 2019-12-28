@@ -339,9 +339,9 @@ void test_tsgenerator() {
   TEST_GROUP_FUNCTION;
 
   //redirect cerr to keep test output clean
-  ostringstream local;
+  std::ostringstream local;
 
-  auto cerr_buff = cerr.rdbuf(local.rdbuf());
+  auto cerr_buff = std::cerr.rdbuf(local.rdbuf());
 
   //tests for wrong input
   try {
@@ -457,14 +457,14 @@ void test_tsgenerator() {
 
     generator.testMeanStdDev({ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0 }, mean, stdDev);
-    TEST(mean <= numeric_limits<double>::min() && mean >=
-        -numeric_limits<double>::min());
+    TEST(mean <= std::numeric_limits<double>::min() && mean >=
+        -std::numeric_limits<double>::min());
     TEST(stdDev == 1.0);
 
     generator.testMeanStdDev({ 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,
         3.0 }, mean, stdDev);
-    TEST(mean <= 3.0 + numeric_limits<double>::min() && mean >= 3.0
-        - numeric_limits<double>::min());
+    TEST(mean <= 3.0 + std::numeric_limits<double>::min() && mean >= 3.0
+        - std::numeric_limits<double>::min());
     TEST(stdDev == 1.0);
 
     generator.testMeanStdDev({ 3.0, -3.0, 1.75, 9.0, 33.0, 3.101, 0.03,
@@ -490,7 +490,7 @@ void test_tsgenerator() {
     TEST(stdDev <= topMotifSetStdDevs[1] + 0.0000001 && stdDev >=
         topMotifSetStdDevs[1] - 0.0000001);
 
-    vector <double> subsequence2(testTimeSeries.begin() + topMotifSetPos[2],
+    tsg::rseq subsequence2(testTimeSeries.begin() + topMotifSetPos[2],
         testTimeSeries.begin() + topMotifSetPos[2] + 20);
     generator.testMeanStdDev(subsequence2, mean, stdDev);
     TEST(mean <= topMotifSetMeans[2] + 0.0000001 && mean >= topMotifSetMeans[2]
@@ -603,7 +603,7 @@ void test_tsgenerator() {
     try {
 
       generator.testSimilarity({}, topMotifSetPos[0], topMotifSetPos[0],
-          numeric_limits<double>::max());
+          std::numeric_limits<double>::max());
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -614,7 +614,7 @@ void test_tsgenerator() {
     try {
 
       generator.testSimilarity(testTimeSeries, 303, topMotifSetPos[0],
-          numeric_limits<double>::max());
+          std::numeric_limits<double>::max());
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -625,7 +625,7 @@ void test_tsgenerator() {
     try {
 
       generator.testSimilarity(testTimeSeries, topMotifSetPos[0], 303,
-          numeric_limits<double>::max());
+          std::numeric_limits<double>::max());
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -636,11 +636,11 @@ void test_tsgenerator() {
     generator.testCalcRunnings(testTimeSeries);
 
     double similarity = generator.testSimilarity(testTimeSeries,
-        topMotifSetPos[0], topMotifSetPos[1], numeric_limits<double>::max());
+        topMotifSetPos[0], topMotifSetPos[1], std::numeric_limits<double>::max());
     TEST(abs(similarity - testSequencesSimilarty) <= 0.0000001);
 
     similarity = generator.testSimilarity(testTimeSeries, topMotifSetPos[1],
-        topMotifSetPos[2], numeric_limits<double>::max());
+        topMotifSetPos[2], std::numeric_limits<double>::max());
     TEST(abs(similarity) <= 0.0000001);
 
     similarity = generator.testSimilarity(testTimeSeries, topMotifSetPos[0],
@@ -657,7 +657,7 @@ void test_tsgenerator() {
 
       generator.testSimilarity({}, {}, topMotifSetMeans[0],
           topMotifSetStdDevs[0], topMotifSetPos[0],
-          numeric_limits<double>::max());
+          std::numeric_limits<double>::max());
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -669,7 +669,7 @@ void test_tsgenerator() {
 
       generator.testSimilarity(testTimeSeries, tsg::rseq(),
           topMotifSetMeans[0], topMotifSetStdDevs[0], topMotifSetPos[0],
-          numeric_limits<double>::max());
+          std::numeric_limits<double>::max());
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -681,7 +681,7 @@ void test_tsgenerator() {
 
       generator.testSimilarity(testTimeSeries, { 0.0, 0.0 },
           topMotifSetMeans[0], topMotifSetStdDevs[0], topMotifSetPos[0],
-          numeric_limits<double>::max());
+          std::numeric_limits<double>::max());
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -693,7 +693,7 @@ void test_tsgenerator() {
 
       generator.testSimilarity(testTimeSeries, testSequenceOne,
           topMotifSetMeans[0], topMotifSetStdDevs[0], 303,
-          numeric_limits<double>::max());
+          std::numeric_limits<double>::max());
       TEST(!"Has to throw an error!");
     }
     catch (int e) {
@@ -704,13 +704,13 @@ void test_tsgenerator() {
     similarity = generator.testSimilarity(testTimeSeries,
         testMotifSetSubsequences[0], topMotifSetMeans[0],
         topMotifSetStdDevs[0], topMotifSetPos[1],
-        numeric_limits<double>::max());
+        std::numeric_limits<double>::max());
     TEST(abs(similarity - testSequencesSimilarty) <= 0.0000001);
 
     similarity = generator.testSimilarity(testTimeSeries,
         testMotifSetSubsequences[1], topMotifSetMeans[1],
         topMotifSetStdDevs[1], topMotifSetPos[2],
-        numeric_limits<double>::max());
+        std::numeric_limits<double>::max());
     TEST(abs(similarity) <= 0.0000001);
 
     similarity = generator.testSimilarity(testTimeSeries,
@@ -931,7 +931,7 @@ void test_tsgenerator() {
 
 
   //reset cerr
-  cerr.rdbuf(cerr_buff);
+  std::cerr.rdbuf(cerr_buff);
 }
 
 int main() {

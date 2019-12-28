@@ -64,7 +64,7 @@ if (WIN32)
     set(ARCH win64)
   endif()
 
-  set(TSG_INCLUDEDIR ../tsgenerator-dev/include)
+  set(TSG_INCLUDEDIR ../${LIB_NAME}-dev/include)
   set(FFTW3_INCLUDEDIR ../libs/${ARCH}/fftw3)
 
   file(GLOB FFTW3_LIB_NAME "../libs/${ARCH}/fftw3/libfftw3-*.lib")
@@ -75,13 +75,13 @@ else ()
   set(STDCPPFS stdc++fs)
 
   find_package(PkgConfig REQUIRED)
-  pkg_check_modules(TSG REQUIRED tsgenerator)
+  pkg_check_modules(TSG REQUIRED ${LIB_NAME})
   pkg_check_modules(FFTW3 REQUIRED fftw3)
 endif ()
 
 
 # add the libraries
-find_library(TSG_LOCATION NAMES tsgenerator
+find_library(TSG_LOCATION NAMES ${LIB_NAME}
   HINTS ../libs/${ARCH}/tsgenerator)
 
 add_library(TSG STATIC IMPORTED)
