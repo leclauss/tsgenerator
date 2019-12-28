@@ -37,10 +37,10 @@ Sets the maximum absolute difference between two consecutive values in the time 
 Sets the maximum absolute difference between two values of the base motif.
 .TP
 .BR \-st ", " \-\-step " FLOAT"
-Sets the maximum step size in x direction from two consecutive values when creating a linear approximated or splined base time series.
+Sets the maximum step size in x direction from two consecutive values when creating a splined base time series.
 .TP
 .BR \-ti ", " \-\-times " INTEGER"
-Sets the number of values computed to generate a repeating pattern when generating a linear approsimated or splined base time series.
+Sets the number of values computed to generate a repeating pattern when generating a splined base time series.
 .TP
 .BR \-ma ", " \-\-maxi " FLOAT"
 Sets the maximum absolute value in the base times series.

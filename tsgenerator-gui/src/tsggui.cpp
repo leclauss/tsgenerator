@@ -52,13 +52,11 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   stepAct.setText("step");
   stepMes.setWindowTitle("step option");
   stepMes.setText("The step option sets the maximum step size from two "
-      "consecutive values when creating a linear approximated or splined base "
-      "time series.");
+      "consecutive values when creating a splined base time series.");
   timesAct.setText("times");
   timesMes.setWindowTitle("times option");
   timesMes.setText("The times option sets the number of values of the "
-      "repeating pattern when linear approximated or splined a base time "
-      "series");
+      "repeating pattern when a splined base time series is generated");
   maxiAct.setText("maxi");
   maxiMes.setWindowTitle("maxi option");
   maxiMes.setText("The maxi option sets the maximum absolute value of the "
