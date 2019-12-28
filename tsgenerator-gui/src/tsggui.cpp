@@ -51,17 +51,17 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
       "maximum difference between two values of the base motif.");
   stepAct.setText("step");
   stepMes.setWindowTitle("step option");
-  stepMes.setText("The step option sets the maximal step size from two "
-      "consecutive values when creating a linear approximating or splining "
-      "base time series.");
+  stepMes.setText("The step option sets the maximum step size from two "
+      "consecutive values when creating a linear approximated or splined base "
+      "time series.");
   timesAct.setText("times");
   timesMes.setWindowTitle("times option");
   timesMes.setText("The times option sets the number of values of the "
-      "repeating pattern when linear approximating of splining a base time "
+      "repeating pattern when linear approximated or splined a base time "
       "series");
   maxiAct.setText("maxi");
   maxiMes.setWindowTitle("maxi option");
-  maxiMes.setText("The maxi option sets the maximal absolute value of the "
+  maxiMes.setText("The maxi option sets the maximum absolute value of the "
       "base time series.");
   idxLabel.setText("Motif Locations");
   startButton.setText("start");

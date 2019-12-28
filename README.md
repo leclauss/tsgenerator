@@ -285,28 +285,24 @@ make test
 
 ### Quick Usage
 
-1. One may generate a synthetic time series with a length of 10000, time series top latent motif attributes type sine, 3 top latent motif matching subseqeunces, window size 50, top latent motif height 100.0 and a randomization factor of 0.01 by running the tsgenerator with the following command. On Linux and Mac in the **build/** directory and on Windows in the **build/src/** directory.
+1. One may generate a synthetic time series with a length of 10000, time series top latent motif attributes type sine, 3 top latent motif matching subseqeunces, window size 30, top latent motif height 10.0 and a randomization factor of 0.01 by running the tsgenerator with the following command. On Linux and Mac in the **build/** directory and on Windows in the **build/src/** directory.
  ```bash
- ./tsgenerator -l 10000 -w 50 -rd 0.01 -lm sine 3 100.0
+ ./tsgenerator -g "latent motif" -ty sine -me "boundedNormalRandomWalk" -l 10000 -w 30 -no 1.0 -si 3 -h 10.0
  ```
 
-2. tsgenerator command has the following syntax.
- ```bash
- ./tsgenerator -l INTEGER -w INTEGER -rd FLOAT [Options]
- ```
-
- The argument **-l** sets the length of the synthetic time series.
- The argument **-w** sets the window size of the synthetic time series motif sets subsequences.
- The argument **-rd FLOAT** sets the randomization factor that is used to generate the sythetic time series values as well as the synthetic time series top pair motifs or the time series top latent motif matching subsequences.
-
- The available options are -db, -pm, -lm, -o, -tsn, -ho, -r, -rd, -h and -v.
- * **-db** sets the operating mode to data base.
- * **-pm** sets the operating mode to top pair motif and the subsequences type as well as height. The default operating mode is the top pair motif mode, the default type is BOX and the default height is 200. The synthax is STRING FLOAT.
- * **-lm** sets the operating mode to top latent motif and the synthetic time series top latent motif attributes. The attributes are the type, the count and the height of the synthetic time series top latent motif. The synthax is STRING INTEGER FLOAT.
- * **-o STRING** sets the output file name.
- * **-tsn STRING** sets the synthetic time series name.
- * **-ho** sets the output to horizontal mode. Each row in the CSV files is now a data set.
- * **-r FLOAT FLOAT** sets the range of the synthetic time series values.
+2. tsgenerator command has the following options.
+ * **-g STRING** sets the method for injecting sequences into the time series matching the synthetic motif. The available methods are **pair motif**, **set motif** and **latent motif**.
+ * **-ty STRING** sets the motif type, the shape of the injected motif and the inserted sequences.
+ * **-me STRING** sets the method for generating the base time series. The available methods are **simpleRandomWalk**, **realRandomWalk**, **normalRandomWalk**, **linearRandomWalk**, **boundedSimpleRandomWalk**, **boundedRealRandomWalk**, **boundedNormalRandomWalk**, **boundedLinearRandomWalk**, **uniformRandom**, **normalRandom**, **piecewiseLinearRandom** and **splineRepeated**.
+ * **-l INTEGER** sets the length of the synthetic time series.
+ * **-w INTEGER** sets the window size of the synthetic time series motif sets subsequences.
+ * **-si INTEGER** sets the size of the motif, the number of inserted sequences non-self matched by the motif.
+ * **-no FLOAT** sets the noise value. A random value in the range from -FLOAT to FLOAT is added to the base time series and the inserted sequences.
+ * **-d FLOAT** sets the maximum absolute difference between two consecutive values in the time series.
+ * **-he FLOAT** sets the maximum absolute difference between two values of the base motif.
+ * **-st FLOAT** sets the maximum step size in x direction from two consecutive values when creating a linear approximated or splined base time series.
+ * **-ti INTEGER** sets the number of values computed to generate a repeating pattern when generating a linear approsimated or splined base time series.
+ * **-ma FLOAT** sets the maximum absolute value in the base times series.
  * **-h** prints the help text.
  * **-v** prints the version information.
 
