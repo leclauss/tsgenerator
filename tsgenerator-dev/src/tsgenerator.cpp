@@ -654,92 +654,186 @@ namespace tsg {
     return false;
   }
 
-  void TSGenerator::injectPairMotif(rseq &timeSeries_out, rseq &d_out, iseq
-      &window_out, iseqs &motifPositions_out) {
+  void TSGenerator::injectPairMotif(rseq &timeSeries_out) {
 
-    std::cout << "pair motif not yet implemented" << std::endl;
+    //declaration stuff
+    int motifPos0, motifPos1;
+    int pos0 = -1;
+    int pos1 = -1;
+    double mean, stdDev;
+    rseq motif;
+    rseq subsequence(window, 0.0);
+    double d = std::numeric_limits<double>::max();
+    std::normal_distribution<double> distribution(0.0, abs(noise) * 0.25 <= 0.0
+        ? std::numeric_limits<double>::min() : noise * 0.25);
+    double value;
+
+    //generate a base time series
+    generateBaseTimeSeries(timeSeries_out);
+
+    //calculate temporary motif set center subsequence in the window size
+    //dimentional room of subsequence values
+    calculateSubsequence(motif, type, height);
+
+    //add noise
+    for (auto& value : motif)
+      value += distribution(randomEngine);
+
+    //get new random position in the synthetic time series
+    motifPos0 = freePositions.calculateRandomPosition();
+    freePositions.removePosition();
+
+    //inject sequence into the time series
+    value = timeSeries_out[motifPos0];
+
+    for (int i = 0; i < window; i++)
+      timeSeries_out[i + motifPos0] = value + motif[i];
+
+    //compute running mean and std dev
+    calcRunnings(timeSeries_out);
+
+    //determine simlarity of the top motif pair in the random synthetic time
+    //series
+    scrimpPP(timeSeries_out, sums, sumSquares, pos0, pos1,
+        window);
+    d = similarity(timeSeries_out, pos0, pos1,
+        std::numeric_limits<double>::max());
+
+    //compute the second motif sequence
+    double lth = noise / length;
+
+    noise += lth;
+
+    rseq second;
+    second.resize(motif.size());
+
+    do {
+
+      std::normal_distribution<double> distributionNoise(0.0, abs(noise)
+          * 0.25 <= 0.0 ? std::numeric_limits<double>::min() : noise * 0.25);
+
+      noise -= lth;
+
+      //copy motif
+      for (int i = 0; i < window; i++)
+        second[i] = motif[i];
+
+      //add noise
+      for (auto& value : second)
+        value += distributionNoise(randomEngine);
+
+      mean = 0.0;
+      stdDev = 0.0;
+      meanStdDev(second, mean, stdDev);
+
+    } while(similarity(timeSeries_out, second, mean, stdDev, motifPos0, d) >=
+        d);
+
+    rseq tmp;
+    tmp.resize(motif.size());
+
+    //get a random position for the second motif sequence
+    motifPos1 = freePositions.calculateRandomPosition();
+
+    double dTmp;
+
+    for(int i = 0; i < length + 1000; i++) {
+
+      //inject the second motif sequence
+      tmp[0] = timeSeries_out[motifPos1];
+      timeSeries_out[motifPos1] = tmp[0] + second[0];
+
+      for (int i = 1; i < window; i++) {
+
+        tmp[i] = timeSeries_out[i + motifPos1];
+        timeSeries_out[i + motifPos1] = tmp[0] + second[i];
+      }
+
+      //update the runnings
+      updateRunnings(timeSeries_out, motifPos1);
+
+      dTmp = similarity(timeSeries_out, motifPos0, motifPos1, d);
+
+      //check for success
+      if(!searchForUnintentionalMatches(timeSeries_out, { motifPos0, motifPos1
+            }, dTmp))
+        break;
+
+      //reset time series
+      for (int i = 0; i < window; i++)
+        timeSeries_out[i + motifPos1] = tmp[i];
+
+      //update the runnings
+      updateRunnings(timeSeries_out, motifPos1);
+
+      //get new random position for the second motif sequence
+      motifPos1 = freePositions.calculateRandomPosition();
+    }
   }
 
   void TSGenerator::injectSetMotif(rseq &timeSeries_out, rseq &d_out, iseq
       &window_out, iseqs &motifPositions_out) {
 
-    std::cout << "set motif not yet implemented" << std::endl;
-  }
-
-  void TSGenerator::injectLatentMotif(rseq &timeSeries_out, rseq &d_out, iseq
-      &window_out, iseqs &motifPositions_out) {
-
     //declaration stuff
     int positionOne = -1;
     int positionTwo = -1;
-    rseq motifCenter;
+    rseq motif;
     rseq subsequence(window, 0.0);
-    bool repeatLoop = true;
-    double mean;
-    double stdDev;
     double d = std::numeric_limits<double>::max();
-    std::normal_distribution<double> distribution(0.0, abs(noise) / 4.0 <= 0.0
-        ? std::numeric_limits<double>::min() : noise / 4.0);
+    std::normal_distribution<double> distribution(0.0, abs(noise) * 0.25 <= 0.0
+        ? std::numeric_limits<double>::min() : noise * 0.25);
+    int position;
+    double value;
 
-    for (int i = 0; i < 50 && repeatLoop; i++) {
+    //generate a base time series
+    generateBaseTimeSeries(timeSeries_out);
 
-      repeatLoop = false;
+    //calculate temporary motif set center subsequence in the window size
+    //dimentional room of subsequence values
+    calculateSubsequence(motif, type, height);
 
-      //generate a base time series
-      generateBaseTimeSeries(timeSeries_out);
+    //add noise
+    for (auto& value : motif)
+      value += distribution(randomEngine);
 
-      //compute running mean and std dev
-      calcRunnings(timeSeries_out);
+    //add window to output
+    window_out.push_back((int)(motif.size()));
 
-      //determine similarity of the top motif pair in the random synthetic time
-      //series
-      scrimpPP(timeSeries_out, sums, sumSquares, positionOne, positionTwo,
-          window);
-      d = similarity(timeSeries_out, positionOne, positionTwo,
-          std::numeric_limits<double>::max());
+    //get new random position in the synthetic time series
+    position = freePositions.calculateRandomPosition();
+    freePositions.removePosition();
 
-      //calculate temporary motif set center subsequence in the window size
-      //dimentional room of subsequence values
-      calculateSubsequence(motifCenter, type, height);
+    motifPositions_out[0].push_back(position);
 
-      if (noise > 0.0)
-        for (auto& value : motifCenter)
-          value += distribution(randomEngine);
+    //inject sequence into the time series
+    value = timeSeries_out[position];
 
-      mean = 0.0;
-      stdDev = 0.0;
-      meanStdDev(motifCenter, mean, stdDev);
+    for (int i = 0; i < window; i++)
+      timeSeries_out[i + position] = value + motif[i];
 
-      //check if there is no other subsequence in the range 3.0 * d / 2.0
-      //around the center subsequence
-      for (int itr = 0;
-          itr < (int)timeSeries_out.size() - window + 1;
-          itr++) {
+    //compute running mean and std dev
+    calcRunnings(timeSeries_out);
 
-        rseq tmpSubsequence(timeSeries_out.begin() + itr,
-            timeSeries_out.begin() + itr + window);
+    //determine similarity of the top motif pair in the random synthetic time
+    //series
+    scrimpPP(timeSeries_out, sums, sumSquares, positionOne, positionTwo,
+        window);
+    d = similarity(timeSeries_out, positionOne, positionTwo,
+        std::numeric_limits<double>::max());
 
-        if (similarity(timeSeries_out, motifCenter, mean, stdDev, itr,
-              std::numeric_limits<double>::max()) <= 3.0 * d / 2.0) {
-
-          repeatLoop = true;
-          break;
-        }
-      }
-    }
+    //make sure that the remaining motif matching sequences are within range
+    //d / 3.0 of the motif, i.e. no non-overlapping subsequence cannot contain
+    //a motif non-self mathing more subsequences
+    d = d / 3.0;
 
     //declaration stuff
-    int position;
     int retryItr = 0;
-    double value;
     double min, max;
     double lth = noise / length;
 
-    window_out.push_back((int)(motifCenter.size()));
-
 
     //inject sequences into the time series
-    for (int motifItr = 0; motifItr < size; motifItr++) {
+    for (int motifItr = 1; motifItr < size; motifItr++) {
 
       //compute the random position for the subsequence
       position = freePositions.calculateRandomPosition();
@@ -750,18 +844,17 @@ namespace tsg {
       while (retryItr < length + 100) {
 
         std::normal_distribution<double> distributionNoise(0.0, abs(noise)
-            / 4.0 <= 0.0 ? std::numeric_limits<double>::min() : noise / 4.0);
+            * 0.25 <= 0.0 ? std::numeric_limits<double>::min() : noise * 0.25);
 
         //copy another motif sequence ...
-        rseq newSubsequence(motifCenter);
+        rseq newSubsequence(motif);
 
         //... with noise
-        if (noise > 0.0)
-          for (auto& item : newSubsequence)
-            item += distributionNoise(randomEngine);
+        for (auto& item : newSubsequence)
+          item += distributionNoise(randomEngine);
 
-        //check if the sequence is within range d / 2.0 of the center
-        if (similarity(motifCenter, newSubsequence, d / 2.0) < d / 2.0) {
+        //check if the sequence is within range d of the motif
+        if (similarity(motif, newSubsequence, d) < d) {
 
           //backup subsequence at position
           for (int i = 0; i < window; i++)
@@ -799,9 +892,9 @@ namespace tsg {
           updateRunnings(timeSeries_out, position);
 
           if (!searchForUnintentionalMatches(timeSeries_out,
-                motifPositions_out[0], d) &&
+                motifPositions_out[0], d * 2.0) &&
               !checkIfThereIsALargerMotifSet(timeSeries_out,
-                motifPositions_out[0], d / 2.0)) {
+                motifPositions_out[0], d)) {
 
             break;
           }
@@ -841,7 +934,182 @@ namespace tsg {
       freePositions.removePosition();
     }
 
-    d_out.push_back(d / 2.0);
+    d_out.push_back(d);
+  }
+
+  void TSGenerator::injectLatentMotif(rseq &timeSeries_out, rseq &d_out, iseq
+      &window_out, iseqs &motifPositions_out) {
+
+    //declaration stuff
+    int positionOne = -1;
+    int positionTwo = -1;
+    rseq motifCenter;
+    rseq subsequence(window, 0.0);
+    bool repeatLoop = true;
+    double mean, stdDev;
+    double d = std::numeric_limits<double>::max();
+    std::normal_distribution<double> distribution(0.0, abs(noise) * 0.25 <= 0.0
+        ? std::numeric_limits<double>::min() : noise * 0.25);
+
+    for (int i = 0; i < 50 && repeatLoop; i++) {
+
+      repeatLoop = false;
+
+      //generate a base time series
+      generateBaseTimeSeries(timeSeries_out);
+
+      //compute running mean and std dev
+      calcRunnings(timeSeries_out);
+
+      //determine similarity of the top motif pair in the random synthetic time
+      //series
+      scrimpPP(timeSeries_out, sums, sumSquares, positionOne, positionTwo,
+          window);
+      d = similarity(timeSeries_out, positionOne, positionTwo,
+          std::numeric_limits<double>::max());
+
+      //calculate temporary motif set center subsequence in the window size
+      //dimentional room of subsequence values
+      calculateSubsequence(motifCenter, type, height);
+
+      for (auto& value : motifCenter)
+        value += distribution(randomEngine);
+
+      mean = 0.0;
+      stdDev = 0.0;
+      meanStdDev(motifCenter, mean, stdDev);
+
+      //check if there is no other subsequence in the range 3.0 * d / 2.0
+      //around the center subsequence
+      for (int itr = 0;
+          itr < (int)timeSeries_out.size() - window + 1;
+          itr++) {
+
+        rseq tmpSubsequence(timeSeries_out.begin() + itr,
+            timeSeries_out.begin() + itr + window);
+
+        if (similarity(timeSeries_out, motifCenter, mean, stdDev, itr,
+              std::numeric_limits<double>::max()) <= 1.5 * d) {
+
+          repeatLoop = true;
+          break;
+        }
+      }
+    }
+
+    //declaration stuff
+    int position;
+    int retryItr = 0;
+    double value;
+    double min, max;
+    double lth = noise / length;
+
+    window_out.push_back((int)(motifCenter.size()));
+
+
+    //inject sequences into the time series
+    for (int motifItr = 0; motifItr < size; motifItr++) {
+
+      //compute the random position for the subsequence
+      position = freePositions.calculateRandomPosition();
+
+      motifPositions_out[0].push_back(position);
+
+      //try to inject another sequence
+      while (retryItr < length + 100) {
+
+        std::normal_distribution<double> distributionNoise(0.0, abs(noise)
+            * 0.25 <= 0.0 ? std::numeric_limits<double>::min() : noise * 0.25);
+
+        //copy another motif sequence ...
+        rseq newSubsequence(motifCenter);
+
+        //... with noise
+        for (auto& item : newSubsequence)
+          item += distributionNoise(randomEngine);
+
+        //check if the sequence is within range d / 2.0 of the center
+        if (similarity(motifCenter, newSubsequence, d * 0.5) < d * 0.5) {
+
+          //backup subsequence at position
+          for (int i = 0; i < window; i++)
+            subsequence[i] = timeSeries_out[position + i];
+
+          value = subsequence[0];
+
+          //make sure we are in maxi when maxi can handle the motif height
+          if (abs(height) <= 2 * maxi) {
+
+            max = newSubsequence[0];
+            min = max;
+
+            for (int i = 0; i < window; i++) {
+
+              if (newSubsequence[i] < min)
+                min = newSubsequence[i];
+
+              if (newSubsequence[i] > max)
+                max = newSubsequence[i];
+            }
+
+            if (value + max > maxi)
+              value = maxi - max;
+
+            if (value - min < -maxi)
+              value = -maxi - min;
+          }
+
+          //inject sequence into the time series
+          for (int i = 0; i < window; i++)
+            timeSeries_out[i + position] = value + newSubsequence[i];
+
+          //update the running sum and sum of square
+          updateRunnings(timeSeries_out, position);
+
+          if (!searchForUnintentionalMatches(timeSeries_out,
+                motifPositions_out[0], d) &&
+              !checkIfThereIsALargerMotifSet(timeSeries_out,
+                motifPositions_out[0], d * 0.5)) {
+
+            break;
+          }
+          else {
+
+            //restore old subsequence
+            for (int i = 0; i < window; i++)
+              timeSeries_out[position + i] = subsequence[i];
+
+            //update the running mean and variance
+            updateRunnings(timeSeries_out, position);
+
+            //get new random position in the synthetic time series
+            position = freePositions.calculateRandomPosition();
+
+            motifPositions_out[0].back() = position;
+
+            noise -= lth;
+          }
+        }
+        else {
+
+          noise -= lth;
+        }
+
+        if (retryItr == length + 100 - 1) {
+
+          std::cerr << "ERROR: Cannot add motif set subsequence!" <<
+            " Retry or change your settings!" << std::endl;
+          throw(EXIT_FAILURE);
+        }
+
+        retryItr++;
+      }
+
+      //remove the position from available positions
+      freePositions.removePosition();
+    }
+
+    d_out.push_back(d * 0.5);
   }
 
   void TSGenerator::run(rseq &timeSeries_out, rseq &d_out, iseq &window_out,
@@ -873,7 +1141,7 @@ namespace tsg {
     switch (gen) {
 
       case 0:
-        injectPairMotif(timeSeries_out, d_out, window_out, motifPositions_out);
+        injectPairMotif(timeSeries_out);
         break;
       case 1:
         injectSetMotif(timeSeries_out, d_out, window_out, motifPositions_out);
@@ -897,8 +1165,8 @@ namespace tsg {
     d_out.push_back(similarity(timeSeries_out, positionOne, positionTwo,
         std::numeric_limits<double>::max()));
 
-    motifPositions_out[1].push_back(positionOne);
-    motifPositions_out[1].push_back(positionTwo);
+    motifPositions_out[gen ? 1 : 0].push_back(positionOne);
+    motifPositions_out[gen ? 1 : 0].push_back(positionTwo);
 
     window_out.push_back(window);
   }

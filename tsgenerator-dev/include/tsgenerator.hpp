@@ -305,14 +305,9 @@ namespace tsg
     ///\brief Injects a pair motif into the time series.
     ///
     ///\param [out] &timeSeries_out Hands over the time series.
-    ///\param [out] &d_out Hands over the range of each the motif sets.
-    ///\param [out] &window_out Hands over the window size of each motif set.
-    ///\param [out] &motifPositions_out Hands over the positions of each motif
-    ///set.
     ///
     ///tbd
-    void injectPairMotif(rseq &timeSeries_out, rseq &d_out, iseq &window_out,
-        iseqs &motifPositions_out);
+    void injectPairMotif(rseq &timeSeries_out);
 
     ///\brief Injects a set motif into the time series.
     ///
