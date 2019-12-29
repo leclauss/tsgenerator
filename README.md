@@ -291,20 +291,20 @@ make test
  ```
 
 2. tsgenerator command has the following options.
- * **-g STRING** sets the method for injecting sequences into the time series matching the synthetic motif. The available methods are **pair motif**, **set motif** and **latent motif**.
- * **-ty STRING** sets the motif type, the shape of the injected motif and the inserted sequences.
- * **-me STRING** sets the method for generating the base time series. The available methods are **simpleRandomWalk**, **realRandomWalk**, **normalRandomWalk**, **linearRandomWalk**, **boundedSimpleRandomWalk**, **boundedRealRandomWalk**, **boundedNormalRandomWalk**, **boundedLinearRandomWalk**, **uniformRandom**, **normalRandom**, **piecewiseLinearRandom** and **splineRepeated**.
- * **-l INTEGER** sets the length of the synthetic time series.
- * **-w INTEGER** sets the window size of the synthetic time series motif sets subsequences.
- * **-si INTEGER** sets the size of the motif, the number of inserted sequences non-self matched by the motif.
- * **-no FLOAT** sets the noise value. A random value in the range from -FLOAT to FLOAT is added to the base time series and the inserted sequences.
- * **-d FLOAT** sets the maximum absolute difference between two consecutive values in the time series.
- * **-he FLOAT** sets the maximum absolute difference between two values of the base motif.
- * **-st FLOAT** sets the maximum step size in x direction from two consecutive values when creating a linear approximated or splined base time series.
- * **-ti INTEGER** sets the number of values computed to generate a repeating pattern when generating a linear approsimated or splined base time series.
- * **-ma FLOAT** sets the maximum absolute value in the base times series.
- * **-h** prints the help text.
- * **-v** prints the version information.
+ * **-g STRING, --generator STRING** sets the method for injecting sequences into the time series matching the synthetic motif. The available methods are **pair motif**, **set motif** and **latent motif**.
+ * **-ty STRING, --type STRING** sets the motif type, the shape of the injected motif and the inserted sequences. The available types are **box**, **triangle**, **semicircle**, **trapezoid**, **positiveflank**, **negativeflank**, **sine** and **cosine**.
+ * **-me STRING, --method STRING** sets the method for generating the base time series. The available methods are **simpleRandomWalk**, **realRandomWalk**, **normalRandomWalk**, **linearRandomWalk**, **boundedSimpleRandomWalk**, **boundedRealRandomWalk**, **boundedNormalRandomWalk**, **boundedLinearRandomWalk**, **uniformRandom**, **normalRandom**, **piecewiseLinearRandom** and **splineRepeated**.
+ * **-l INTEGER, --length INTEGER** sets the length of the synthetic time series.
+ * **-w INTEGER, --window INTEGER** sets the window size of the synthetic time series motif sets subsequences.
+ * **-si INTEGER, --size INTEGER** sets the size of the motif, the number of inserted sequences non-self matched by the motif.
+ * **-no FLOAT, --noise FLOAT** sets the noise value. A random value in the range from -FLOAT to FLOAT is added to the base time series and the inserted sequences.
+ * **-d FLOAT, --delta FLOAT** sets the maximum absolute difference between two consecutive values in the time series.
+ * **-he FLOAT, --height FLOAT** sets the maximum absolute difference between two values of the base motif.
+ * **-st FLOAT, --step FLOAT** sets the maximum step size in x direction from two consecutive values when creating a linear approximated or splined base time series.
+ * **-ti INTEGER, --times INTEGER** sets the number of values computed to generate a repeating pattern when generating a linear approsimated or splined base time series.
+ * **-ma FLOAT, --maxi FLOAT** sets the maximum absolute value in the base times series.
+ * **-h, --help** prints the help text.
+ * **-v, --version** prints the version information.
 
 ### Output
 
