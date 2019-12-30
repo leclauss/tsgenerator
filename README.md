@@ -39,11 +39,6 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
  sudo apt-get install pkg-config
  ```
 
-6. Download and install [FFTW](http://www.fftw.org/ "FFTW website").
- ```bash
- sudo apt-get install libfftw3-dev
- ```
-
 *[Optional] Tools for documentation generation*
 
 1. Download and install [Graphviz](https://www.graphviz.org/ "Graphviz website").
@@ -122,11 +117,6 @@ This project assumes that [Graphviz](https://www.graphviz.org/ "Graphviz website
 4. Download and install [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/ "pkg-config website").
  ```bash
  brew install pkg-config
- ```
-
-5. Download and install [FFTW](http://www.fftw.org/ "FFTW website").
- ```bash
- brew install fftw
  ```
 
 *[Optional] Tools for documentation generation*
