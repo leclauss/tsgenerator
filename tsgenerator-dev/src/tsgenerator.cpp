@@ -471,6 +471,37 @@ namespace tsg {
     }
   }
 
+  bool TSGenerator::checkForSmallerDistance(const rseq &timeSeries_in, const
+      iseq &motifPositions_in, double similarity_in) {
+
+    //lower and upper positions of the overlapping subsequences
+    int lowerBound = std::max(0, motifPositions_in.back() - window + 1);
+    int upperBound = std::min(motifPositions_in.back() + window, length
+        - window + 1);
+
+
+    //each overlapping subsequence
+    for (int i = lowerBound; i < upperBound; i++) {
+
+      //each subsequence of the time series
+      for (int j = 0; j < length - window + 1; j++) {
+
+        //the subsequences are not the injected sequences and non
+        //overlapping
+        if (!(j == motifPositions_in[0] && i == motifPositions_in[1]) &&
+            abs(i - j) >= window) {
+
+          //the similarity of both subsequences is smaller than the similarity
+          //of both injected sequences
+          if (similarity(timeSeries_in, i, j, similarity_in) <= similarity_in)
+            return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   bool TSGenerator::searchForUnintentionalMatches(const rseq &timeSeries_in,
       const iseq &motifPositions_in, double similarity_in) {
 
@@ -694,8 +725,7 @@ namespace tsg {
 
     //determine simlarity of the top motif pair in the random synthetic time
     //series
-    scrimpPP(timeSeries_out, sums, sumSquares, pos0, pos1,
-        window);
+    tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
     d = similarity(timeSeries_out, pos0, pos1,
         std::numeric_limits<double>::max());
 
@@ -755,9 +785,16 @@ namespace tsg {
       dTmp = similarity(timeSeries_out, motifPos0, motifPos1, d);
 
       //check for success
-      if(!searchForUnintentionalMatches(timeSeries_out, { motifPos0, motifPos1
-            }, dTmp))
+      if(!checkForSmallerDistance(timeSeries_out, { motifPos0, motifPos1 },
+            dTmp))
         break;
+
+      if(i == length + 999) {
+
+        std::cerr << "ERROR: Cannot inject second pair motif sequence!" <<
+          std::endl;
+        throw(EXIT_FAILURE);
+      }
 
       //reset time series
       for (int i = 0; i < window; i++)
@@ -816,8 +853,7 @@ namespace tsg {
 
     //determine similarity of the top motif pair in the random synthetic time
     //series
-    scrimpPP(timeSeries_out, sums, sumSquares, positionOne, positionTwo,
-        window);
+    tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
     d = similarity(timeSeries_out, positionOne, positionTwo,
         std::numeric_limits<double>::max());
 
@@ -963,8 +999,7 @@ namespace tsg {
 
       //determine similarity of the top motif pair in the random synthetic time
       //series
-      scrimpPP(timeSeries_out, sums, sumSquares, positionOne, positionTwo,
-          window);
+      tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
       d = similarity(timeSeries_out, positionOne, positionTwo,
           std::numeric_limits<double>::max());
 
@@ -1160,8 +1195,7 @@ namespace tsg {
     int positionOne = 0;
     int positionTwo = 0;
 
-    scrimpPP(timeSeries_out, sums, sumSquares, positionOne, positionTwo,
-        window);
+    tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
     d_out.push_back(similarity(timeSeries_out, positionOne, positionTwo,
         std::numeric_limits<double>::max()));
 

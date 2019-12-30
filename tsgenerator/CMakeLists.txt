@@ -65,18 +65,11 @@ if (WIN32)
   endif()
 
   set(TSG_INCLUDEDIR ../${LIB_NAME}-dev/include)
-  set(FFTW3_INCLUDEDIR ../libs/${ARCH}/fftw3)
-
-  file(GLOB FFTW3_LIB_NAME "../libs/${ARCH}/fftw3/libfftw3-*.lib")
-  string(REGEX MATCH "libfftw3-.*.lib" FFTW3_LIB_NAME ${FFTW3_LIB_NAME})
-
-  file(GLOB FFTW3_DLL_NAME "../libs/${ARCH}/fftw3/libfftw3-*.dll")
 else ()
   set(STDCPPFS stdc++fs)
 
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(TSG REQUIRED ${LIB_NAME})
-  pkg_check_modules(FFTW3 REQUIRED fftw3)
 endif ()
 
 
@@ -88,16 +81,6 @@ add_library(TSG STATIC IMPORTED)
 set_target_properties(TSG PROPERTIES
   IMPORTED_LOCATION ${TSG_LOCATION})
 
-find_library(FFTW3_LOCATION NAMES fftw3 ${FFTW3_LIB_NAME}
-  HINTS ../libs/${ARCH}/fftw3)
-
-if (FFTW3_LOCATION EQUAL "FFTW3_LOCATION-NOTFOUND")
-  message(FATAL_ERROR "Cannot find FFTW3")
-endif ()
-
-add_library(FFTW3 STATIC IMPORTED)
-set_target_properties(FFTW3 PROPERTIES
-  IMPORTED_LOCATION ${FFTW3_LOCATION})
 
 # build
 configure_file(include/global.hpp.in global.hpp @ONLY)
@@ -111,17 +94,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE
   include src
   PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${TSG_INCLUDEDIR}
-  ${FFTW3_INCLUDEDIR})
+  ${TSG_INCLUDEDIR})
 
 target_compile_options(${PROJECT_NAME} PUBLIC
-  ${TSG_CFLAGS_OTHER}
-  ${FFTW3_CFLAGS_OTHER})
+  ${TSG_CFLAGS_OTHER})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
   ${STDCPPFS}
-  TSG
-  FFTW3)
+  TSG)
 
 add_executable(unittests
   test/unittests.cpp
@@ -132,17 +112,14 @@ target_include_directories(unittests PRIVATE
   test include src
   PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${TSG_INCLUDEDIR}
-  ${FFTW3_INCLUDEDIR})
+  ${TSG_INCLUDEDIR})
 
 target_compile_options(unittests PUBLIC
-  ${TSG_CFLAGS_OTHER}
-  ${FFTW3_CFLAGS_OTHER})
+  ${TSG_CFLAGS_OTHER})
 
 target_link_libraries(unittests PUBLIC
   ${STDCPPFS}
-  TSG
-  FFTW3)
+  TSG)
 
 
 # install
@@ -163,14 +140,7 @@ install(FILES ${CMAKE_BINARY_DIR}/tsgenerator.3
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION})
 set(CPACK_PACKAGE_CONTACT "Rafael Moczalla")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libfftw3-dev,tsgenerator-dev")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "tsgenerator-dev")
 
 include(CPack)
 
-if (WIN32)
-  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
-    -E copy ${FFTW3_DLL_NAME} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-
-  add_custom_command(TARGET unittests POST_BUILD COMMAND ${CMAKE_COMMAND} -E
-    copy ${FFTW3_DLL_NAME} $<TARGET_FILE_DIR:unittests>)
-endif ()

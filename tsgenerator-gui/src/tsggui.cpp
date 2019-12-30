@@ -122,8 +122,8 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   types.append("triangle");
   types.append("semicircle");
   types.append("trapezoid");
-  types.append("positive flank");
-  types.append("negative flank");
+  types.append("positiveflank");
+  types.append("negativeflank");
   types.append("sine");
   types.append("cosine");
 

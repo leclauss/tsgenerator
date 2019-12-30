@@ -19,12 +19,11 @@
 #include <cfloat>
 #include <limits>
 #include <iterator>
-#include <fftw3.h>
 #include <tsgtypes.hpp>
 #include <motifsetcollection.hpp>
 #include <freepositions.hpp>
 #include <basets.hpp>
-#include <scrimpplusplus.hpp>
+#include <tpm.hpp>
 
 
 namespace tsg
@@ -271,6 +270,21 @@ namespace tsg
     ///This function computes a base times series according to the length, delta,
     ///maxi and noise values.
     void generateBaseTimeSeries(rseq &timeSeries_out);
+
+    ///\brief Check if there is a better pair motif in the time series.
+    ///
+    ///\param [in] &timeSereis_in Hands over the time series.
+    ///\param [in] &subsequencePositions_in Hands over the pair motif
+    ///subsequence positions.
+    ///\param [in] similarity_in Hands over the similarity to break.
+    ///
+    ///\return true if there exists a subsequence pair in the time series with
+    ///smaller distance.
+    ///
+    ///This function checks if the subsequences overlapping the second injected
+    ///pair motif sequence have another subsequence within range similarity_in.
+    bool checkForSmallerDistance(const rseq &timeSeries_in, const iseq
+        &motifPositions_in, double similarity_in);
 
     ///\brief Search for unintentional matches in the time series with new
     ///injected subsequence.

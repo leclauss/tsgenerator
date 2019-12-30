@@ -37,59 +37,17 @@ enable_testing()
 
 add_test(NAME "unit_tests" COMMAND unittests)
 
-# check the dependencies
-if (WIN32)
-  # build project
-  set(ARCH win32)
-  if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(ARCH win64)
-  endif()
-  if (CMAKE_GENERATOR_PLATFORM MATCHES .*32.*)
-    set(ARCH win32)
-  endif()
-  if (CMAKE_GENERATOR_PLATFORM MATCHES .*64.*)
-    set(ARCH win64)
-  endif()
-
-  file(GLOB FFTW3_LIB_NAME "../libs/${ARCH}/fftw3/libfftw3-*.lib")
-  string(REGEX MATCH "libfftw3-.*.lib" FFTW3_LIB_NAME ${FFTW3_LIB_NAME})
-
-  set(FFTW3_INCLUDEDIR ../libs/${ARCH}/fftw3)
-else ()
-  find_package(PkgConfig REQUIRED)
-  pkg_check_modules(FFTW3 REQUIRED fftw3)
-endif ()
-
 
 # build
-find_library(FFTW3_LOCATION NAMES fftw3 ${FFTW3_LIB_NAME}
-  HINTS ../libs/${ARCH}/fftw3)
-
-if (FFTW3_LOCATION EQUAL "FFTW3_LOCATION-NOTFOUND")
-  message(FATAL_ERROR "Cannot find FFTW3")
-endif ()
-
-add_library(FFTW3 STATIC IMPORTED)
-set_target_properties(FFTW3 PROPERTIES
-  IMPORTED_LOCATION ${FFTW3_LOCATION})
-
 add_library(shared SHARED
   src/motifsetcollection
   src/freepositions
   src/basets
-  src/scrimpplusplus
+  src/tpm
   src/tsgenerator)
 
 target_include_directories(shared PRIVATE
-  api include src
-  PUBLIC
-  ${FFTW3_INCLUDEDIR})
-
-target_link_libraries(shared PUBLIC
-  FFTW3)
-
-target_compile_options(shared PUBLIC
-  ${FFTW3_CFLAGS_OTHER})
+  api include src)
 
 set_target_properties(shared PROPERTIES
   OUTPUT_NAME ${PROJECT_LIB_NAME}
@@ -100,7 +58,7 @@ add_library(static STATIC
   src/motifsetcollection
   src/freepositions
   src/basets
-  src/scrimpplusplus
+  src/tpm
   src/tsgenerator)
 
 set_target_properties(static PROPERTIES
@@ -109,28 +67,17 @@ set_target_properties(static PROPERTIES
   SOVERSION ${TSG_SOVERSION})
 
 target_include_directories(static PRIVATE
-  api include src
-  PUBLIC
-  ${FFTW3_INCLUDEDIR})
-
-target_link_libraries(static PUBLIC
-  FFTW3)
+  api include src)
 
 add_executable(unittests
   test/unittests.cpp)
 
 target_include_directories(unittests PRIVATE
-  test include src
-  PUBLIC
-  ${FFTW3_INCLUDEDIR})
-
-target_compile_options(unittests PUBLIC
-  ${FFTW3_CFLAGS_OTHER})
+  test include src)
 
 target_link_libraries(unittests PUBLIC
   ${STDCPPFS}
-  shared
-  FFTW3)
+  shared)
 
 
 # install
@@ -153,7 +100,7 @@ install(FILES
   include/basets.hpp
   include/freepositions.hpp
   include/motifsetcollection.hpp
-  include/scrimpplusplus.hpp
+  include/tpm.hpp
   include/tsgtypes.hpp
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_LIB_NAME})
 
@@ -165,7 +112,6 @@ install(FILES ${CMAKE_BINARY_DIR}/tsgenerator.pc
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${TSG_VERSION})
 set(CPACK_PACKAGE_CONTACT "Rafael Moczalla")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS libfftw3-dev)
 
 include(CPack)
 
