@@ -219,6 +219,8 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   gui.setCentralWidget(&pane);
   gui.resize(800, 300);
   gui.setWindowTitle("tsgenerator");
+  gui.grabGesture(Qt::PanGesture);
+  gui.grabGesture(Qt::PinchGesture);
   gui.show();
 }
 

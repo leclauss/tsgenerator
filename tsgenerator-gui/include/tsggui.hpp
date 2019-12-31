@@ -8,6 +8,8 @@
 #include <tsgtypes.hpp>
 #include <outputgenerator.hpp>
 #include <global.hpp>
+#include <chart.hpp>
+#include <chartview.hpp>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -17,7 +19,6 @@
 #include <QMainWindow>
 #include <QWidget>
 #include <QGridLayout>
-#include <QtCharts>
 #include <QListWidget>
 #include <QStringList>
 #include <QPushButton>
@@ -29,6 +30,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QMessageBox>
+#include <QLineSeries>
 
 
 class TsgGui : public QApplication {
@@ -89,12 +91,12 @@ private:
   QMessageBox maxiMes;
   QWidget pane;
   QGridLayout layout;
-  QtCharts::QChartView tsChartView;
-  QtCharts::QChart tsChart;
-  QtCharts::QLineSeries tsSeries;
-  QtCharts::QChartView motifChartView;
-  QtCharts::QChart motifChart;
-  QtCharts::QLineSeries motifSeries;
+  ChartView tsChartView;
+  Chart tsChart;
+  QLineSeries tsSeries;
+  ChartView motifChartView;
+  Chart motifChart;
+  QLineSeries motifSeries;
   QListWidget motifList;
   QStringList motifs;
   QLabel idxLabel;

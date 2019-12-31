@@ -103,7 +103,9 @@ add_executable(${PROJECT_NAME}
   src/main.cpp
   src/tsggui.cpp
   src/global.cpp
-  src/outputgenerator.cpp)
+  src/outputgenerator.cpp
+  src/chartview.cpp
+  src/chart.cpp)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
   include src
