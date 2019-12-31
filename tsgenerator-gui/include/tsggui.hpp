@@ -31,6 +31,9 @@
 #include <QAction>
 #include <QMessageBox>
 #include <QLineSeries>
+#include <QAreaSeries>
+#include <QPen>
+#include <QBrush>
 
 
 class TsgGui : public QApplication {
@@ -93,6 +96,12 @@ private:
   QGridLayout layout;
   ChartView tsChartView;
   Chart tsChart;
+  QPen tsPen;
+  QPen motifPen;
+  QBrush brush;
+  QLineSeries upperSeries;
+  QLineSeries lowerSeries;
+  QAreaSeries marker;
   QLineSeries tsSeries;
   ChartView motifChartView;
   Chart motifChart;

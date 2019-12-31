@@ -158,7 +158,24 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   connect(&startButton, SIGNAL(clicked()), this, SLOT(generateTS()));
   connect(&saveButton, SIGNAL(clicked()), this, SLOT(saveTS()));
 
+  //set subsqeuence marker
+  motifPen.setColor(0xffbb00);
+  brush.setColor(0xffddaa);
+  brush.setStyle(Qt::SolidPattern);
+  marker.setPen(motifPen);
+  marker.setBrush(brush);
+  marker.setUpperSeries(&upperSeries);
+  marker.setLowerSeries(&lowerSeries);
+
+  //set time series color
+  tsPen.setColor(0x0076ff);
+  tsSeries.setPen(tsPen);
+
+  //set motif plot color
+  motifSeries.setPen(motifPen);
+
   //add time series plot
+  tsChart.addSeries(&marker);
   tsChart.addSeries(&tsSeries);
   tsChart.createDefaultAxes();
   tsChart.legend()->hide();
@@ -314,6 +331,25 @@ void TsgGui::generateTS() {
       //check if first time series
       if (motifs.empty())
         first = true;
+      else
+        selMotif = 0;
+
+      //highlight motif
+      if (!first) {
+
+        upperSeries.clear();
+        lowerSeries.clear();
+      }
+
+      upperSeries.append(motifPositions[0][selMotif],
+          100000000.0);
+      upperSeries.append(motifPositions[0][selMotif] + window - 1,
+          100000000.0);
+      lowerSeries.append(motifPositions[0][selMotif],
+          -100000000.0);
+      lowerSeries.append(motifPositions[0][selMotif] + window - 1,
+          -100000000.0);
+
 
       //print ts
       if (!first)
@@ -432,6 +468,21 @@ void TsgGui::plotMotif() {
     if (motifList.currentRow() != selMotif) {
 
       selMotif = motifList.currentRow();
+
+
+      //upate subsequence marker
+      upperSeries.clear();
+      lowerSeries.clear();
+
+      upperSeries.append(motifPositions[0][selMotif],
+          100000000.0);
+      upperSeries.append(motifPositions[0][selMotif] + window - 1,
+          100000000.0);
+      lowerSeries.append(motifPositions[0][selMotif],
+          -100000000.0);
+      lowerSeries.append(motifPositions[0][selMotif] + window - 1,
+          -100000000.0);
+
 
       //update motif location plot
       motifSeries.clear();
