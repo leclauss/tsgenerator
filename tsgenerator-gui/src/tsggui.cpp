@@ -312,7 +312,7 @@ void TsgGui::generateTS() {
       //generate the time series
       tsg::TSGenerator tSGenerator(length, window, delta, noise, type,
           motifSize, height, step, times, method, maxi, gen);
-      tSGenerator.run(timeSeries, dVector, motifPositions);
+      tSGenerator.run(timeSeries, motif, dVector, motifPositions);
 
       success = true;
     }

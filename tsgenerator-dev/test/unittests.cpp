@@ -900,13 +900,14 @@ void test_tsgenerator() {
     tsg::rseq timeSeries_out;
     tsg::rseq d_out;
     tsg::iseqs positions_out;
+    tsg::rseqs motif;
 
 
     for (int itr = 0; itr < 3; itr++) {
 
       try {
 
-        generator.run(timeSeries_out, d_out, positions_out);
+        generator.run(timeSeries_out, motif, d_out, positions_out);
         TEST("Has to run without throwing an error!");
 
         simGenerator.testCalcRunnings(timeSeries_out);

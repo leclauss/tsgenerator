@@ -685,7 +685,14 @@ namespace tsg {
     return false;
   }
 
-  void TSGenerator::injectPairMotif(rseq &timeSeries_out) {
+  void TSGenerator::injectPairMotif(rseq &timeSeries_out, rseqs &motif_out) {
+
+    //empty motifs
+    if (!motif_out.empty()) {
+
+      motif_out.clear();
+      motif_out.resize(2);
+    }
 
     //declaration stuff
     int motifPos0, motifPos1;
@@ -702,9 +709,9 @@ namespace tsg {
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
 
-    //calculate temporary motif set center subsequence in the window size
-    //dimentional room of subsequence values
+    //compute first pair motif sequence
     calculateSubsequence(motif, type, height);
+    motif_out[0] = motif;
 
     //add noise
     for (auto& value : motif)
@@ -759,6 +766,8 @@ namespace tsg {
     } while(similarity(timeSeries_out, second, mean, stdDev, motifPos0, d) >=
         d);
 
+    motif_out[1] = second;
+
     rseq tmp;
     tmp.resize(motif.size());
 
@@ -808,8 +817,15 @@ namespace tsg {
     }
   }
 
-  void TSGenerator::injectSetMotif(rseq &timeSeries_out, rseq &d_out, iseqs
-      &pos_out) {
+  void TSGenerator::injectSetMotif(rseq &timeSeries_out, rseqs &motif_out, rseq
+      &d_out, iseqs &pos_out) {
+
+    //empty motifs
+    if (!motif_out.empty()) {
+
+      motif_out.clear();
+      motif_out.resize(1);
+    }
 
     //declaration stuff
     int positionOne = -1;
@@ -825,9 +841,10 @@ namespace tsg {
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
 
-    //calculate temporary motif set center subsequence in the window size
-    //dimentional room of subsequence values
+    //compute the motif sequence
     calculateSubsequence(motif, type, height);
+
+    motif_out[0] = motif;
 
     //add noise
     for (auto& value : motif)
@@ -970,8 +987,15 @@ namespace tsg {
     d_out.push_back(d);
   }
 
-  void TSGenerator::injectLatentMotif(rseq &timeSeries_out, rseq &d_out, iseqs
-      &pos_out) {
+  void TSGenerator::injectLatentMotif(rseq &timeSeries_out, rseqs &motif_out,
+      rseq &d_out, iseqs &pos_out) {
+
+    //empty motifs
+    if (!motif_out.empty()) {
+
+      motif_out.clear();
+      motif_out.resize(1);
+    }
 
     //declaration stuff
     int positionOne = -1;
@@ -1028,6 +1052,8 @@ namespace tsg {
         }
       }
     }
+
+    motif_out[0] = motifCenter;
 
     //declaration stuff
     int position;
@@ -1142,7 +1168,8 @@ namespace tsg {
     d_out.push_back(d * 0.5);
   }
 
-  void TSGenerator::run(rseq &timeSeries_out, rseq &d_out, iseqs &pos_out) {
+  void TSGenerator::run(rseq &timeSeries_out, rseqs &motif_out, rseq &d_out,
+      iseqs &pos_out) {
 
     //clear the output buffers
     if (!d_out.empty()) {
@@ -1164,13 +1191,13 @@ namespace tsg {
     switch (gen) {
 
       case 0:
-        injectPairMotif(timeSeries_out);
+        injectPairMotif(timeSeries_out, motif_out);
         break;
       case 1:
-        injectSetMotif(timeSeries_out, d_out, pos_out);
+        injectSetMotif(timeSeries_out, motif_out, d_out, pos_out);
         break;
       case 2:
-        injectLatentMotif(timeSeries_out, d_out, pos_out);
+        injectLatentMotif(timeSeries_out, motif_out, d_out, pos_out);
         break;
       default:
         std::cerr << "ERROR: Unknown motif generator: " << gen << std::endl;

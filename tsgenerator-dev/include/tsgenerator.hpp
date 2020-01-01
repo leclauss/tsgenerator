@@ -319,23 +319,27 @@ namespace tsg
     ///\brief Injects a pair motif into the time series.
     ///
     ///\param [out] &timeSeries_out Hands over the time series.
+    ///\param [out] &motif_out Hands over the motif sequences.
     ///
     ///tbd
-    void injectPairMotif(rseq &timeSeries_out);
+    void injectPairMotif(rseq &timeSeries_out, rseqs &motif_out);
 
     ///\brief Injects a set motif into the time series.
     ///
     ///\param [out] &timeSeries_out Hands over the time series.
+    ///\param [out] &motif_out Hands over the motif sequences.
     ///\param [out] &d_out Hands over the range of each the motif sets.
     ///\param [out] &pos_out Hands over the positions of each motif
     ///set.
     ///
     ///tbd
-    void injectSetMotif(rseq &timeSeries_out, rseq &d_out, iseqs &pos_out);
+    void injectSetMotif(rseq &timeSeries_out, rseqs &motif_out, rseq &d_out,
+        iseqs &pos_out);
 
     ///\brief Injects a latent motif into the time series.
     ///
     ///\param [out] &timeSeries_out Hands over the time series.
+    ///\param [out] &motif_out Hands over the motif sequences.
     ///\param [out] &d_out Hands over the range of each the motif sets.
     ///\param [out] &pos_out Hands over the positions of each motif set.
     ///
@@ -344,7 +348,8 @@ namespace tsg
     ///other subsequences is generated. Than sequences are injected within
     ///range d / 2 to any other subsequence. Finally the function checks wether
     ///there is a larget latent motif.
-    void injectLatentMotif(rseq &timeSeries_out, rseq &d_out, iseqs &pos_out);
+    void injectLatentMotif(rseq &timeSeries_out, rseqs &motif_out, rseq &d_out,
+        iseqs &pos_out);
 
   public:
 
@@ -412,6 +417,7 @@ namespace tsg
     ///\brief Generates a time series with defined time series motif sets.
     ///
     ///\param [out] &timeSeries_out Hands over the time series.
+    ///\param [out] &motif_out Hands over the motif sequences.
     ///\param [out] &d_out Hands over the range of each the motif sets.
     ///\param [out] &pos_out Hands over the positions of each motif
     ///set.
@@ -422,7 +428,8 @@ namespace tsg
     ///written into a file. A not defined motif tag is treated as a random
     ///motif. Therfore, a ranodm motif type is chosen. The default motif type
     ///is the random motif.
-    void run(rseq &timeSeries_out, rseq &d_out, iseqs &pos_out);
+    void run(rseq &timeSeries_out, rseqs &motif_out, rseq &d_out, iseqs
+        &pos_out);
   };
 }
 

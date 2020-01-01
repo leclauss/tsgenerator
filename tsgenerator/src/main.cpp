@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
     double maxi = 20.0;
     tsg::word method("boundedNormalRandomWalk");
     tsg::word gen("latent motif");
+    tsg::rseqs motif;
 
     try {
 
@@ -276,7 +277,7 @@ int main(int argc, char *argv[]) {
       tsg::iseqs motifPositions;
       tsg::TSGenerator tSGenerator(length, window, delta, noise, type, size,
           height, step, times, method, maxi, gen);
-      tSGenerator.run(timeSeries, dVector, motifPositions);
+      tSGenerator.run(timeSeries, motif, dVector, motifPositions);
 
       //output stuff
       OutputGenerator outputFile;

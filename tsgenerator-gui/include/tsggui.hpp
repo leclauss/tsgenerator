@@ -57,6 +57,7 @@ private:
   tsg::word method = "boundedNormalRandomWalk";
   tsg::word gen = "latent motif";
   int selMotif = 0;
+  tsg::rseqs motif;
 
   //final product
   tsg::rseq timeSeries;
