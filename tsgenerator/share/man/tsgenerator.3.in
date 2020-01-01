@@ -44,6 +44,12 @@ Sets the number of values computed to generate a repeating pattern when generati
 .BR \-ma ", " \-\-maxi " FLOAT"
 Sets the maximum absolute value in the base times series.
 .TP
+.BR \-o ", " \-\-out " STRING"
+Sets the base file name of the output files.
+.TP
+.BR \-ho ", " \-\-horizontalOutput
+Prints the time series values divided by a delimiter into the output file.
+.TP
 .BR \-v ", " \-\-version
 Prints the version information of @PROJECT_NAME@.
 .TP

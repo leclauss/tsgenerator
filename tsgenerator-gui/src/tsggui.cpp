@@ -312,7 +312,7 @@ void TsgGui::generateTS() {
       //generate the time series
       tsg::TSGenerator tSGenerator(length, window, delta, noise, type,
           motifSize, height, step, times, method, maxi, gen);
-      tSGenerator.run(timeSeries, dVector, windows, motifPositions);
+      tSGenerator.run(timeSeries, dVector, motifPositions);
 
       success = true;
     }
@@ -435,8 +435,39 @@ void TsgGui::saveTS() {
       //output stuff
       OutputGenerator outputFile;
 
-      outputFile.printTimeSeriesVertical(timeSeries, dVector, windows,
-          motifPositions);
+      outputFile.open();
+      outputFile.printTimeSeriesVertical(timeSeries);
+
+      if (gen == "set motif") {
+
+        outputFile.printMetaLine((std::vector<int>){ window }, "window");
+        outputFile.printMetaLine((std::vector<int>){ motifPositions[0][0] },
+            "set motif");
+        outputFile.printMetaLine(motifPositions[0], "matchings");
+        outputFile.printMetaLine((std::vector<double>){ dVector[0] }, "range");
+        outputFile.printMetaLine(motifPositions[1], "pair motif");
+        outputFile.printMetaLine((std::vector<double>){ dVector[1] }, "pair "
+            "motif distance");
+      }
+      else if (gen == "latent motif") {
+
+        outputFile.printMetaLine((std::vector<int>){ window }, "window");
+        //tbd
+        outputFile.printMetaLine((std::vector<double>){}, "latent motif");
+        outputFile.printMetaLine(motifPositions[0], "matchings");
+        outputFile.printMetaLine((std::vector<double>){ dVector[0] }, "range");
+        outputFile.printMetaLine(motifPositions[1], "pair motif");
+        outputFile.printMetaLine((std::vector<double>){ dVector[1] }, "pair "
+            "motif distance");
+      }
+      else {
+
+        outputFile.printMetaLine((std::vector<int>){ window }, "window");
+        outputFile.printMetaLine(motifPositions[0], "pair motif");
+        outputFile.printMetaLine(dVector, "distance");
+      }
+
+      outputFile.close();
     }
     catch (int e) {
 

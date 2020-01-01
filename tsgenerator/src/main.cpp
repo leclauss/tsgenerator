@@ -273,14 +273,13 @@ int main(int argc, char *argv[]) {
       //generate the time series
       tsg::rseq timeSeries;
       tsg::rseq dVector;
-      tsg::iseq windows;
       tsg::iseqs motifPositions;
       tsg::TSGenerator tSGenerator(length, window, delta, noise, type, size,
           height, step, times, method, maxi, gen);
-      tSGenerator.run(timeSeries, dVector, windows, motifPositions);
+      tSGenerator.run(timeSeries, dVector, motifPositions);
 
       //output stuff
-      OutputGenerator *outputFile = nullptr;
+      OutputGenerator outputFile;
 
       if (checkArg(argTokens, "-o", payload) || checkArg(argTokens, "--out",
             payload)) {
@@ -291,32 +290,51 @@ int main(int argc, char *argv[]) {
           exit(EXIT_FAILURE);
         }
         else
-          outputFile = new OutputGenerator(payload[0]);
+          outputFile.setFileName(payload[0]);
       }
-      else
-        outputFile = new OutputGenerator();
 
-      if (checkArg(argTokens, "-tsn", payload) || checkArg(argTokens,
-            "--timeSeriesName", payload)) {
-
-        if (payload.empty()) {
-
-          std::cerr << "ERROR: The time series name is unset." << std::endl;
-          exit(EXIT_FAILURE);
-        }
-        else
-          outputFile->setTimeSeriesName(payload[0]);
-      }
+      outputFile.open();
 
       if (checkArg(argTokens, "-ho", payload) || checkArg(argTokens,
-            "--horizontalOutput", payload))
-        outputFile->printTimeSeriesHorizontal(timeSeries, dVector, windows,
-            motifPositions);
-      else
-        outputFile->printTimeSeriesVertical(timeSeries, dVector, windows,
-            motifPositions);
+            "--horizontalOutput", payload)) {
 
-      delete outputFile;
+        outputFile.printTimeSeriesHorizontal(timeSeries);
+      }
+      else {
+
+        outputFile.printTimeSeriesVertical(timeSeries);
+      }
+
+      if (gen == "set motif") {
+
+        outputFile.printMetaLine((std::vector<int>){ window }, "window");
+        outputFile.printMetaLine((std::vector<int>){ motifPositions[0][0] },
+            "set motif");
+        outputFile.printMetaLine(motifPositions[0], "matchings");
+        outputFile.printMetaLine((std::vector<double>){ dVector[0] }, "range");
+        outputFile.printMetaLine(motifPositions[1], "pair motif");
+        outputFile.printMetaLine((std::vector<double>){ dVector[1] }, "pair "
+            "motif distance");
+      }
+      else if (gen == "latent motif") {
+
+        outputFile.printMetaLine((std::vector<int>){ window }, "window");
+        //tbd
+        outputFile.printMetaLine((std::vector<double>){}, "latent motif");
+        outputFile.printMetaLine(motifPositions[0], "matchings");
+        outputFile.printMetaLine((std::vector<double>){ dVector[0] }, "range");
+        outputFile.printMetaLine(motifPositions[1], "pair motif");
+        outputFile.printMetaLine((std::vector<double>){ dVector[1] }, "pair "
+            "motif distance");
+      }
+      else {
+
+        outputFile.printMetaLine((std::vector<int>){ window }, "window");
+        outputFile.printMetaLine(motifPositions[0], "pair motif");
+        outputFile.printMetaLine(dVector, "distance");
+      }
+
+      outputFile.close();
     }
     catch (int e) {
 

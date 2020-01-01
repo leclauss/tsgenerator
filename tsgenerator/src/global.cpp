@@ -184,8 +184,6 @@ void print_help() {
     std::endl;
   std::cout << "    -o,    --out NAME             " <<
     "         Sets the output file name." << std::endl;
-  std::cout << "    -tsn,  --timeSeriesName NAME  " <<
-    "         Sets the time series name." << std::endl;
   std::cout << "    -ho,   --horizontalOutput     " <<
     "         Sets the output mode to horizontal." << std::endl;
   std::cout << "    -r,    --range FLOAT FLOAT    " <<

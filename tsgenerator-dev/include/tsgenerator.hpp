@@ -327,29 +327,24 @@ namespace tsg
     ///
     ///\param [out] &timeSeries_out Hands over the time series.
     ///\param [out] &d_out Hands over the range of each the motif sets.
-    ///\param [out] &window_out Hands over the window size of each motif set.
-    ///\param [out] &motifPositions_out Hands over the positions of each motif
+    ///\param [out] &pos_out Hands over the positions of each motif
     ///set.
     ///
     ///tbd
-    void injectSetMotif(rseq &timeSeries_out, rseq &d_out, iseq &window_out,
-        iseqs &motifPositions_out);
+    void injectSetMotif(rseq &timeSeries_out, rseq &d_out, iseqs &pos_out);
 
     ///\brief Injects a latent motif into the time series.
     ///
     ///\param [out] &timeSeries_out Hands over the time series.
     ///\param [out] &d_out Hands over the range of each the motif sets.
-    ///\param [out] &window_out Hands over the window size of each motif set.
-    ///\param [out] &motifPositions_out Hands over the positions of each motif
-    ///set.
+    ///\param [out] &pos_out Hands over the positions of each motif set.
     ///
     ///First the distance d of a most similar subsequence pair is computed and
     ///a random motif center sequence with similarity 3 / 2 d or more to all
     ///other subsequences is generated. Than sequences are injected within
     ///range d / 2 to any other subsequence. Finally the function checks wether
     ///there is a larget latent motif.
-    void injectLatentMotif(rseq &timeSeries_out, rseq &d_out, iseq &window_out,
-        iseqs &motifPositions_out);
+    void injectLatentMotif(rseq &timeSeries_out, rseq &d_out, iseqs &pos_out);
 
   public:
 
@@ -418,8 +413,7 @@ namespace tsg
     ///
     ///\param [out] &timeSeries_out Hands over the time series.
     ///\param [out] &d_out Hands over the range of each the motif sets.
-    ///\param [out] &window_out Hands over the window size of each motif set.
-    ///\param [out] &motifPositions_out Hands over the positions of each motif
+    ///\param [out] &pos_out Hands over the positions of each motif
     ///set.
     ///
     ///First, this function checks all variables and pointers for validity.
@@ -428,8 +422,7 @@ namespace tsg
     ///written into a file. A not defined motif tag is treated as a random
     ///motif. Therfore, a ranodm motif type is chosen. The default motif type
     ///is the random motif.
-    void run(rseq &timeSeries_out, rseq &d_out, iseq &window_out, iseqs
-        &motifPositions_out);
+    void run(rseq &timeSeries_out, rseq &d_out, iseqs &pos_out);
   };
 }
 

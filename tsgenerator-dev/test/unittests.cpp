@@ -899,7 +899,6 @@ void test_tsgenerator() {
     TestTSGenerator generator(3000, 100, 20, 0.0, 2, 3, 50.0);
     tsg::rseq timeSeries_out;
     tsg::rseq d_out;
-    tsg::iseq windowSize_out;
     tsg::iseqs positions_out;
 
 
@@ -907,8 +906,7 @@ void test_tsgenerator() {
 
       try {
 
-        generator.run(timeSeries_out, d_out, windowSize_out,
-            positions_out);
+        generator.run(timeSeries_out, d_out, positions_out);
         TEST("Has to run without throwing an error!");
 
         simGenerator.testCalcRunnings(timeSeries_out);
@@ -919,7 +917,6 @@ void test_tsgenerator() {
                   2 * d_out[0]) <= 2 * d_out[0]);
 
         TEST(d_out.size() == 2);
-        TEST(windowSize_out.size() == 2);
         TEST(positions_out.size() == 2);
       }
       catch (...) {

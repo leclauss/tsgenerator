@@ -808,8 +808,8 @@ namespace tsg {
     }
   }
 
-  void TSGenerator::injectSetMotif(rseq &timeSeries_out, rseq &d_out, iseq
-      &window_out, iseqs &motifPositions_out) {
+  void TSGenerator::injectSetMotif(rseq &timeSeries_out, rseq &d_out, iseqs
+      &pos_out) {
 
     //declaration stuff
     int positionOne = -1;
@@ -833,14 +833,11 @@ namespace tsg {
     for (auto& value : motif)
       value += distribution(randomEngine);
 
-    //add window to output
-    window_out.push_back((int)(motif.size()));
-
     //get new random position in the synthetic time series
     position = freePositions.calculateRandomPosition();
     freePositions.removePosition();
 
-    motifPositions_out[0].push_back(position);
+    pos_out[0].push_back(position);
 
     //inject sequence into the time series
     value = timeSeries_out[position];
@@ -874,7 +871,7 @@ namespace tsg {
       //compute the random position for the subsequence
       position = freePositions.calculateRandomPosition();
 
-      motifPositions_out[0].push_back(position);
+      pos_out[0].push_back(position);
 
       //try to inject another sequence
       while (retryItr < length + 100) {
@@ -928,9 +925,9 @@ namespace tsg {
           updateRunnings(timeSeries_out, position);
 
           if (!searchForUnintentionalMatches(timeSeries_out,
-                motifPositions_out[0], d * 2.0) &&
+                pos_out[0], d * 2.0) &&
               !checkIfThereIsALargerMotifSet(timeSeries_out,
-                motifPositions_out[0], d)) {
+                pos_out[0], d)) {
 
             break;
           }
@@ -946,7 +943,7 @@ namespace tsg {
             //get new random position in the synthetic time series
             position = freePositions.calculateRandomPosition();
 
-            motifPositions_out[0].back() = position;
+            pos_out[0].back() = position;
 
             noise -= lth;
           }
@@ -973,8 +970,8 @@ namespace tsg {
     d_out.push_back(d);
   }
 
-  void TSGenerator::injectLatentMotif(rseq &timeSeries_out, rseq &d_out, iseq
-      &window_out, iseqs &motifPositions_out) {
+  void TSGenerator::injectLatentMotif(rseq &timeSeries_out, rseq &d_out, iseqs
+      &pos_out) {
 
     //declaration stuff
     int positionOne = -1;
@@ -1039,8 +1036,6 @@ namespace tsg {
     double min, max;
     double lth = noise / length;
 
-    window_out.push_back((int)(motifCenter.size()));
-
 
     //inject sequences into the time series
     for (int motifItr = 0; motifItr < size; motifItr++) {
@@ -1048,7 +1043,7 @@ namespace tsg {
       //compute the random position for the subsequence
       position = freePositions.calculateRandomPosition();
 
-      motifPositions_out[0].push_back(position);
+      pos_out[0].push_back(position);
 
       //try to inject another sequence
       while (retryItr < length + 100) {
@@ -1102,9 +1097,9 @@ namespace tsg {
           updateRunnings(timeSeries_out, position);
 
           if (!searchForUnintentionalMatches(timeSeries_out,
-                motifPositions_out[0], d) &&
+                pos_out[0], d) &&
               !checkIfThereIsALargerMotifSet(timeSeries_out,
-                motifPositions_out[0], d * 0.5)) {
+                pos_out[0], d * 0.5)) {
 
             break;
           }
@@ -1120,7 +1115,7 @@ namespace tsg {
             //get new random position in the synthetic time series
             position = freePositions.calculateRandomPosition();
 
-            motifPositions_out[0].back() = position;
+            pos_out[0].back() = position;
 
             noise -= lth;
           }
@@ -1147,8 +1142,7 @@ namespace tsg {
     d_out.push_back(d * 0.5);
   }
 
-  void TSGenerator::run(rseq &timeSeries_out, rseq &d_out, iseq &window_out,
-      iseqs &motifPositions_out) {
+  void TSGenerator::run(rseq &timeSeries_out, rseq &d_out, iseqs &pos_out) {
 
     //clear the output buffers
     if (!d_out.empty()) {
@@ -1157,19 +1151,13 @@ namespace tsg {
       d_out.resize(0);
     }
 
-    if (!window_out.empty()) {
+    if (!pos_out.empty()) {
 
-      window_out.clear();
-      window_out.resize(0);
-    }
-
-    if (!motifPositions_out.empty()) {
-
-      motifPositions_out.clear();
-      motifPositions_out.resize(2);
+      pos_out.clear();
+      pos_out.resize(2);
     }
     else
-      motifPositions_out.resize(2);
+      pos_out.resize(2);
 
 
     //choose correct generator
@@ -1179,11 +1167,10 @@ namespace tsg {
         injectPairMotif(timeSeries_out);
         break;
       case 1:
-        injectSetMotif(timeSeries_out, d_out, window_out, motifPositions_out);
+        injectSetMotif(timeSeries_out, d_out, pos_out);
         break;
       case 2:
-        injectLatentMotif(timeSeries_out, d_out, window_out,
-            motifPositions_out);
+        injectLatentMotif(timeSeries_out, d_out, pos_out);
         break;
       default:
         std::cerr << "ERROR: Unknown motif generator: " << gen << std::endl;
@@ -1199,9 +1186,7 @@ namespace tsg {
     d_out.push_back(similarity(timeSeries_out, positionOne, positionTwo,
         std::numeric_limits<double>::max()));
 
-    motifPositions_out[gen ? 1 : 0].push_back(positionOne);
-    motifPositions_out[gen ? 1 : 0].push_back(positionTwo);
-
-    window_out.push_back(window);
+    pos_out[gen ? 1 : 0].push_back(positionOne);
+    pos_out[gen ? 1 : 0].push_back(positionTwo);
   }
 }

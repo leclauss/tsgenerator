@@ -293,6 +293,8 @@ make test
  * **-st FLOAT, --step FLOAT** sets the maximum step size in x direction from two consecutive values when creating a linear approximated or splined base time series.
  * **-ti INTEGER, --times INTEGER** sets the number of values computed to generate a repeating pattern when generating a linear approsimated or splined base time series.
  * **-ma FLOAT, --maxi FLOAT** sets the maximum absolute value in the base times series.
+ * **-o STRING, --out STRING** sets the base name of the output files.
+ * **-ho, --horizontalOutput** prints the time series values horizontal in the output file divided by a delimiter.
  * **-h, --help** prints the help text.
  * **-v, --version** prints the version information.
 
