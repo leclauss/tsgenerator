@@ -68,6 +68,9 @@ private:
   //gui components
   QMainWindow gui;
   QMenuBar menuBar;
+  QMenu infoMenu;
+  QAction copywriteAct;
+  QMessageBox copywriteMes;
   QMenu helpMenu;
   QAction genAct;
   QMessageBox genMes;
@@ -179,6 +182,12 @@ public slots:
   ///
   ///This function replots the selected motif subsequence in the time series.
   void plotMotif();
+
+  ///\brief This function opens the copywrite.
+  ///
+  ///This function opens a message box with the copywrite text for the
+  ///generator option.
+  void showCopywrite();
 
   ///\brief This function opens the generator help.
   ///
