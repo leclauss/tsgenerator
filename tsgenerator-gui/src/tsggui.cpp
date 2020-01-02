@@ -61,7 +61,7 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   maxiMes.setWindowTitle("maxi option");
   maxiMes.setText("The maxi option sets the maximum absolute value of the "
       "base time series.");
-  idxLabel.setText("Motif Locations");
+  idxLabel.setText("motif locations");
   startButton.setText("start");
   saveButton.setText("save");
   lengthLabel.setText("length");
@@ -85,6 +85,8 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   typeLabel.setText("type");
   methodLabel.setText("method");
   genLabel.setText("generator");
+  distLabel.setText("distance");
+  rangeLabel.setText("range");
 
   //connect the message boxes to the actions
   connect(&genAct, SIGNAL(triggered()), this, SLOT(showGenHelp()));
@@ -226,9 +228,13 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   layout.addWidget(&startButton, 4, 4);
   layout.addWidget(&saveButton, 4, 5);
   layout.addWidget(&tsChartView, 5, 0, 1, -1);
-  layout.addWidget(&motifChartView, 6, 0, 2, 3);
-  layout.addWidget(&idxLabel, 6, 3);
-  layout.addWidget(&motifList, 7, 3);
+  layout.addWidget(&motifChartView, 6, 0, 8, 3);
+  layout.addWidget(&idxLabel, 6, 3, 1, 2);
+  layout.addWidget(&distLabel, 6, 5);
+  layout.addWidget(&motifList, 7, 3, 7, 2);
+  layout.addWidget(&distText, 7, 5);
+  layout.addWidget(&rangeLabel, 8, 5);
+  layout.addWidget(&rangeText, 9, 5);
 
   pane.setLayout(&layout);
 
@@ -334,6 +340,18 @@ void TsgGui::generateTS() {
 
       selMotif = 0;
 
+      //update smallest distance and motif range
+      if (gen == "pair motif") {
+
+        distText.setText(std::to_string(dVector[0]).c_str());
+        rangeText.setText("");
+      }
+      else {
+
+        distText.setText(std::to_string(dVector[1]).c_str());
+        rangeText.setText(std::to_string(dVector[0]).c_str());
+      }
+
       //highlight motif
       if (!first) {
 
@@ -343,8 +361,13 @@ void TsgGui::generateTS() {
 
       int pos = motifPositions[0][selMotif];
 
-      if (gen == "latent motif")
+      if (gen == "latent motif") {
+
         pos = -length;
+        marker.hide();
+      }
+      else
+        marker.show();
 
       upperSeries.append(pos, 100000000.0);
       upperSeries.append(pos + window - 1, 100000000.0);
@@ -584,6 +607,8 @@ void TsgGui::plotMotif() {
 
       if (pos < 0) {
 
+        marker.hide();
+
         motifSeries.append(0, motif[0][0]);
         min = motif[0][0];
         max = min;
@@ -598,6 +623,8 @@ void TsgGui::plotMotif() {
         }
       }
       else {
+
+        marker.show();
 
         motifSeries.append(motifPositions[0][pos],
             timeSeries[motifPositions[0][pos]]);

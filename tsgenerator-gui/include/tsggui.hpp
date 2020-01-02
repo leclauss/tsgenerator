@@ -139,6 +139,10 @@ private:
   QLabel genLabel;
   QComboBox genDrop;
   QStringList gens;
+  QLabel distLabel;
+  QLineEdit distText;
+  QLabel rangeLabel;
+  QLineEdit rangeText;
 
 public:
 
