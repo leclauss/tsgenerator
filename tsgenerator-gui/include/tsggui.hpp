@@ -57,13 +57,13 @@ private:
   tsg::word method = "boundedNormalRandomWalk";
   tsg::word gen = "latent motif";
   int selMotif = 0;
-  tsg::rseqs motif;
 
   //final product
   tsg::rseq timeSeries;
   tsg::rseq dVector;
   tsg::iseq windows;
   tsg::iseqs motifPositions;
+  tsg::rseqs motif;
 
   //gui components
   QMainWindow gui;
@@ -108,7 +108,7 @@ private:
   Chart motifChart;
   QLineSeries motifSeries;
   QListWidget motifList;
-  QStringList motifs;
+  QStringList motifLocs;
   QLabel idxLabel;
   QPushButton startButton;
   QPushButton saveButton;

@@ -690,8 +690,19 @@ namespace tsg {
     //empty motifs
     if (!motif_out.empty()) {
 
+      for (auto &motif : motif_out)
+        motif.clear();
+
       motif_out.clear();
       motif_out.resize(2);
+      motif_out[0].resize(window);
+      motif_out[1].resize(window);
+    }
+    else {
+
+      motif_out.resize(2);
+      motif_out[0].resize(window);
+      motif_out[1].resize(window);
     }
 
     //declaration stuff
@@ -714,7 +725,7 @@ namespace tsg {
     motif_out[0] = motif;
 
     //add noise
-    for (auto& value : motif)
+    for (auto &value : motif)
       value += distribution(randomEngine);
 
     //get new random position in the synthetic time series
@@ -756,7 +767,7 @@ namespace tsg {
         second[i] = motif[i];
 
       //add noise
-      for (auto& value : second)
+      for (auto &value : second)
         value += distributionNoise(randomEngine);
 
       mean = 0.0;
@@ -823,8 +834,17 @@ namespace tsg {
     //empty motifs
     if (!motif_out.empty()) {
 
+      for (auto &motif : motif_out)
+        motif.clear();
+
       motif_out.clear();
       motif_out.resize(1);
+      motif_out[0].resize(window);
+    }
+    else {
+
+      motif_out.resize(1);
+      motif_out[0].resize(window);
     }
 
     //declaration stuff
@@ -847,7 +867,7 @@ namespace tsg {
     motif_out[0] = motif;
 
     //add noise
-    for (auto& value : motif)
+    for (auto &value : motif)
       value += distribution(randomEngine);
 
     //get new random position in the synthetic time series
@@ -900,7 +920,7 @@ namespace tsg {
         rseq newSubsequence(motif);
 
         //... with noise
-        for (auto& item : newSubsequence)
+        for (auto &item : newSubsequence)
           item += distributionNoise(randomEngine);
 
         //check if the sequence is within range d of the motif
@@ -993,8 +1013,17 @@ namespace tsg {
     //empty motifs
     if (!motif_out.empty()) {
 
+      for (auto &motif : motif_out)
+        motif.clear();
+
       motif_out.clear();
       motif_out.resize(1);
+      motif_out[0].resize(window);
+    }
+    else {
+
+      motif_out.resize(1);
+      motif_out[0].resize(window);
     }
 
     //declaration stuff
@@ -1028,7 +1057,7 @@ namespace tsg {
       //dimentional room of subsequence values
       calculateSubsequence(motifCenter, type, height);
 
-      for (auto& value : motifCenter)
+      for (auto &value : motifCenter)
         value += distribution(randomEngine);
 
       mean = 0.0;
@@ -1081,7 +1110,7 @@ namespace tsg {
         rseq newSubsequence(motifCenter);
 
         //... with noise
-        for (auto& item : newSubsequence)
+        for (auto &item : newSubsequence)
           item += distributionNoise(randomEngine);
 
         //check if the sequence is within range d / 2.0 of the center
