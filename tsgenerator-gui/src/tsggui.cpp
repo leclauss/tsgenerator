@@ -350,10 +350,11 @@ void TsgGui::loadData() {
       tsSeries.append(i, timeSeries[i]);
     }
 
-    tsChart.axes(Qt::Horizontal)[0]->setRange(0.0, length);
     tsChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
         + 0.1 * (max - min));
   }
+
+  tsChart.axes(Qt::Horizontal)[0]->setRange(0.0, length);
 
   //print motif location plot
   motifSeries.clear();
@@ -729,6 +730,9 @@ void TsgGui::openData() {
 
           motifPositions[start].push_back(pos);
 
+          if (pos + window - 1 > length)
+            length = pos + window - 1;
+
           while (posIntChars.find(metaFile.peek()) == std::string::npos &&
               metaFile.peek() != '\n' && metaFile.peek() != EOF)
             metaFile.ignore();
@@ -763,6 +767,9 @@ void TsgGui::openData() {
       while (metaFile.peek() != '\n' && metaFile >> pos) {
 
         motifPositions[start].push_back(pos);
+
+        if (pos + window - 1 > length)
+          length = pos + window - 1;
 
         while (posIntChars.find(metaFile.peek()) == std::string::npos &&
             metaFile.peek() != '\n' && metaFile.peek() != EOF)
@@ -861,30 +868,31 @@ void TsgGui::plotMotif() {
   if (!running) {
 
     running = true;
-    double min, max;
+    double min = 0.0;
+    double max = 0.0;
+
+    selMotif = motifList.currentRow();
+
+    int pos = selMotif;
 
     if (motifList.currentRow() != selMotif) {
-
-      selMotif = motifList.currentRow();
-
 
       //upate subsequence marker
       upperSeries.clear();
       lowerSeries.clear();
 
-      int pos = selMotif;
 
       if (gen == "latent motif")
         pos--;
 
-      if (pos < 0) {
+      if (pos < 0 && !motif.empty() && !motif[0].empty()) {
 
         upperSeries.append(-length, 100000000.0);
         upperSeries.append(-length + window - 1, 100000000.0);
         lowerSeries.append(-length, -100000000.0);
         lowerSeries.append(-length + window - 1, -100000000.0);
       }
-      else {
+      else if (!motifPositions.empty() && !motifPositions[0].empty()) {
 
         upperSeries.append(motifPositions[0][pos], 100000000.0);
         upperSeries.append(motifPositions[0][pos] + window - 1, 100000000.0);
@@ -896,8 +904,7 @@ void TsgGui::plotMotif() {
       //update motif location plot
       motifSeries.clear();
 
-
-      if (pos < 0) {
+      if (pos < 0 && !motif.empty() && !motif[0].empty()) {
 
         marker.hide();
 
@@ -914,7 +921,7 @@ void TsgGui::plotMotif() {
           motifSeries.append(i, motif[0][i]);
         }
       }
-      else {
+      else if (!motifPositions.empty() && !motifPositions[0].empty()) {
 
         marker.show();
 
@@ -934,11 +941,13 @@ void TsgGui::plotMotif() {
         }
       }
 
-      if (pos < 0)
+      if (pos < 0 && !motif.empty() && !motif[0].empty())
         motifChart.axes(Qt::Horizontal)[0]->setRange(0, window - 1);
-      else
+      else if (!motifPositions.empty() && !motifPositions[0].empty())
         motifChart.axes(Qt::Horizontal)[0]->setRange(motifPositions[0][pos],
             motifPositions[0][pos] + window - 1);
+      if ((!motif.empty() && !motif[0].empty()) ||
+          (!motifPositions.empty() && !motifPositions[0].empty()))
       motifChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
           + 0.1 * (max - min));
     }
