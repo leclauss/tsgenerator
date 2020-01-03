@@ -5,6 +5,7 @@
 ///This is the header file of the TSGenerator GUI.
 
 #include <tsgenerator.hpp>
+#include <fstream>
 #include <tsgtypes.hpp>
 #include <outputgenerator.hpp>
 #include <global.hpp>
@@ -30,6 +31,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QMessageBox>
+#include <QFileDialog>
 #include <QLineSeries>
 #include <QAreaSeries>
 #include <QPen>
@@ -68,6 +70,10 @@ private:
   //gui components
   QMainWindow gui;
   QMenuBar menuBar;
+  QMenu fileMenu;
+  QAction openAct;
+  QFileDialog openFileDialog;
+  QAction saveAct;
   QMenu infoMenu;
   QAction copywriteAct;
   QMessageBox copywriteMes;
@@ -114,7 +120,6 @@ private:
   QStringList motifLocs;
   QLabel idxLabel;
   QPushButton startButton;
-  QPushButton saveButton;
   QLabel lengthLabel;
   QLineEdit lengthText;
   QLabel windowLabel;
@@ -166,17 +171,28 @@ public:
   ///Does actually nothing.
   ~TsgGui();
 
+  ///\brief This function loads data into the gui.
+  ///
+  ///This function loads the data into the gui including plotting.
+  void loadData();
+
 public slots:
   ///\brief This function generates the time series.
   ///
   ///This function generates the time series using the tsgenerator library.
   void generateTS();
 
-  ///\brief This function stores the times series.
+  ///\brief This function opens data.
   ///
-  ///This function stores the ts series and metadata into a seperate folder
+  ///This function opens the time series and metadata from a folder
   ///using the output generator.
-  void saveTS();
+  void openData();
+
+  ///\brief This function stores data.
+  ///
+  ///This function stores the time series and metadata into a seperate folder
+  ///using the output generator.
+  void saveData();
 
   ///\brief This function replots the motif.
   ///

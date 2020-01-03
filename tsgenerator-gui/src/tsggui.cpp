@@ -12,6 +12,13 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   //help message box
 
   //set initialize widgets
+  fileMenu.setTitle("File");
+  openAct.setText("open");
+  openFileDialog.setWindowTitle("open file");
+  openFileDialog.setFileMode(QFileDialog::ExistingFile);
+  openFileDialog.setDirectory(".");
+  openFileDialog.setNameFilter("*.csv");
+  saveAct.setText("save");
   infoMenu.setTitle("Info");
   copywriteAct.setText("license");
   copywriteMes.setWindowTitle("license");
@@ -84,7 +91,6 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
       "base time series.");
   idxLabel.setText("motif locations");
   startButton.setText("start");
-  saveButton.setText("save");
   lengthLabel.setText("length");
   lengthText.setPlaceholderText(std::to_string(length).c_str());
   windowLabel.setText("window");
@@ -109,7 +115,10 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   distLabel.setText("distance");
   rangeLabel.setText("range");
 
-  //connect the message boxes to the actions
+  //setup menu actions
+  connect(&openAct, SIGNAL(triggered()), this, SLOT(openData()));
+  connect(&saveAct, SIGNAL(triggered()), this, SLOT(saveData()));
+
   connect(&copywriteAct, SIGNAL(triggered()), this, SLOT(showCopywrite()));
 
   connect(&genAct, SIGNAL(triggered()), this, SLOT(showGenHelp()));
@@ -126,6 +135,10 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   connect(&maxiAct, SIGNAL(triggered()), this, SLOT(showMaxiHelp()));
 
   //create menus
+  fileMenu.addAction(&openAct);
+  fileMenu.addAction(&saveAct);
+  menuBar.addMenu(&fileMenu);
+
   helpMenu.addAction(&genAct);
   helpMenu.addAction(&typeAct);
   helpMenu.addAction(&methodAct);
@@ -140,10 +153,10 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   helpMenu.addAction(&maxiAct);
   menuBar.addMenu(&helpMenu);
 
-  gui.setMenuBar(&menuBar);
-
   infoMenu.addAction(&copywriteAct);
   menuBar.addMenu(&infoMenu);
+
+  gui.setMenuBar(&menuBar);
 
   //add the types
   types.append("box");
@@ -182,9 +195,8 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   genDrop.addItems(gens);
   genDrop.setCurrentIndex(2);
 
-  //setup buttons
+  //setup save button action
   connect(&startButton, SIGNAL(clicked()), this, SLOT(generateTS()));
-  connect(&saveButton, SIGNAL(clicked()), this, SLOT(saveTS()));
 
   //set subsqeuence marker
   motifPen.setColor(0xffbb00);
@@ -251,8 +263,7 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
   layout.addWidget(&timesText, 3, 4);
   layout.addWidget(&maxiLabel, 2, 5);
   layout.addWidget(&maxiText, 3, 5);
-  layout.addWidget(&startButton, 4, 4);
-  layout.addWidget(&saveButton, 4, 5);
+  layout.addWidget(&startButton, 4, 5);
   layout.addWidget(&tsChartView, 5, 0, 1, -1);
   layout.addWidget(&motifChartView, 6, 0, 8, 3);
   layout.addWidget(&idxLabel, 6, 3, 1, 2);
@@ -275,14 +286,176 @@ TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
 
 TsgGui::~TsgGui() { }
 
+void TsgGui::loadData() {
+
+  bool first = false;
+  double min, max;
+
+  //check if first time series
+  if (motifLocs.empty())
+    first = true;
+
+  selMotif = 0;
+
+  //update smallest distance and motif range
+  if (gen == "pair motif") {
+
+    distText.setText(std::to_string(dVector[0]).c_str());
+    rangeText.setText("");
+  }
+  else {
+
+    distText.setText(std::to_string(dVector[1]).c_str());
+    rangeText.setText(std::to_string(dVector[0]).c_str());
+  }
+
+  //highlight motif
+  if (!first) {
+
+    upperSeries.clear();
+    lowerSeries.clear();
+  }
+
+  int pos = motifPositions[0][selMotif];
+
+  if (gen == "latent motif") {
+
+    pos = -length;
+    marker.hide();
+  }
+  else
+    marker.show();
+
+  upperSeries.append(pos, 100000000.0);
+  upperSeries.append(pos + window - 1, 100000000.0);
+  lowerSeries.append(pos, -100000000.0);
+  lowerSeries.append(pos + window - 1, -100000000.0);
+
+
+  //print ts
+  if (!first)
+    tsSeries.clear();
+
+  tsSeries.append(0, timeSeries[0]);
+  min = timeSeries[0];
+  max = min;
+
+  for (int i = 1; i < length; i++) {
+
+    if (timeSeries[i] < min)
+      min = timeSeries[i];
+    if (timeSeries[i] > max)
+      max = timeSeries[i];
+
+    tsSeries.append(i, timeSeries[i]);
+  }
+
+  tsChart.axes(Qt::Horizontal)[0]->setRange(0.0, length);
+  tsChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
+      + 0.1 * (max - min));
+
+  //print motif location plot
+  if (!first)
+    motifSeries.clear();
+
+  if (gen == "latent motif") {
+
+    motifSeries.append(0, motif[0][0]);
+    min = motif[0][0];
+    max = min;
+
+    for (int i = 1; i < (int)motif[0].size(); i++) {
+
+      if (motif[0][i] < min)
+        min = motif[0][i];
+      if (motif[0][i] > max)
+        max = motif[0][i];
+      motifSeries.append(i, motif[0][i]);
+    }
+  }
+  else {
+
+    motifSeries.append(motifPositions[0][selMotif],
+        timeSeries[motifPositions[0][selMotif]]);
+    min = timeSeries[motifPositions[0][selMotif]];
+    max = min;
+
+    for (int i = motifPositions[0][selMotif] + 1;
+        i < motifPositions[0][selMotif] + window; i++) {
+
+      if (timeSeries[i] < min)
+        min = timeSeries[i];
+      if (timeSeries[i] > max)
+        max = timeSeries[i];
+      motifSeries.append(i, timeSeries[i]);
+    }
+  }
+
+  if (gen == "latent motif")
+    motifChart.axes(Qt::Horizontal)[0]->setRange(0, window - 1);
+  else
+    motifChart.axes(Qt::Horizontal)[0]->setRange(motifPositions[0][selMotif],
+        motifPositions[0][selMotif] + window - 1);
+  motifChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
+      + 0.1 * (max - min));
+
+  //print motif select list
+  if (!first) {
+
+    motifLocs.clear();
+    motifList.clear();
+  }
+
+  int start = 0;
+
+  if (gen == "set motif") {
+
+    std::stringstream setMotif;
+    setMotif << "set motif loc: " << motifPositions[0][0];
+    motifLocs.append(setMotif.str().c_str());
+
+    start = 1;
+  }
+  else if (gen == "latent motif") {
+
+    std::stringstream latent;
+    latent << "latent motif";
+    motifLocs.append(latent.str().c_str());
+  }
+  else {
+
+    //first pair motif sequence
+    std::stringstream pair0;
+    pair0 << "pair motif loc: " << motifPositions[0][0];
+    motifLocs.append(pair0.str().c_str());
+
+    //second pair motif sequence
+    std::stringstream pair1;
+    pair1 << "pair motif loc: " << motifPositions[0][0];
+    motifLocs.append(pair1.str().c_str());
+
+    start = 2;
+  }
+
+  for (int i = start; i < (int)motifPositions[0].size(); i++) {
+
+    std::stringstream idx;
+    idx << "matching loc: " << motifPositions[0][i];
+    motifLocs.append(idx.str().c_str());
+  }
+
+  motifList.addItems(motifLocs);
+  motifList.setCurrentRow(0);
+
+  selMotif = 0;
+}
+
 void TsgGui::generateTS() {
 
   if (!running) {
 
     running = true;
-    bool first = false;
     bool success = false;
-    double min, max;
     std::string in;
 
     //read the input
@@ -360,163 +533,7 @@ void TsgGui::generateTS() {
 
     if (success) {
 
-      //check if first time series
-      if (motifLocs.empty())
-        first = true;
-
-      selMotif = 0;
-
-      //update smallest distance and motif range
-      if (gen == "pair motif") {
-
-        distText.setText(std::to_string(dVector[0]).c_str());
-        rangeText.setText("");
-      }
-      else {
-
-        distText.setText(std::to_string(dVector[1]).c_str());
-        rangeText.setText(std::to_string(dVector[0]).c_str());
-      }
-
-      //highlight motif
-      if (!first) {
-
-        upperSeries.clear();
-        lowerSeries.clear();
-      }
-
-      int pos = motifPositions[0][selMotif];
-
-      if (gen == "latent motif") {
-
-        pos = -length;
-        marker.hide();
-      }
-      else
-        marker.show();
-
-      upperSeries.append(pos, 100000000.0);
-      upperSeries.append(pos + window - 1, 100000000.0);
-      lowerSeries.append(pos, -100000000.0);
-      lowerSeries.append(pos + window - 1, -100000000.0);
-
-
-      //print ts
-      if (!first)
-        tsSeries.clear();
-
-      tsSeries.append(0, timeSeries[0]);
-      min = timeSeries[0];
-      max = min;
-
-      for (int i = 1; i < length; i++) {
-
-        if (timeSeries[i] < min)
-          min = timeSeries[i];
-        if (timeSeries[i] > max)
-          max = timeSeries[i];
-
-        tsSeries.append(i, timeSeries[i]);
-      }
-
-      tsChart.axes(Qt::Horizontal)[0]->setRange(0.0, length);
-      tsChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
-          + 0.1 * (max - min));
-
-      //print motif location plot
-      if (!first)
-        motifSeries.clear();
-
-      if (gen == "latent motif") {
-
-        motifSeries.append(0, motif[0][0]);
-        min = motif[0][0];
-        max = min;
-
-        for (int i = 1; i < (int)motif[0].size(); i++) {
-
-          if (motif[0][i] < min)
-            min = motif[0][i];
-          if (motif[0][i] > max)
-            max = motif[0][i];
-          motifSeries.append(i, motif[0][i]);
-        }
-      }
-      else {
-
-        motifSeries.append(motifPositions[0][selMotif],
-            timeSeries[motifPositions[0][selMotif]]);
-        min = timeSeries[motifPositions[0][selMotif]];
-        max = min;
-
-        for (int i = motifPositions[0][selMotif] + 1;
-            i < motifPositions[0][selMotif] + window; i++) {
-
-          if (timeSeries[i] < min)
-            min = timeSeries[i];
-          if (timeSeries[i] > max)
-            max = timeSeries[i];
-          motifSeries.append(i, timeSeries[i]);
-        }
-      }
-
-      if (gen == "latent motif")
-        motifChart.axes(Qt::Horizontal)[0]->setRange(0, window - 1);
-      else
-        motifChart.axes(Qt::Horizontal)[0]->setRange(motifPositions[0][selMotif],
-            motifPositions[0][selMotif] + window - 1);
-      motifChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
-          + 0.1 * (max - min));
-
-      //print motif select list
-      if (!first) {
-
-        motifLocs.clear();
-        motifList.clear();
-      }
-
-      int start = 0;
-
-      if (gen == "set motif") {
-
-        std::stringstream setMotif;
-        setMotif << "set motif loc: " << motifPositions[0][0];
-        motifLocs.append(setMotif.str().c_str());
-
-        start = 1;
-      }
-      else if (gen == "latent motif") {
-
-        std::stringstream latent;
-        latent << "latent motif";
-        motifLocs.append(latent.str().c_str());
-      }
-      else {
-
-        //first pair motif sequence
-        std::stringstream pair0;
-        pair0 << "pair motif loc: " << motifPositions[0][0];
-        motifLocs.append(pair0.str().c_str());
-
-        //second pair motif sequence
-        std::stringstream pair1;
-        pair1 << "pair motif loc: " << motifPositions[0][0];
-        motifLocs.append(pair1.str().c_str());
-
-        start = 2;
-      }
-
-      for (int i = start; i < (int)motifPositions[0].size(); i++) {
-
-        std::stringstream idx;
-        idx << "matching loc: " << motifPositions[0][i];
-        motifLocs.append(idx.str().c_str());
-      }
-
-      motifList.addItems(motifLocs);
-      motifList.setCurrentRow(0);
-
-      selMotif = 0;
+      loadData();
     }
     else {
       std::cerr << "ERROR: Couldn't create time series." << std::endl;
@@ -526,7 +543,233 @@ void TsgGui::generateTS() {
   }
 }
 
-void TsgGui::saveTS() {
+void TsgGui::openData() {
+
+  if (!running) {
+
+    running = true;
+
+    openFileDialog.exec();
+
+    std::string tsFilePath = openFileDialog.selectedFiles()[0].toStdString();
+    std::string metaFilePath = tsFilePath;
+
+    size_t dir = tsFilePath.find_last_of("/");
+    size_t pos = tsFilePath.rfind("meta_");
+
+    if (dir < pos && pos != std::string::npos)
+      tsFilePath.erase(pos, 5);
+    else
+      metaFilePath.insert(tsFilePath.find_last_of("_"), "_meta");
+
+    std::ifstream tsFile;
+    std::ifstream metaFile;
+    double value;
+    std::string doubleChars("-.0123456789");
+    std::string intChars("-0123456789");
+    std::string posIntChars("0123456789");
+    std::string alphabetChars(" abcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    bool tsFileExists = std::filesystem::exists(tsFilePath);
+    bool metaFileExists = std::filesystem::exists(metaFilePath);
+
+    if (tsFileExists) {
+
+      if (!timeSeries.empty())
+        timeSeries.clear();
+
+      tsFile.open(tsFilePath);
+
+      while (doubleChars.find(tsFile.peek()) == std::string::npos &&
+          tsFile.peek() != EOF)
+        tsFile.ignore();
+
+      for (int i = 0; tsFile >> value; i++) {
+
+        timeSeries.push_back(value);
+
+        while (doubleChars.find(tsFile.peek()) == std::string::npos &&
+            tsFile.peek() != EOF)
+          tsFile.ignore();
+      }
+
+      length = (int)timeSeries.size();
+
+      tsFile.close();
+    }
+
+    if (metaFileExists) {
+
+      if (!motif.empty()) {
+
+        for (auto &item : motif)
+          if (!item.empty())
+            item.clear();
+
+        motif.clear();
+      }
+
+      motif.resize(1);
+
+      if (!motifPositions.empty()) {
+
+        for (auto &item : motifPositions)
+          if (!item.empty())
+            item.clear();
+
+        motifPositions.clear();
+      }
+
+      motifPositions.resize(2);
+
+      if (!dVector.empty()) {
+
+        dVector.clear();
+      }
+
+      metaFile.open(metaFilePath);
+
+      //read window
+      while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+          metaFile.peek() != EOF)
+        metaFile.ignore();
+
+      metaFile >> window;
+
+      while (alphabetChars.find(metaFile.peek()) == std::string::npos &&
+          metaFile.peek() != EOF)
+        metaFile.ignore();
+
+      //check which motif generator
+      if (metaFile.peek() == 's') {
+
+        gen = "set motif";
+
+        while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+            metaFile.peek() != EOF)
+          metaFile.ignore();
+
+        while (alphabetChars.find(metaFile.peek()) == std::string::npos &&
+            metaFile.peek() != EOF)
+          metaFile.ignore();
+      }
+      else if (metaFile.peek() == 'l') {
+
+        gen = "latent motif";
+
+        while (doubleChars.find(metaFile.peek()) == std::string::npos &&
+            metaFile.peek() != EOF)
+          metaFile.ignore();
+
+        for (int i = 0; metaFile.peek() != '\n' && metaFile >> value; i++) {
+
+          motif[0].push_back(value);
+
+          while (doubleChars.find(metaFile.peek()) == std::string::npos &&
+              metaFile.peek() != '\n' && metaFile.peek() != EOF)
+            metaFile.ignore();
+        }
+
+        std::cout << "value: " << metaFile.peek() << " char: " << (char)metaFile.peek() << std::endl;
+        while (alphabetChars.find(metaFile.peek()) == std::string::npos &&
+            metaFile.peek() != EOF)
+          metaFile.ignore();
+      }
+      else {
+
+        gen = "pair motif";
+      }
+
+      //check if we have matching subsequences
+      int pos;
+      int start = 0;
+
+      if (metaFile.peek() == 'm') {
+
+        while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+            metaFile.peek() != EOF)
+          metaFile.ignore();
+
+        metaFile >> pos;
+
+        motifPositions[start].push_back(pos);
+
+        while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+            metaFile.peek() != '\n' && metaFile.peek() != EOF)
+          metaFile.ignore();
+
+        //check if we have already a motif
+        if (motif[0].empty() && tsFileExists)
+          for (int i = 0; i < window; i++)
+            motif[0].push_back(timeSeries[pos + i]);
+
+        //get positions
+        while (metaFile.peek() != '\n' && metaFile >> pos) {
+
+          motifPositions[start].push_back(pos);
+
+          while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+              metaFile.peek() != '\n' && metaFile.peek() != EOF)
+            metaFile.ignore();
+        }
+
+        start++;
+
+        while (alphabetChars.find(metaFile.peek()) == std::string::npos &&
+            metaFile.peek() != EOF)
+          metaFile.ignore();
+
+        //get range
+        while (doubleChars.find(metaFile.peek()) == std::string::npos &&
+            metaFile.peek() != EOF)
+          metaFile.ignore();
+
+        metaFile >> value;
+
+        dVector.push_back(value);
+
+        while (alphabetChars.find(metaFile.peek()) == std::string::npos &&
+            metaFile.peek() != EOF)
+          metaFile.ignore();
+      }
+
+      //pair motif locations
+      while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+          metaFile.peek() != EOF)
+        metaFile.ignore();
+
+      while (metaFile.peek() != '\n' && metaFile >> pos) {
+
+        motifPositions[start].push_back(pos);
+
+        while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+            metaFile.peek() != '\n' && metaFile.peek() != EOF)
+          metaFile.ignore();
+      }
+
+      while (alphabetChars.find(metaFile.peek()) == std::string::npos &&
+          metaFile.peek() != EOF)
+        metaFile.ignore();
+
+      //pair motif distance
+      while (doubleChars.find(metaFile.peek()) == std::string::npos &&
+          metaFile.peek() != EOF)
+        metaFile.ignore();
+
+      metaFile >> value;
+
+      dVector.push_back(value);
+
+      metaFile.close();
+
+      loadData();
+    }
+
+    running = false;
+  }
+}
+
+void TsgGui::saveData() {
 
   if (!running) {
 

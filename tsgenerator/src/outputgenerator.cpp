@@ -38,11 +38,7 @@ OutputGenerator::~OutputGenerator() {
 
 void OutputGenerator::open() {
 
-  if (tsFile.is_open())
-    tsFile.close();
-
-  if (metaFile.is_open())
-    metaFile.close();
+  close();
 
   tsFileName += "_" + std::to_string(folderNumber) + ".csv";
   metaFileName += "_" + std::to_string(folderNumber) + ".csv";
