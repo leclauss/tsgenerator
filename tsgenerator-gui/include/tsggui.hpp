@@ -156,7 +156,7 @@ public:
 
   ///\brief The TsgGui constructor.
   ///
-  ///\param [in] argc Hands over the number of arguments.
+  ///\param [in] &argc Hands over the number of arguments.
   ///\param [in] *argv[] Hands over the arguments.
   ///
   ///This is the typical main function of C++. The main function is called at
@@ -164,7 +164,7 @@ public:
   ///duration are initialized. We use the main function to parse the argument
   ///list to set up and to start the TSGenerator. Also a configuration file
   ///is created, if a configuration file do not exist.
-  TsgGui(int argc, char *argv[]);
+  TsgGui(int &argc, char *argv[]);
 
   ///\brief The TsgGui destructor.
   ///

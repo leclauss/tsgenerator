@@ -7,7 +7,7 @@
 #include <tsggui.hpp>
 
 
-TsgGui::TsgGui(int argc, char *argv[]) : QApplication(argc, argv) {
+TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv) {
 
   //help message box
 
