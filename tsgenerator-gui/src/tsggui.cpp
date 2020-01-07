@@ -871,11 +871,11 @@ void TsgGui::plotMotif() {
     double min = 0.0;
     double max = 0.0;
 
-    selMotif = motifList.currentRow();
-
-    int pos = selMotif;
-
     if (motifList.currentRow() != selMotif) {
+
+      selMotif = motifList.currentRow();
+
+      int pos = selMotif;
 
       //upate subsequence marker
       upperSeries.clear();
@@ -899,7 +899,6 @@ void TsgGui::plotMotif() {
         lowerSeries.append(motifPositions[0][pos], -100000000.0);
         lowerSeries.append(motifPositions[0][pos] + window - 1, -100000000.0);
       }
-
 
       //update motif location plot
       motifSeries.clear();
