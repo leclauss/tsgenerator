@@ -44,6 +44,7 @@ add_library(shared SHARED
   src/freepositions
   src/basets
   src/tpm
+  src/tsm
   src/tsgenerator)
 
 target_include_directories(shared PRIVATE
@@ -59,6 +60,7 @@ add_library(static STATIC
   src/freepositions
   src/basets
   src/tpm
+  src/tsm
   src/tsgenerator)
 
 set_target_properties(static PROPERTIES
@@ -101,6 +103,7 @@ install(FILES
   include/freepositions.hpp
   include/motifsetcollection.hpp
   include/tpm.hpp
+  include/tsm.hpp
   include/tsgtypes.hpp
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_LIB_NAME})
 

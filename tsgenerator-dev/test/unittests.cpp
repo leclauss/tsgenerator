@@ -334,6 +334,31 @@ void test_basets() {
 
 }
 
+void test_tsm() {
+
+  TEST_GROUP_FUNCTION;
+
+  tsg::rseq sums;
+  tsg::rseq sumSquares;
+  TestTSGenerator generator(300, 20, 20.0, 0.0, 2, 3, 50.0);
+
+  generator.testCalcRunnings(testTimeSeries);
+  sums = generator.getSums();
+  sumSquares = generator.getSumSquares();
+
+  tsg::iseqs motif;
+
+  try {
+
+    tsg::tsm(testTimeSeries, sums, sumSquares, motif, 20, 6);
+    TEST("Ok!");
+  }
+  catch (int e) {
+
+    TEST(!"Shouldn't throw an error!");
+  }
+}
+
 void test_tsgenerator() {
 
   TEST_GROUP_FUNCTION;
@@ -943,6 +968,8 @@ int main() {
     test_freepositions();
     TEST_SECTION("base time series generation");
     test_basets();
+    TEST_SECTION("top set motif");
+    test_tsm();
     TEST_SECTION("time series generator");
     test_tsgenerator();
 

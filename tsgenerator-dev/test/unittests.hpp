@@ -13,6 +13,7 @@
 #include <tsgenerator.hpp>
 #include <freepositions.hpp>
 #include <basets.hpp>
+#include <tsm.hpp>
 #include <iostream>
 #include <sstream>
 #include <filesystem>
