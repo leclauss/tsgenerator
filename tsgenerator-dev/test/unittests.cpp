@@ -425,7 +425,6 @@ void test_tsm() {
   TEST(abs(dist) <= 0.0000001);
 
   //test the ADM implementation
-  tsg::rseqs d;
   tsg::rseqs dGT = {
     { 0, 7.43966, 6.2613, 6.24954, 6.50969, 5.62853 },
     { 7.43966, 0, 4.00941, 5.40625, 4.59849, 7.11225 },
@@ -437,10 +436,11 @@ void test_tsm() {
 
   try {
 
-    tsm.adm({ 4, 32, 86, 111, 140, 268 }, 20.0, 7.0, d);
+    tsm.adm({4, 32, 86, 111, 140, 268 }, 20.0, 7.0);
     for (int i = 0; i < (int)dGT.size(); i++)
       for (int j = 0; j < (int)dGT.size(); j++)
-        TEST(d[i][j] < dGT[i][j] + 0.0001 && d[i][j] > dGT[i][j] - 0.0001);
+        TEST(tsm.distADM(i, j) < dGT[i][j] + 0.0001 && tsm.distADM(i, j)
+            > dGT[i][j] - 0.0001);
   }
   catch (...) {
 

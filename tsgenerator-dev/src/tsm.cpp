@@ -6,7 +6,6 @@
 ///iteratively the diagonals of the distance matrix of the time series.
 
 #include <tsm.hpp>
-#include <iostream>
 
 
 namespace tsg {
@@ -229,86 +228,106 @@ namespace tsg {
     return sqrt(dist);
   }
 
+  double TSM::distADM(const int i_in, const int j_in) {
+
+    int i = i_in;
+    int j = j_in;
+
+    if (i == j)
+      return 0.0;
+
+    if (j > i) {
+
+      i = j_in;
+      j = i_in;
+    }
+
+    return admDist[i - 1][j];
+  }
+
   void TSM::adm(const iseq &neighborhood_in, const int window_in, const double
-      range_in, rseqs &dist_out) {
+      range_in) {
 
     double range = range_in;
 
     if (range < 0.0)
       range = -range;
 
-    if (dist_out.empty()) {
+    if (admDist.empty()) {
 
-      dist_out.resize(neighborhood_in.size());
+      admDist.resize(neighborhood_in.size() - 1);
     }
     else {
 
-      for (auto &item : dist_out) {
+      for (auto &item : admDist) {
 
         item.clear();
         item.resize(0);
       }
 
-      dist_out.clear();
-      dist_out.resize(neighborhood_in.size());
+      admDist.clear();
+      admDist.resize(neighborhood_in.size() - 1);
     }
 
-    for (auto &item : dist_out)
-      for (int i = 0; i < (int)neighborhood_in.size(); i++)
-        item.push_back(0.0);
+    if ((int)admDist.size() > 0) {
 
-    //maximum distance matrix initialized to 0.0
-    rseqs &a = dist_out;
-    //minimum distance matrix initialized to infinity
-    rseqs m(neighborhood_in.size(), rseq(neighborhood_in.size(),
-          std::numeric_limits<double>::infinity()));
-
-    std::mt19937 randomEngine(std::random_device().entropy()
-        ? std::random_device()()
-        : (unsigned int)
-        (std::chrono::system_clock::now().time_since_epoch().count()));
-
-    std::uniform_int_distribution<int> distributionX(1,
-        (int)neighborhood_in.size() - 1);
-
-    int x = 0;
-    int y = 0;
-    double d = 0.0;
-
-    //compute exact distance for random number of cells
-    for (int i = 0; i < (int)a.size(); i++) {
-
-      do {
-
-        x = distributionX(randomEngine);
-
-        std::uniform_int_distribution<int> distributionY(0, x - 1);
-
-        y = distributionY(randomEngine);
-      } while (a[x][y] != 0.0);
-
-      d = dist(neighborhood_in[x], neighborhood_in[y], window_in);
-      a[x][y] = d;
-      m[x][y] = d;
-    }
-
-    for (int k = 0; k < (int)a.size(); k++) {
+      //maximum distance matrix initialized to 0.0
+      rseqs &a = admDist;
+      //minimum distance matrix initialized to infinity
+      rseqs m(a.size(), rseq(0));
 
       for (int i = 0; i < (int)a.size(); i++) {
 
-        for (int j = 0; j < (int)a.size(); j++) {
+        for (int j = 0; j <= i; j++) {
 
-          a[i][j] = std::max(std::max(a[i][j], a[i][k] - m[k][j]), a[j][k]
-              - m[k][i]);
-          m[i][j] = std::min(m[i][j], m[i][k] + m[k][j]);
+          a[i].push_back(0.0);
+          m[i].push_back(std::numeric_limits<double>::infinity());
         }
       }
-    }
 
-    for (int i = 0; i < (int)a.size(); i++)
-      for (int j = 0; j < (int)a.size(); j++)
-        if (a[i][j] < range)
-          a[i][j] = dist(neighborhood_in[i], neighborhood_in[j], window_in);
+      std::mt19937 randomEngine(std::random_device().entropy()
+          ? std::random_device()()
+          : (unsigned int)
+          (std::chrono::system_clock::now().time_since_epoch().count()));
+
+      std::uniform_int_distribution<int> distributionX(0, (int)a.size() - 1);
+
+      int x = 0;
+      int y = 0;
+      double d = 0.0;
+
+      //compute exact distance for random number of cells
+      for (int i = 0; i < 2 * (int)a.size(); i++) {
+
+        x = distributionX(randomEngine);
+
+        std::uniform_int_distribution<int> distributionY(0, x);
+
+        y = distributionY(randomEngine);
+
+        d = dist(neighborhood_in[x + 1], neighborhood_in[y], window_in);
+        a[x][y] = d;
+        m[x][y] = d;
+      }
+
+      for (int k = 0; k < (int)a.size(); k++) {
+
+        for (int i = 0; i <= k; i++) {
+
+          for (int j = 0; j <= i; j++) {
+
+            a[i][j] = std::max(std::max(a[i][j], a[i][k] - m[k][j]), a[j][k]
+                - m[k][i]);
+            m[i][j] = std::min(m[i][j], m[i][k] + m[k][j]);
+          }
+        }
+      }
+
+      for (int i = 0; i < (int)a.size(); i++)
+        for (int j = 0; j <= i; j++)
+          if (a[i][j] < range)
+            a[i][j] = dist(neighborhood_in[i + 1], neighborhood_in[j], window_in);
+    }
   }
 
   int TSM::tsm(iseq &motif_out, const int window_in, const double range_in,
@@ -393,9 +412,7 @@ namespace tsg {
         neighborhood.size() > mpc.size(); i++) {
 
       //compute the distance matrix of the neighborhood
-      rseqs d;
-
-      adm(neighborhood, window_in, range, d);
+      adm(neighborhood, window_in, range);
 
       //get largest set motif in the neighborhood
       for (int j = 0; j < (int)neighborhood.size(); j++) {
@@ -411,7 +428,7 @@ namespace tsg {
 
         //get all subsequence matching the motif subsequence
         for (int k = 0; k < (int)neighborhood.size(); k++)
-          if (d[j][k] < range)
+          if (distADM(j, k) < range)
             motif.push_back(neighborhood[k]);
 
         std::sort(motif.begin(), motif.end());

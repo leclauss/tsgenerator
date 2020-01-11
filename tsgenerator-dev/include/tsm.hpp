@@ -8,9 +8,7 @@
 #ifndef TSM_HPP
 #define TSM_HPP
 
-#include <cstdlib>
 #include <cmath>
-//#include <iomanip>
 #include <limits>
 #include <algorithm>
 #include <random>
@@ -42,6 +40,11 @@ namespace tsg {
       ///This variable stores the running sum of squares of the objective
       ///sequence.
       const rseq sumSquares;
+
+      ///\brief This variable stores the ADM distance matrix.
+      ///
+      ///This variable stores the ADM distance matrix of a neighborhood.
+      rseqs admDist;
 
     public:
       ///\brief The constructor sets up the top set motif object.
@@ -130,17 +133,29 @@ namespace tsg {
       ///This is an implementation of the z-normalized Euclidean distance.
       double dist(const int pos0_in, const int pos1_in, const int window_in);
 
+      ///\brief ADM distance getter function.
+      ///
+      ///\param [in] &i_in Hands over the index of the first neighbor
+      ///subsequence.
+      ///\param [in] &j_in Hands over the index of the second neighbor
+      ///subsequence.
+      ///
+      ///\return Returns ADM distance.
+      ///
+      ///This getter function returns the ADM distance from the ith to the jth
+      ///neighbor.
+      double distADM(const int i_in, const int j_in);
+
       ///\brief A modified ADM algorithm implementation.
       ///
       ///\param [in] &neighborhood_in Hands over the subsequence indices.
       ///\param [in] window_in Hands over the window size.
       ///\param [in] range_in Hands over the motif range.
-      ///\param [out] &dist_out Returns the distance matrix.
       ///
       ///This is a modified ADM algorithm implementation which computes the
       ///distance matrix of a set of subsequences.
       void adm(const iseq &neighborhood_in, const int window_in, const double
-          range_in, rseqs &dist_out);
+          range_in);
 
       ///\brief A top set motif dicovery procedure.
       ///
