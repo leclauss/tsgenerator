@@ -454,6 +454,11 @@ void test_tsm() {
 
     TEST(tsm.tsm(motif, 20, 0.5) == 3);
     TEST(tsm.tsm(motif, 20, 0.001) == 2);
+    tsm.tsm(motif, 20, 6.0);
+    for (int i = 0; i < (int)motif.size(); i++)
+      for (int j = 0; j < (int)motif.size(); j++)
+        if (i != j)
+          TEST(abs(motif[i] - motif[j]) >= 20);
   }
   catch (...) {
 
