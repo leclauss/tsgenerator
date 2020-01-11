@@ -65,11 +65,13 @@ namespace tsg {
       int start = c * i;
       int end = (int)(c * i + c);
 
+      //rolling case, use last word
       if (roll_in) {
 
         s = lastPAA[i] + rCrS * (timeSeries[pos_in - 1 + end]
             - timeSeries[pos_in - 1 + start]);
       }
+      //regular case, incrementally from time series
       else {
 
         for (int j = start; j < end; j++) {
