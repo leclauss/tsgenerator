@@ -41,6 +41,12 @@ namespace tsg {
       ///sequence.
       const rseq sumSquares;
 
+      ///\brief This variable stores the last PAA representation.
+      ///
+      ///This variable stores the last PAA representation for running PAA
+      ///computation.
+      rseq lastPAA;
+
       ///\brief This variable stores the ADM distance matrix.
       ///
       ///This variable stores the ADM distance matrix of a neighborhood.
@@ -64,11 +70,13 @@ namespace tsg {
       ///\param [in] pos_in Hands over the subsequence position in the time series.
       ///\param [in] window_in Hands over the window size.
       ///\param [in] paa_in Hands over the paa size.
-      ///
+      ///\param [in] roll_in Hands over a flag whether to use the last PAA
+      ///representation for rolling PAA calculation or not.
+       ///
       ///This is a PAA implementation. This algorithm computes the PAA
       ///representation of a z normalized subsequence.
       void zNormalPAA(rseq &paa_out, const int pos_in, const int window_in, const
-          int paa_in = 6);
+          int paa_in = 6, const bool roll_in = false);
 
       ///\brief An inverse normal CDF implementation.
       ///
@@ -100,13 +108,16 @@ namespace tsg {
       ///\param [in] window_in Hands over the window size.
       ///\param [in] paa_in Hands over the paa size.
       ///\param [in] &breakpoints_in Hands over the breakpoints.
+      ///\param [in] roll_in Hands over a flag whether to use the last PAA
+      ///representation for rolling PAA calculation or not.
       ///
       ///This is a SAX implementation. This algorithm computes the SAX
       ///representation of a z normalized subsequence.
       void zNormalSAX(word &sax_out, const int pos_in, const int window_in,
           const int paa_in, const rseq &breakpoints_in
           = { -std::numeric_limits<double>::infinity(), -0.967422, -0.430727, 0.0,
-          0.430727, 0.967422, std::numeric_limits<double>::infinity() });
+            0.430727, 0.967422, std::numeric_limits<double>::infinity() }, const
+          bool roll_in = false);
 
       ///\brief A SAX minimum distance implementation.
       ///

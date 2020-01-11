@@ -350,7 +350,7 @@ void test_tsm() {
 
   //test the z-normalized PAA implementation
   tsg::rseq paa;
-  tsg::rseq paaGT = { 0.1850, 0.1143, -0.1378, -0.0328, 0.1385, 0.0957 };
+  tsg::rseq paaGT = { 0.2569, 0.1308, -0.5240, -0.3319, 0.0035, -0.2243 };
 
   try {
 

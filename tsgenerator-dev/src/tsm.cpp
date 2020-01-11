@@ -34,7 +34,7 @@ namespace tsg {
   }
 
   void TSM::zNormalPAA(rseq &paa_out, const int pos_in, const int window_in,
-      const int paa_in) {
+      const int paa_in, const bool roll_in) {
 
     if (!paa_out.empty()) {
 
@@ -46,24 +46,43 @@ namespace tsg {
     double c = (double)window_in / (double)paa_in;
     double rC = (double)paa_in / (double)window_in;
     double s = 0.0;
-    double den = 0.0;
+    double mean = rW * sums[pos_in];
+    double sig = (rW * (sumSquares[pos_in] - rW * (sums[pos_in]
+            * sums[pos_in])));
+
+    if (sig < 1.0)
+      sig = 1.0;
+    else
+      sig = sqrt(sig);
+
+    double rSig = 1.0 / sig;
+    double rCrS = rC * rSig;
 
     for (int i = 0; i < paa_in; i++) {
 
       s = 0;
-      for (int j = c * i; j < (int)(c * i + c); j++) {
 
-        den = (rW * (sumSquares[pos_in + i] - rW * (sums[pos_in + i]
-            * sums[pos_in + i])));
+      int start = c * i;
+      int end = (int)(c * i + c);
 
-        if (den < 1.0)
-          s += (timeSeries[pos_in + j] - rW * sums[pos_in + i]) / 1.0;
-        else
-          s += (timeSeries[pos_in + j] - rW * sums[pos_in + i]) / den;
+      if (roll_in) {
+
+        s = lastPAA[i] + rCrS * (timeSeries[pos_in - 1 + end]
+            - timeSeries[pos_in - 1 + start]);
+      }
+      else {
+
+        for (int j = start; j < end; j++) {
+
+            s += (timeSeries[pos_in + j] - mean) * rSig;
+            s *= rC;
+        }
       }
 
-      paa_out.push_back(rC * s);
+      paa_out.push_back(s);
     }
+
+    lastPAA = paa_out;
   }
 
   double TSM::invNormalCDF(const double p_in, const double prec_in) {
@@ -130,7 +149,7 @@ namespace tsg {
   }
 
   void TSM::zNormalSAX(word &sax_out, const int pos_in, const int window_in,
-      const int paa_in, const rseq &breakpoints_in) {
+      const int paa_in, const rseq &breakpoints_in, const bool roll_in) {
 
     if (!sax_out.empty()) {
 
@@ -140,7 +159,7 @@ namespace tsg {
 
     rseq paa;
 
-    zNormalPAA(paa, pos_in, window_in, paa_in);
+    zNormalPAA(paa, pos_in, window_in, paa_in, roll_in);
 
     for (int i = 0; i < (int)paa.size(); i++)
       for (int j = 0; j < (int)breakpoints_in.size(); j++)
@@ -345,30 +364,27 @@ namespace tsg {
     }
 
     int window = window_in;
-    double rWindow = 1.0 / window;
-
     int length = (int)(timeSeries.size());
 
-    //precompute running mean and standard deviation
-    rseq mean;
-    for (int i = 0; i < length - window + 1; i++)
-      mean.push_back(sums[i] * rWindow);
-    rseq var;
-    for (int i = 0; i < length - window + 1; i++)
-      var.push_back(sumSquares[i] * rWindow - mean[i] * mean[i]);
-    rseq sigma;
-    for (int i = 0; i < length - window + 1; i++)
-      sigma.push_back(var[i] > 1.0 ? sqrt(var[i]) : 1.0);
-
+    //compute buckets containing all indices of subsequences with similar
+    //z-normalized sax representation
     std::vector<std::pair<word, iseq>> buckets;
     std::vector<std::pair<word, iseq>>::iterator itB;
     word sax = "";
 
-    //compute buckets containing all indices of subsequences with similar
-    //z-normalized sax representation
-    for (int i = 0; i < length - window + 1; i++) {
+    zNormalSAX(sax, 0, window, paa_in, breakpoints_in);
 
-      zNormalSAX(sax, i, window, paa_in, breakpoints_in);
+    itB = find_if(buckets.begin(), buckets.end(), [&sax](const
+          std::pair<word, iseq> &e){return e.first == sax;});
+
+    if (itB == buckets.end())
+      buckets.push_back(std::pair<word, iseq>(word(sax), { 0 }));
+    else
+      itB->second.push_back(0);
+
+    for (int i = 1; i < length - window + 1; i++) {
+
+      zNormalSAX(sax, i, window, paa_in, breakpoints_in, true);
 
       itB = find_if(buckets.begin(), buckets.end(), [&sax](const
             std::pair<word, iseq> &e){return e.first == sax;});
@@ -433,6 +449,7 @@ namespace tsg {
 
         std::sort(motif.begin(), motif.end());
 
+        //filter overlapping subsequences from motif
         int last = 0;
 
         for (int k = 1; k < (int)motif.size(); k++) {
