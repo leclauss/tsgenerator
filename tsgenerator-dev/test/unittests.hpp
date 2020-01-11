@@ -1654,4 +1654,73 @@ public:
   }
 };
 
+// --------------------------------------------------------------------------
+///\brief This class represents a test version of the top set motif object.
+///
+///The protected functions as well as the protected attributes of the test top
+///set motif object are made accessable.
+// --------------------------------------------------------------------------
+class TestTSM : public tsg::TSM {
+
+public:
+  // --------------------------------------------------------------------------
+  ///\brief The constructor initializes the TSGenerator.
+  ///
+  ///\param [in] length_in Hands over the time series length.
+  ///\param [in] window_in Hands over the window size.
+  ///\param [in] delta_in Hands over the maximum difference between two
+  ///consecutive values in the time series.
+  ///\param [in] noise_in Hands over the noise option, i.e., +-noise_in 2 will
+  ///be added to each value of the time series.
+  ///\param [in] type_in Hands over the motif type, i.e., the motif shape.
+  ///\param [in] size_in Hands over the number of subsequences non-self matched
+  ///by the motif.
+  ///\param [in] height_in Hands over the maximum difference between two values
+  ///of the motif.
+  ///
+  ///The constructor checks whether a true random engine is available and
+  ///stores the result in the trueRandomEngineAvailable variable.
+  // --------------------------------------------------------------------------
+  TestTSM(const tsg::rseq &timeSeries_in, const tsg::rseq &sums_in, const
+      tsg::rseq &sumSquares_in) : TSM(timeSeries_in, sums_in, sumSquares_in) { }
+
+  // --------------------------------------------------------------------------
+  ///\brief Returns the time series.
+  ///
+  ///\return The time series.
+  ///
+  ///This function returns the time series.
+  // --------------------------------------------------------------------------
+  const tsg::rseq &getTimeSeries() {
+
+    return timeSeries;
+  }
+
+  // --------------------------------------------------------------------------
+  ///\brief Returns the running sum of the time series.
+  ///
+  ///\return The running sums of the time series.
+  ///
+  ///This function returns the content of the variable that stores the sums of
+  ///the time series.
+  // --------------------------------------------------------------------------
+  const tsg::rseq &getSums() {
+
+    return sums;
+  }
+
+  // --------------------------------------------------------------------------
+  ///\brief Returns the running sum of square of the time series.
+  ///
+  ///\return The sum of squares of the time series.
+  ///
+  ///This function returns the content of the variable that stores the
+  ///sum of squares of the time series.
+  // --------------------------------------------------------------------------
+  const tsg::rseq &getSumSquares() {
+
+    return sumSquares;
+  }
+};
+
 #endif

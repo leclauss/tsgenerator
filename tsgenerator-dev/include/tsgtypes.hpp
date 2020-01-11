@@ -8,6 +8,7 @@
 #define TSGTYPES_HPP
 
 #include <vector>
+#include <set>
 #include <string>
 
 
@@ -36,6 +37,16 @@ namespace tsg {
   ///The vector of vectors of integers is used as a mathimatical matrix of
   ///integers or a sequence of sequences of integers.
   typedef std::vector<std::vector<int>> iseqs;
+
+  ///\brief This is a set of unique integers.
+  ///
+  ///The set of unique integers contains integers without duplicates.
+  typedef std::set<int> iset;
+
+  ///\brief This is a set of unique reals.
+  ///
+  ///The set of unique reals contains reals without duplicates.
+  typedef std::set<double> rset;
 
   ///\brief This is a word.
   ///

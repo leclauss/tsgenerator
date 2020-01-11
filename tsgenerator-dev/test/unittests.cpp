@@ -346,14 +346,116 @@ void test_tsm() {
   sums = generator.getSums();
   sumSquares = generator.getSumSquares();
 
-  tsg::iseqs motif;
+  tsg::TSM tsm(testTimeSeries, sums, sumSquares);
+
+  //test the z-normalized PAA implementation
+  tsg::rseq paa;
+  tsg::rseq paaGT = { 0.1850, 0.1143, -0.1378, -0.0328, 0.1385, 0.0957 };
 
   try {
 
-    tsg::tsm(testTimeSeries, sums, sumSquares, motif, 20, 6);
-    TEST("Ok!");
+    tsm.zNormalPAA(paa, 56, 20, 6);
+
+    for (int i = 0; i < (int)paaGT.size(); i++)
+      TEST(paa[i] < paaGT[i] + 0.0001 && paa[i] > paaGT[i] - 0.0001);
   }
-  catch (int e) {
+  catch (...) {
+
+    TEST(!"Shouldn't throw an error!");
+  }
+
+  //test the invNormalCDF implementation
+  tsg::rseq bGT = { -std::numeric_limits<double>::infinity(), -0.8416, -0.2533,
+    0.2533, 0.8416, std::numeric_limits<double>::infinity() };
+
+  double cdf = tsm.invNormalCDF(1.0 / 5.0, 0.000001);
+
+  TEST(cdf < bGT[1] && cdf > bGT[1] - 0.0001);
+
+  tsg::rseq b;
+
+  try {
+
+    tsm.invNormalCDF(5, b, 0.000001);
+
+    TEST(b[0] == bGT[0]);
+    TEST(b[5] == bGT[5]);
+
+    for (int i = 1; i < (int)bGT.size() - 1; i++)
+      TEST(b[i] < bGT[i] + 0.0001 && b[i] > bGT[i] - 0.0001);
+  }
+  catch (...) {
+
+    TEST(!"Shouldn't throw an error!");
+  }
+
+  //test the z-normalized SAX implemenation
+  tsg::word sax;
+
+  try {
+
+    tsm.zNormalSAX(sax, 148, 20, 6, bGT);
+  }
+  catch (...) {
+
+    TEST(!"Shouldn't throw an error!");
+  }
+
+  //test the SAX minimum distance function
+  double dist = -1.0;
+
+  try {
+
+    dist = tsm.saxDist({ 1, 1, 1, 1, 1 }, { 3, 3, 3, 3, 3}, 20, b);
+    TEST(dist == sqrt(20.0 / 5.0 * 5.0 * (b[1] - b[2]) * (b[1] - b[2])));
+
+    dist = tsm.saxDist({ 1, 1, 1, 1, 1 }, { 2, 2, 2, 2, 2}, 20, b);
+    TEST(dist == 0.0);
+  }
+  catch (...) {
+
+    TEST(!"Shouldn't throw an error!");
+  }
+
+  //test the z-normalized Euclidean distance function
+  dist = tsm.dist(topMotifSetPos[0], topMotifSetPos[1], 20.0);
+  TEST(abs(dist - testSequencesSimilarty) <= 0.0000001);
+
+  dist = tsm.dist(topMotifSetPos[1], topMotifSetPos[2], 20.0);
+  TEST(abs(dist) <= 0.0000001);
+
+  //test the ADM implementation
+  tsg::rseqs d;
+  tsg::rseqs dGT = {
+    { 0, 7.43966, 6.2613, 6.24954, 6.50969, 5.62853 },
+    { 7.43966, 0, 4.00941, 5.40625, 4.59849, 7.11225 },
+    { 6.2613, 4.00941, 0, 4.70289, 2.52727, 5.94591 },
+    { 6.24954, 5.40625, 4.70289, 0, 4.4723, 6.72786 },
+    { 6.50969, 4.59849, 2.52727, 4.4723, 0, 5.5463 },
+    { 5.62853, 7.11225, 5.94591, 6.72786, 5.5463, 0 }
+  };
+
+  try {
+
+    tsm.adm({ 4, 32, 86, 111, 140, 268 }, 20.0, 7.0, d);
+    for (int i = 0; i < (int)dGT.size(); i++)
+      for (int j = 0; j < (int)dGT.size(); j++)
+        TEST(d[i][j] < dGT[i][j] + 0.0001 && d[i][j] > dGT[i][j] - 0.0001);
+  }
+  catch (...) {
+
+    TEST(!"Shouldn't throw an error!");
+  }
+
+  //test the top set motif discovery implementation
+  tsg::iseq motif;
+
+  try {
+
+    TEST(tsm.tsm(motif, 20, 0.5) == 3);
+    TEST(tsm.tsm(motif, 20, 0.001) == 2);
+  }
+  catch (...) {
 
     TEST(!"Shouldn't throw an error!");
   }
