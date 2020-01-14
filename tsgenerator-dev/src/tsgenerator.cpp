@@ -19,7 +19,7 @@ namespace tsg {
       times_in, const int method_in, const double maxi_in, const int gen_in)
     : length(abs(length_in)), window(window_in), delta(delta_in),
     noise(noise_in), type(abs(type_in)), size(abs(size_in)), height(height_in),
-    step(abs(step_in)), times(abs(times_in)), method(method_in),
+    step(abs(step_in)), times(abs(times_in)), method(abs(method_in)),
     maxi(abs(maxi_in)), gen(abs(gen_in)), freePositions(length, window),
     randomEngine(std::random_device().entropy()
       ? std::random_device()()
@@ -502,8 +502,8 @@ namespace tsg {
     return false;
   }
 
-  bool TSGenerator::searchForUnintentionalMatches(const rseq &timeSeries_in,
-      const iseq &motifPositions_in, double similarity_in) {
+  bool TSGenerator::largerMotifSet(const rseq &timeSeries_in,
+      const iseq &motifPositions_in, double range_in) {
 
     //lower and upper positions of the subsequences overlapping the new motif
     //set
@@ -511,50 +511,49 @@ namespace tsg {
     int upperBound = std::min(motifPositions_in.back() + window, length
         - window + 1);
 
+    bool candidate = true;
+    subsequences candidates;
 
-    bool candidate;
-
-    for (int itr = 0; itr < length - window + 1; itr++) {
+    //process all subsequences
+    for (int i = 0; i < length - window + 1; i++) {
 
       candidate = true;
 
-      //check if itr is non overlapping to any motif set subsequence
+      //check if subsequence is overlapping to any motif set subsequence
       for (int position : motifPositions_in)
-        if (abs(position - itr) < window) {
+        if (abs(position - i) < window)
+          {
 
+          //then ignore it
           candidate = false;
           break;
         }
 
-      //if so check if itr is too similar to any subsequence overlapping with
-      //the new added motif
+      //if candidate found
       if (candidate)
+        //check if subsequence is within range of any subsequence overlapping
+        //the new added motif subsequence
         for (int newMotifItr = lowerBound; newMotifItr < upperBound;
             newMotifItr++)
               //non overlapping and ...
-          if (abs(newMotifItr - itr) >= window &&
+          if (abs(newMotifItr - i) >= window &&
               //... matching
-              similarity(timeSeries_in, itr, newMotifItr, similarity_in) <=
-              similarity_in)
-            return true;
+              similarity(timeSeries_in, i, newMotifItr, range_in) <= range_in)
+            {
+
+            subsequence sub;
+            sub.position = i;
+            sub.length = 1;
+            candidates.push_back(sub);
+            break;
+          }
     }
-
-    return false;
-  }
-
-  bool TSGenerator::checkIfThereIsALargerMotifSet(const rseq &timeSeries_in,
-      const iseq &motifPositions_in, double range_in) {
 
     iseq positions;
     int newMotif = motifPositions_in.back();
 
     for (int position : motifPositions_in)
       positions.push_back(position);
-
-    sort(positions.begin(), positions.end());
-
-    subsequences overlapping;
-
 
     //get all positions of time series subsequences overlapping the injected
     //motif positions
@@ -565,7 +564,7 @@ namespace tsg {
         subsequence leftSubsequences;
         leftSubsequences.position = std::max(0, position - window + 1);
         leftSubsequences.length = position - leftSubsequences.position;
-        overlapping.push_back(leftSubsequences);
+        candidates.push_back(leftSubsequences);
 
         //right of the injected motifs
         subsequence rightSubsequences;
@@ -573,24 +572,28 @@ namespace tsg {
         rightSubsequences.length   = std::min(position + window
             - rightSubsequences.position, length - window
             + 1 - rightSubsequences.position);
-        overlapping.push_back(rightSubsequences);
+        candidates.push_back(rightSubsequences);
       }
 
+    std::sort(candidates.begin(), candidates.end(), [](subsequence const &a,
+          subsequence const &b) {
+        return a.position < b.position;
+        });
 
     int motifSize = 1;
-
-    int lastPos = -window;
+    int last = -window;
+    iseq motif;
 
     //if the new motif has to much matches with left and right overlapping sets
-    for (int itr = 0; itr < (int)overlapping.size(); itr++)
-      for (int posItr = std::max(overlapping[itr].position, lastPos + window);
-          posItr < overlapping[itr].position + overlapping[itr].length;
-          posItr++)
-        if (abs(motifPositions_in.back() - posItr) >= window &&
-            similarity(timeSeries_in, motifPositions_in.back(), posItr,
-              2 * range_in) <= 2 * range_in) {
+    for (int i = 0; i < (int)candidates.size(); i++)
+      for (int j = std::max(candidates[i].position, last + window);
+          j < candidates[i].position + candidates[i].length;
+          j++)
+        if (abs(motifPositions_in.back() - j) >= window &&
+            similarity(timeSeries_in, motifPositions_in.back(), j, range_in) <=
+            range_in) {
 
-          lastPos = posItr;
+          last = j;
           motifSize++;
           break;
         }
@@ -614,31 +617,29 @@ namespace tsg {
 
     //if one subsequence of the overlapping set of subsequences left of the new
     //motif has to much matches with the left and right overlapping sets
-    for (int item = leftNewSubsequence.position; item
-        < leftNewSubsequence.position + leftNewSubsequence.length; item++) {
+    for (int i = leftNewSubsequence.position; i < leftNewSubsequence.position
+        + leftNewSubsequence.length; i++) {
 
       motifSize = 1;
 
-      for (int itr = rightNewSubsequence.position; itr
-          < rightNewSubsequence.position + rightNewSubsequence.length; itr++)
-        if (abs(item - itr) >= window && similarity(timeSeries_in, item, itr,
-              2 * range_in) <= 2 * range_in) {
+      for (int j = rightNewSubsequence.position;
+          j < rightNewSubsequence.position + rightNewSubsequence.length; j++)
+        if (abs(i - j) >= window && similarity(timeSeries_in, i, j, range_in)
+            <= range_in) {
 
           motifSize++;
           break;
         }
 
-      lastPos = -window;
+      last = -window;
 
-      for (int itr = 0; itr < (int)overlapping.size(); itr++)
-        for (int posItr = std::max(overlapping[itr].position, lastPos + window);
-            posItr < overlapping[itr].position + overlapping[itr].length;
-            posItr++)
-          if (abs(item - posItr) >= window &&
-              similarity(timeSeries_in, item, posItr, 2 * range_in) <=
-              2 * range_in) {
+      for (int j = 0; j < (int)candidates.size(); j++)
+        for (int k = std::max(candidates[j].position, last + window);
+            k < candidates[j].position + candidates[j].length; k++)
+          if (abs(i - k) >= window && similarity(timeSeries_in, i, k, range_in)
+              <= range_in) {
 
-            lastPos = posItr;
+            last = k;
             motifSize++;
             break;
           }
@@ -650,30 +651,29 @@ namespace tsg {
 
     //if one subsequence of the overlapping set of subsequences right of the
     //new motif has to much matches with the left and right overlapping sets
-    for (int item = rightNewSubsequence.position; item
-        < rightNewSubsequence.position + rightNewSubsequence.length; item++) {
+    for (int i = rightNewSubsequence.position; i < rightNewSubsequence.position
+        + rightNewSubsequence.length; i++) {
 
       motifSize = 1;
 
-      for (int itr = leftNewSubsequence.position; itr
-          < leftNewSubsequence.position + leftNewSubsequence.length; itr++)
-        if (abs(item - itr) >= window && similarity(timeSeries_in, item, itr,
-              2 * range_in) <= 2 * range_in) {
+      for (int j = leftNewSubsequence.position; j
+          < leftNewSubsequence.position + leftNewSubsequence.length; j++)
+        if (abs(i - j) >= window && similarity(timeSeries_in, i, j, range_in)
+            <= range_in) {
 
           motifSize++;
           break;
         }
 
-      lastPos = -window;
+      last = -window;
 
-      for (int itr = 0; itr < (int)overlapping.size(); itr++)
-        for (int posItr = std::max(overlapping[itr].position, lastPos + window);
-            posItr < overlapping[itr].position + overlapping[itr].length;
-            posItr++)
-          if (abs(item - posItr) >= window && similarity(timeSeries_in, item,
-                posItr, 2 * range_in) <= 2 * range_in) {
+      for (int j = 0; j < (int)candidates.size(); j++)
+        for (int k = std::max(candidates[j].position, last + window);
+            k < candidates[j].position + candidates[j].length; k++)
+          if (abs(i - k) >= window && similarity(timeSeries_in, i, k, range_in)
+              <= range_in) {
 
-            lastPos = posItr;
+            last = k;
             motifSize++;
             break;
           }
@@ -891,11 +891,6 @@ namespace tsg {
     d = similarity(timeSeries_out, positionOne, positionTwo,
         std::numeric_limits<double>::max());
 
-    //make sure that the remaining motif matching sequences are within range
-    //d / 3.0 of the motif, i.e. no non-overlapping subsequence cannot contain
-    //a motif non-self mathing more subsequences
-    d = d / 3.0;
-
     //declaration stuff
     int retryItr = 0;
     double min, max;
@@ -913,6 +908,7 @@ namespace tsg {
       //try to inject another sequence
       while (retryItr < length + 100) {
 
+        //try to inject another sequence
         std::normal_distribution<double> distributionNoise(0.0, abs(noise)
             * 0.25 <= 0.0 ? std::numeric_limits<double>::min() : noise * 0.25);
 
@@ -961,10 +957,7 @@ namespace tsg {
           //update the running sum and sum of square
           updateRunnings(timeSeries_out, position);
 
-          if (!searchForUnintentionalMatches(timeSeries_out,
-                pos_out[0], d * 2.0) &&
-              !checkIfThereIsALargerMotifSet(timeSeries_out,
-                pos_out[0], d)) {
+          if (!largerMotifSet(timeSeries_out, pos_out[0], d)) {
 
             break;
           }
@@ -998,6 +991,7 @@ namespace tsg {
         }
 
         retryItr++;
+
       }
 
       //remove the position from available positions
@@ -1151,10 +1145,7 @@ namespace tsg {
           //update the running sum and sum of square
           updateRunnings(timeSeries_out, position);
 
-          if (!searchForUnintentionalMatches(timeSeries_out,
-                pos_out[0], d) &&
-              !checkIfThereIsALargerMotifSet(timeSeries_out,
-                pos_out[0], d * 0.5)) {
+          if (!largerMotifSet(timeSeries_out, pos_out[0], d)) {
 
             break;
           }
@@ -1210,10 +1201,10 @@ namespace tsg {
     if (!pos_out.empty()) {
 
       pos_out.clear();
-      pos_out.resize(2);
+      pos_out.resize(gen ? 2 : 1);
     }
     else
-      pos_out.resize(2);
+      pos_out.resize(gen ? 2 : 1);
 
 
     //choose correct generator

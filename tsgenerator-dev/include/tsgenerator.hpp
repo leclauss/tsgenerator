@@ -24,6 +24,7 @@
 #include <freepositions.hpp>
 #include <basets.hpp>
 #include <tpm.hpp>
+#include <tsm.hpp>
 
 
 namespace tsg
@@ -286,22 +287,6 @@ namespace tsg
     bool checkForSmallerDistance(const rseq &timeSeries_in, const iseq
         &motifPositions_in, double similarity_in);
 
-    ///\brief Search for unintentional matches in the time series with new
-    ///injected subsequence.
-    ///
-    ///\param [in] &timeSereis_in Hands over the time series.
-    ///\param [in] &subsequencePositions_in Hands over the position of the new
-    ///subsequence.
-    ///\param [in] similarity_in Hands over the similarity to break.
-    ///
-    ///\return true if there exists an unintentional subsequence match with the
-    ///new subequence.
-    ///
-    ///This function searches for unintentinal matches of subsequences in the
-    ///time series with the new injected subsequence.
-    bool searchForUnintentionalMatches(const rseq &timeSeries_in, const iseq
-        &motifPositions_in, double similarity_in);
-
     ///\brief Checks if there is a larger motif set.
     ///
     ///\param [in] &timeSereis_in Hands over the time series.
@@ -311,9 +296,8 @@ namespace tsg
     ///
     ///\return true if there exists an larger motif set.
     ///
-    ///This function checks if there is a larger motif set in the set of motif
-    ///set positions including all overlapping subsequences in the time series.
-    bool checkIfThereIsALargerMotifSet(const rseq &timeSeries_in, const iseq
+    ///This function checks if there is a larger motif set with given name.
+    bool largerMotifSet(const rseq &timeSeries_in, const iseq
         &motifPositions_in, double range_in);
 
     ///\brief Injects a pair motif into the time series.

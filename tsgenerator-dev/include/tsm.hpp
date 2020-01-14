@@ -8,6 +8,7 @@
 #ifndef TSM_HPP
 #define TSM_HPP
 
+#include <iostream>
 #include <cmath>
 #include <limits>
 #include <algorithm>

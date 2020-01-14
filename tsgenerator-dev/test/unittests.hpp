@@ -1438,14 +1438,22 @@ public:
   ///by the motif.
   ///\param [in] height_in Hands over the maximum difference between two values
   ///of the motif.
+  ///\param [in] times_in Hands over the times of steps.
+  ///\param [in] method_in Hands over the method for base time series
+  ///generation.
+  ///\param [in] max_in Hands over the maximum absolute value of the time
+  ///series.
+  ///\param [in] gen_in Hands over the motif generation type.
   ///
   ///The constructor checks whether a true random engine is available and
   ///stores the result in the trueRandomEngineAvailable variable.
   // --------------------------------------------------------------------------
-  TestTSGenerator(int length_in, int window_in, double delta_in, double
-      noise_in, int type_in, int size_in, double height_in)
-    : TSGenerator(length_in, window_in, delta_in, noise_in, type_in, size_in,
-        height_in) { }
+  TestTSGenerator(const int length_in, const int window_in, const double
+      delta_in, const double noise_in, const int type_in, const int size_in,
+      const double height_in, const double step_in = 1.0, const int times_in
+      = 3, const int method_in = 5, const double maxi_in = 100.0, const int
+      gen_in = 2) : TSGenerator(length_in, window_in, delta_in, noise_in, type_in, size_in,
+        height_in, step_in, times_in, method_in, maxi_in, gen_in) { }
 
   // --------------------------------------------------------------------------
   ///\brief Sets the length of the time series.
@@ -1607,50 +1615,6 @@ public:
       double height_in) {
 
     calculateSubsequence(subsequence_out, type_in, height_in);
-  }
-
-  // --------------------------------------------------------------------------
-  ///\brief Runs the search for unintentional matches in the time series
-  ///function.
-  ///
-  ///\param [in] &timeSereis_in Hands over the time series.
-  ///\param [in] &subsequencePositions_in Hands over the position of the new
-  ///subsequence.
-  ///\param [in] similarity_in Hands over the similarity to break.
-  ///
-  ///\return true if there exists an unintentional subsequence match with the
-  ///new subequence.
-  ///
-  ///This function runs the search for unintentional matches in the time series
-  ///function since the function is protected.
-  // --------------------------------------------------------------------------
-  bool testSearchForUnintentionalMatches(const tsg::rseq &timeSeries_in,
-      const tsg::iseq &motifSetPositions_in, double similarity_in) {
-
-    return searchForUnintentionalMatches(timeSeries_in, motifSetPositions_in,
-        similarity_in);
-  }
-
-  // --------------------------------------------------------------------------
-  ///\brief Runs the larger motif set check function.
-  ///
-  ///\param [in] &timeSereis_in Hands over the time series.
-  ///\param [in] &subsequencePositions_in Hands over the position of the new
-  ///subsequence.
-  ///\param [in] range_in Hands over the motif set range.
-  ///
-  ///\return true if there exists an unintentional subsequence match with the
-  ///new subequence.
-  ///
-  ///This function runs the larger motif set in the set of motif set positions
-  ///including all overlapping subsequences in the time series check function
-  ///since the function is protected.
-  // --------------------------------------------------------------------------
-  bool testCheckIfThereIsALargerMotifSet(const tsg::rseq &timeSeries_in,
-      const tsg::iseq &motifSetPositions_in,  double range_in) {
-
-    return checkIfThereIsALargerMotifSet(timeSeries_in, motifSetPositions_in,
-        range_in);
   }
 };
 

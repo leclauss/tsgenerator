@@ -998,37 +998,85 @@ void test_tsgenerator() {
     generator.testCalculateSubsequence(sequenceTwo, 7, 10.0);
     generator.testMeanStdDev(sequenceTwo, meanTwo, stdDevTwo);
     TEST(mean != meanTwo);
-
-
-    //test the search for unintantional matches
-    TEST(!generator.testSearchForUnintentionalMatches(testTimeSeries,
-          topMotifSetPos, 2 * topMotifSetRange));
-    TEST(generator.testSearchForUnintentionalMatches(testTimeSeries,
-          { topMotifSetPos[0], topMotifSetPos[1] }, 2 * topMotifSetRange));
-
-
-    //test the check for larger latent set motifs
-    TEST(!generator.testCheckIfThereIsALargerMotifSet(testTimeSeries,
-          topMotifSetPos,  topMotifSetRange));
-    TEST(!generator.testCheckIfThereIsALargerMotifSet(testTimeSeries,
-          { topMotifSetPos[0], topMotifSetPos[1], 249 }, topMotifSetRange));
-    TEST(!generator.testCheckIfThereIsALargerMotifSet(testTimeSeries,
-          { topMotifSetPos[0], topMotifSetPos[1], 249, 229 },
-          topMotifSetRange));
-    TEST(!generator.testCheckIfThereIsALargerMotifSet(testTimeSeries,
-          { topMotifSetPos[0], topMotifSetPos[1], 249, 229, 100 },
-          topMotifSetRange));
-    generator.testCalcRunnings(testTimeSeriesCheckLargerMotifSet);
-    TEST(generator.testCheckIfThereIsALargerMotifSet(
-          testTimeSeriesCheckLargerMotifSet, { 34, 248, topMotifSetPos[1] },
-          topMotifSetRange));
   }
 
+  {
+    //test synthetic time series pair motif generation function
+    TestTSGenerator simGenerator(1000, 20, 1.0, 2.0, 4, 3, 10.0, 1.0, 3, 5,
+        20.0, 0);
+    TestTSGenerator generator(1000, 20, 1.0, 2.0, 4, 3, 10.0, 1.0, 3, 5,
+        20.0, 0);
+    tsg::rseq timeSeries_out;
+    tsg::rseq d_out;
+    tsg::iseqs positions_out;
+    tsg::rseqs motif;
+    double d;
+
+
+    for (int itr = 0; itr < 3; itr++) {
+
+      try {
+
+        generator.run(timeSeries_out, motif, d_out, positions_out);
+        TEST("Has to run without throwing an error!");
+
+        simGenerator.testCalcRunnings(timeSeries_out);
+        d = simGenerator.testSimilarity(timeSeries_out, positions_out[0][0],
+              positions_out[0][1], d_out[0]);
+        TEST(d <= d_out[0] + 0.0000001 && d >= d_out[0] - 0.0000001);
+
+        TEST(d_out.size() == 1);
+        TEST(positions_out.size() == 1);
+      }
+      catch (...) {
+
+        TEST(!"Has to run without throwing an error!");
+      }
+    }
+  }
 
   {
-    //test synthetic time series motif set generation function
-    TestTSGenerator simGenerator(3000, 100, 20, 0.0, 2, 3, 50.0);
-    TestTSGenerator generator(3000, 100, 20, 0.0, 2, 3, 50.0);
+    //test synthetic time series set motif generation function
+    TestTSGenerator simGenerator(1000, 20, 1.0, 2.0, 4, 3, 10.0, 1.0, 3, 5,
+        20.0, 1);
+    TestTSGenerator generator(1000, 20, 1.0, 2.0, 4, 3, 10.0, 1.0, 3, 5,
+        20.0, 1);
+    tsg::rseq timeSeries_out;
+    tsg::rseq d_out;
+    tsg::iseqs positions_out;
+    tsg::rseqs motif;
+
+
+    for (int itr = 0; itr < 3; itr++) {
+
+      try {
+
+        generator.run(timeSeries_out, motif, d_out, positions_out);
+        TEST("Has to run without throwing an error!");
+
+        simGenerator.testCalcRunnings(timeSeries_out);
+
+        for (auto &pos0 : positions_out[0])
+          for (auto &pos1 : positions_out[0])
+            TEST(simGenerator.testSimilarity(timeSeries_out, pos0, pos1,
+                  2 * d_out[0]) <= 2 * d_out[0]);
+
+        TEST(d_out.size() == 2);
+        TEST(positions_out.size() == 2);
+      }
+      catch (...) {
+
+        TEST(!"Has to run without throwing an error!");
+      }
+    }
+  }
+
+  {
+    //test synthetic time series latent motif generation function
+    TestTSGenerator simGenerator(1000, 20, 1.0, 2.0, 4, 3, 10.0, 1.0, 3, 5,
+        20.0, 2);
+    TestTSGenerator generator(1000, 20, 1.0, 2.0, 4, 3, 10.0, 1.0, 3, 5,
+        20.0, 2);
     tsg::rseq timeSeries_out;
     tsg::rseq d_out;
     tsg::iseqs positions_out;
