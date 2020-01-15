@@ -1025,56 +1025,35 @@ namespace tsg {
     int positionTwo = -1;
     rseq motifCenter;
     rseq subsequence(window, 0.0);
-    bool repeatLoop = true;
     double mean, stdDev;
     double d = std::numeric_limits<double>::max();
     std::normal_distribution<double> distribution(0.0, abs(noise) * 0.25 <= 0.0
         ? std::numeric_limits<double>::min() : noise * 0.25);
 
-    for (int i = 0; i < 50 && repeatLoop; i++) {
+    //generate a base time series
+    generateBaseTimeSeries(timeSeries_out);
 
-      repeatLoop = false;
+    //compute running mean and std dev
+    calcRunnings(timeSeries_out);
 
-      //generate a base time series
-      generateBaseTimeSeries(timeSeries_out);
+    //determine similarity of the top motif pair in the random synthetic time
+    //series
+    tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
+    d = similarity(timeSeries_out, positionOne, positionTwo,
+        std::numeric_limits<double>::max());
 
-      //compute running mean and std dev
-      calcRunnings(timeSeries_out);
+    //calculate temporary motif set center subsequence in the window size
+    //dimentional room of subsequence values
+    calculateSubsequence(motifCenter, type, height);
 
-      //determine similarity of the top motif pair in the random synthetic time
-      //series
-      tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
-      d = similarity(timeSeries_out, positionOne, positionTwo,
-          std::numeric_limits<double>::max());
+    for (auto &value : motifCenter)
+      value += distribution(randomEngine);
 
-      //calculate temporary motif set center subsequence in the window size
-      //dimentional room of subsequence values
-      calculateSubsequence(motifCenter, type, height);
+    mean = 0.0;
+    stdDev = 0.0;
+    meanStdDev(motifCenter, mean, stdDev);
 
-      for (auto &value : motifCenter)
-        value += distribution(randomEngine);
-
-      mean = 0.0;
-      stdDev = 0.0;
-      meanStdDev(motifCenter, mean, stdDev);
-
-      //check if there is no other subsequence in the range 3.0 * d / 2.0
-      //around the center subsequence
-      for (int itr = 0;
-          itr < (int)timeSeries_out.size() - window + 1;
-          itr++) {
-
-        rseq tmpSubsequence(timeSeries_out.begin() + itr,
-            timeSeries_out.begin() + itr + window);
-
-        if (similarity(timeSeries_out, motifCenter, mean, stdDev, itr,
-              std::numeric_limits<double>::max()) <= 1.5 * d) {
-
-          repeatLoop = true;
-          break;
-        }
-      }
-    }
+    d *= 0.49999999;
 
     motif_out[0] = motifCenter;
 
@@ -1107,8 +1086,8 @@ namespace tsg {
         for (auto &item : newSubsequence)
           item += distributionNoise(randomEngine);
 
-        //check if the sequence is within range d / 2.0 of the center
-        if (similarity(motifCenter, newSubsequence, d * 0.5) < d * 0.5) {
+        //check if the sequence is within range d of the center
+        if (similarity(motifCenter, newSubsequence, d) < d) {
 
           //backup subsequence at position
           for (int i = 0; i < window; i++)
@@ -1145,7 +1124,7 @@ namespace tsg {
           //update the running sum and sum of square
           updateRunnings(timeSeries_out, position);
 
-          if (!largerMotifSet(timeSeries_out, pos_out[0], d)) {
+          if (!largerMotifSet(timeSeries_out, pos_out[0], 2.0 * d)) {
 
             break;
           }
@@ -1185,7 +1164,7 @@ namespace tsg {
       freePositions.removePosition();
     }
 
-    d_out.push_back(d * 0.5);
+    d_out.push_back(d);
   }
 
   void TSGenerator::run(rseq &timeSeries_out, rseqs &motif_out, rseq &d_out,
