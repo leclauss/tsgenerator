@@ -10,12 +10,12 @@
 void test_check_if_float() {
 
   TEST_GROUP_FUNCTION;
-  TEST(check_if_float("123456789"));
-  TEST(check_if_float("-123456789"));
-  TEST(check_if_float("123456789.123456789"));
-  TEST(check_if_float("-123456789.123456789"));
-  TEST(!check_if_float("abcd"));
-  TEST(!check_if_float(""));
+  TEST_R(check_if_float("123456789"));
+  TEST_R(check_if_float("-123456789"));
+  TEST_R(check_if_float("123456789.123456789"));
+  TEST_R(check_if_float("-123456789.123456789"));
+  TEST_R(!check_if_float("abcd"));
+  TEST_R(!check_if_float(""));
 }
 
 char **argv;
@@ -51,36 +51,36 @@ void test_parseArgs() {
 
   parseArgs(argc, argv, argTokens);
 
-  TEST(argTokens[0] == "--arg0");
-  TEST(argTokens[1] == "payload");
-  TEST(argTokens[2] == "-arg2");
-  TEST(argTokens[3] == "-1000.1");
-  TEST(argTokens[4] == "-empty");
-  TEST(argTokens[5] == "--multiplePayload");
-  TEST(argTokens[6] == "-100.000");
-  TEST(argTokens[7] == "tsg::word1 tsg::word2");
-  TEST(argTokens[8] == "end");
+  TEST_R(argTokens[0] == "--arg0");
+  TEST_R(argTokens[1] == "payload");
+  TEST_R(argTokens[2] == "-arg2");
+  TEST_R(argTokens[3] == "-1000.1");
+  TEST_R(argTokens[4] == "-empty");
+  TEST_R(argTokens[5] == "--multiplePayload");
+  TEST_R(argTokens[6] == "-100.000");
+  TEST_R(argTokens[7] == "tsg::word1 tsg::word2");
+  TEST_R(argTokens[8] == "end");
 }
 
 void test_checkArg() {
 
   TEST_GROUP_FUNCTION;
 
-  TEST(!checkArg(argTokens, "", payload));
-  TEST(!checkArg(argTokens, "-1000.1", payload));
-  TEST(checkArg(argTokens, "-empty", payload));
-  TEST(payload.empty());
-  TEST(checkArg(argTokens, "--arg0", payload));
-  TEST(payload.size() == 1);
-  TEST(payload[0] == "payload");
-  TEST(checkArg(argTokens, "-arg2", payload));
-  TEST(payload.size() == 1);
-  TEST(payload[0] == "-1000.1");
-  TEST(checkArg(argTokens, "--multiplePayload", payload));
-  TEST(payload.size() == 3);
-  TEST(payload[0] == "-100.000");
-  TEST(payload[1] == "tsg::word1 tsg::word2");
-  TEST(payload[2] == "end");
+  TEST_R(!checkArg(argTokens, "", payload));
+  TEST_R(!checkArg(argTokens, "-1000.1", payload));
+  TEST_R(checkArg(argTokens, "-empty", payload));
+  TEST_R(payload.empty());
+  TEST_R(checkArg(argTokens, "--arg0", payload));
+  TEST_R(payload.size() == 1);
+  TEST_R(payload[0] == "payload");
+  TEST_R(checkArg(argTokens, "-arg2", payload));
+  TEST_R(payload.size() == 1);
+  TEST_R(payload[0] == "-1000.1");
+  TEST_R(checkArg(argTokens, "--multiplePayload", payload));
+  TEST_R(payload.size() == 3);
+  TEST_R(payload[0] == "-100.000");
+  TEST_R(payload[1] == "tsg::word1 tsg::word2");
+  TEST_R(payload[2] == "end");
 }
 
 void test_print_version() {
@@ -105,7 +105,7 @@ void test_print_version() {
 
   std::cout.rdbuf(cout_buff);
 
-  TEST(testStream.str() == local.str());
+  TEST_R(testStream.str() == local.str());
 }
 
 void test_print_help() {
@@ -214,7 +214,7 @@ void test_print_help() {
 
   std::cout.rdbuf(cout_buff);
 
-  TEST(testStream.str() == local.str());
+  TEST_R(testStream.str() == local.str());
 }
 
 void test_outputgenerator() {
@@ -246,18 +246,18 @@ void test_outputgenerator() {
   generator.open();
   generator.close();
 
-  TEST(generator.getFolderNumber() == secondFolderNumber);
-  TEST(generator.getFileName() == ("./time_series_"
+  TEST_R(generator.getFolderNumber() == secondFolderNumber);
+  TEST_R(generator.getFileName() == ("./time_series_"
         + std::to_string(secondFolderNumber) + "/time_series"));
-  TEST(generator.getMetaFileName() == ("./time_series_"
+  TEST_R(generator.getMetaFileName() == ("./time_series_"
         + std::to_string(secondFolderNumber) + "/time_series_meta"));
-  TEST(std::filesystem::remove("time_series_"
+  TEST_R(std::filesystem::remove("time_series_"
         + std::to_string(secondFolderNumber) + "/time_series_"
         + std::to_string(secondFolderNumber) + ".csv"));
-  TEST(std::filesystem::remove("time_series_"
+  TEST_R(std::filesystem::remove("time_series_"
         + std::to_string(secondFolderNumber)
         + "/time_series_meta_" + std::to_string(secondFolderNumber) + ".csv"));
-  TEST(std::filesystem::remove("time_series_"
+  TEST_R(std::filesystem::remove("time_series_"
         + std::to_string(secondFolderNumber)));
 
   generator.open();
@@ -287,12 +287,12 @@ void test_outputgenerator() {
   tsg::word line;
 
   if (TEST_IF(getline(iTestTimeSeries, line) ? true : false))
-    TEST(line == correctStream.str());
+    TEST_R(line == correctStream.str());
 
-  TEST(!getline(iTestTimeSeries, line));
+  TEST_R(!getline(iTestTimeSeries, line));
 
   //remove folder
-  TEST(std::filesystem::remove("time_series_" + std::to_string(folderNumber)));
+  TEST_R(std::filesystem::remove("time_series_" + std::to_string(folderNumber)));
 
   //reset cerr
   std::cerr.rdbuf(cerr_buff);

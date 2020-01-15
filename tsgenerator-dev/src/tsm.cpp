@@ -269,11 +269,6 @@ namespace tsg {
   void TSM::adm(const iseq &neighborhood_in, const int window_in, const double
       range_in) {
 
-    double range = range_in;
-
-    if (range < 0.0)
-      range = -range;
-
     if (admDist.empty()) {
 
       admDist.resize(neighborhood_in.size() - 1);
@@ -337,16 +332,16 @@ namespace tsg {
 
           for (int j = 0; j <= i; j++) {
 
-            a[i][j] = std::max(std::max(a[i][j], a[i][k] - m[k][j]), a[j][k]
+            a[i][j] = std::max(std::max(a[i][j], a[k][i] - m[k][j]), a[k][j]
                 - m[k][i]);
-            m[i][j] = std::min(m[i][j], m[i][k] + m[k][j]);
+            m[i][j] = std::min(m[i][j], m[k][i] + m[k][j]);
           }
         }
       }
 
       for (int i = 0; i < (int)a.size(); i++)
         for (int j = 0; j <= i; j++)
-          if (a[i][j] < range)
+          if (a[i][j] < range_in)
             a[i][j] = dist(neighborhood_in[i + 1], neighborhood_in[j], window_in);
     }
   }

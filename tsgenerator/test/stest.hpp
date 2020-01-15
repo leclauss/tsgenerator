@@ -9,8 +9,8 @@
 
 
 //-----------------------------------------------------------------------------
-// sTest v 1.2 - unit testing framework for C++ 
-// 
+// sTest v 1.2 - unit testing framework for C++
+//
 // Copyright (c) 2017 Gregory Wilk
 // Source: https://github.com/greg-white/sTest
 // License MIT
@@ -61,7 +61,6 @@ int main()
 #endif
 
 #include <cstring>  // strrchr
-#include <cstdlib>  // used for exit(EXIT_FAILURE)
 
 // get source file name without path
 #if defined(_WIN32)
@@ -143,11 +142,11 @@ namespace _test
     void print_test_section(const char *name)
     {
         std::cout << '[' << name << "]" << std::endl;
-		for (const char *item = name; *item != '\0'; item++)
-			std::cout << "-";
-		std::cout << "-";
-		std::cout << "-";
-		std::cout << std::endl;
+        for (const char *item = name; *item != '\0'; item++)
+            std::cout << "-";
+        std::cout << "-";
+        std::cout << "-";
+        std::cout << std::endl;
         std::cout << std::endl;
     }
 
@@ -344,14 +343,15 @@ namespace _test
 
         switch (type)
         {
-            case LogType::check:/*
-				if (passed)
-				{
-					std::cout << " Test passed!";
-					std::cout << "   " << file;
-					std::cout << ":" << line;
-					std::cout << "   " << what << std::endl;
-				}*/
+            case LogType::check:
+                if (passed)
+                {
+                  std::cout << " Test passed!";
+                  std::cout << "   " << file;
+                  std::cout << ":" << line;
+                  std::cout << "   " << what << std::endl;
+                }
+                [[fallthrough]];
             case LogType::check_skip:
                 hasTestsOrGroup = true;
                 if (!isMerged || !merged.counted)
@@ -362,20 +362,20 @@ namespace _test
                 }
                 lastFile = file;
                 lastLine = line;
-				if (!passed)
-				{
-					if (!isMerged || !merged.failed)
-					{
-						totalStatus.failedCount++;
-						groupStatus.failedCount++;
-						merged.failed = isMerged;
-					}
-					if (type == LogType::check_skip)
-					{
-						totalStatus.hasSkipped = true;
-						groupStatus.hasSkipped = true;
-					}
-				}
+                if (!passed)
+                {
+                    if (!isMerged || !merged.failed)
+                    {
+                        totalStatus.failedCount++;
+                        groupStatus.failedCount++;
+                        merged.failed = isMerged;
+                    }
+                    if (type == LogType::check_skip)
+                    {
+                        totalStatus.hasSkipped = true;
+                        groupStatus.hasSkipped = true;
+                    }
+                }
 
                 merged.printed = print_test_check<T>(what, file, line, passed, type == LogType::check_skip, merged.printed) && isMerged;
 
@@ -424,7 +424,7 @@ namespace _test
                     isMerged = false;
                     merged.Clear();
                     hasTestsOrGroup = true;
-                }               
+                }
                 break;
 
             case LogType::begin_section:
