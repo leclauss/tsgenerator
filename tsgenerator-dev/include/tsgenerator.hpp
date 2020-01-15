@@ -284,7 +284,7 @@ namespace tsg
     ///
     ///This function checks if the subsequences overlapping the second injected
     ///pair motif sequence have another subsequence within range similarity_in.
-    bool checkForSmallerDistance(const rseq &timeSeries_in, const iseq
+    bool smallerDistance(const rseq &timeSeries_in, const iseq
         &motifPositions_in, double similarity_in);
 
     ///\brief Checks if there is a larger motif set.

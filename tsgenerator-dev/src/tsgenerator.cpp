@@ -471,8 +471,8 @@ namespace tsg {
     }
   }
 
-  bool TSGenerator::checkForSmallerDistance(const rseq &timeSeries_in, const
-      iseq &motifPositions_in, double similarity_in) {
+  bool TSGenerator::smallerDistance(const rseq &timeSeries_in, const iseq
+      &motifPositions_in, double similarity_in) {
 
     //lower and upper positions of the overlapping subsequences
     int lowerBound = std::max(0, motifPositions_in.back() - window + 1);
@@ -805,7 +805,7 @@ namespace tsg {
       dTmp = similarity(timeSeries_out, motifPos0, motifPos1, d);
 
       //check for success
-      if(!checkForSmallerDistance(timeSeries_out, { motifPos0, motifPos1 },
+      if(!smallerDistance(timeSeries_out, { motifPos0, motifPos1 },
             dTmp))
         break;
 
