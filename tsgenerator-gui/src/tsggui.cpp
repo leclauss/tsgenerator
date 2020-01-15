@@ -114,6 +114,8 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv) {
   genLabel.setText("generator");
   distLabel.setText("distance");
   rangeLabel.setText("range");
+  browseLabel.setText("data file:");
+  browseButton.setText("browse");
 
   //setup menu actions
   connect(&openAct, SIGNAL(triggered()), this, SLOT(openData()));
@@ -197,6 +199,7 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv) {
 
   //setup save button action
   connect(&startButton, SIGNAL(clicked()), this, SLOT(generateTS()));
+  connect(&browseButton, SIGNAL(clicked()), this, SLOT(openData()));
 
   //set subsqeuence marker
   motifPen.setColor(0xffbb00);
@@ -239,39 +242,47 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv) {
   connect(&motifList, SIGNAL(itemSelectionChanged()), this, SLOT(plotMotif()));
 
   //layout all items
-  layout.addWidget(&genLabel, 0, 0);
-  layout.addWidget(&genDrop, 1, 0);
-  layout.addWidget(&typeLabel, 0, 1);
-  layout.addWidget(&typeDrop, 1, 1);
-  layout.addWidget(&methodLabel, 0, 2);
-  layout.addWidget(&methodDrop, 1, 2);
-  layout.addWidget(&lengthLabel, 0, 3);
-  layout.addWidget(&lengthText, 1, 3);
-  layout.addWidget(&windowLabel, 0, 4);
-  layout.addWidget(&windowText, 1, 4);
-  layout.addWidget(&sizeLabel, 0, 5);
-  layout.addWidget(&sizeText, 1, 5);
-  layout.addWidget(&noiseLabel, 2, 0);
-  layout.addWidget(&noiseText, 3, 0);
-  layout.addWidget(&deltaLabel, 2, 1);
-  layout.addWidget(&deltaText, 3, 1);
-  layout.addWidget(&heightLabel, 2, 2);
-  layout.addWidget(&heightText, 3, 2);
-  layout.addWidget(&stepLabel, 2, 3);
-  layout.addWidget(&stepText, 3, 3);
-  layout.addWidget(&timesLabel, 2, 4);
-  layout.addWidget(&timesText, 3, 4);
-  layout.addWidget(&maxiLabel, 2, 5);
-  layout.addWidget(&maxiText, 3, 5);
-  layout.addWidget(&startButton, 4, 5);
-  layout.addWidget(&tsChartView, 5, 0, 1, -1);
-  layout.addWidget(&motifChartView, 6, 0, 8, 3);
-  layout.addWidget(&idxLabel, 6, 3, 1, 2);
-  layout.addWidget(&distLabel, 6, 5);
-  layout.addWidget(&motifList, 7, 3, 7, 2);
-  layout.addWidget(&distText, 7, 5);
-  layout.addWidget(&rangeLabel, 8, 5);
-  layout.addWidget(&rangeText, 9, 5);
+  browseLayout.addWidget(&browseLabel);
+  browseLayout.addWidget(&browseText);
+  browseLayout.addWidget(&browseButton);
+
+  browseBox.setTitle("data source");
+  browseBox.setLayout(&browseLayout);
+
+  layout.addWidget(&browseBox, 0, 0, 1, 6);
+  layout.addWidget(&genLabel, 1, 0);
+  layout.addWidget(&genDrop, 2, 0);
+  layout.addWidget(&typeLabel, 1, 1);
+  layout.addWidget(&typeDrop, 2, 1);
+  layout.addWidget(&methodLabel, 1, 2);
+  layout.addWidget(&methodDrop, 2, 2);
+  layout.addWidget(&lengthLabel, 1, 3);
+  layout.addWidget(&lengthText, 2, 3);
+  layout.addWidget(&windowLabel, 1, 4);
+  layout.addWidget(&windowText, 2, 4);
+  layout.addWidget(&sizeLabel, 1, 5);
+  layout.addWidget(&sizeText, 2, 5);
+  layout.addWidget(&noiseLabel, 3, 0);
+  layout.addWidget(&noiseText, 4, 0);
+  layout.addWidget(&deltaLabel, 3, 1);
+  layout.addWidget(&deltaText, 4, 1);
+  layout.addWidget(&heightLabel, 3, 2);
+  layout.addWidget(&heightText, 4, 2);
+  layout.addWidget(&stepLabel, 3, 3);
+  layout.addWidget(&stepText, 4, 3);
+  layout.addWidget(&timesLabel, 3, 4);
+  layout.addWidget(&timesText, 4, 4);
+  layout.addWidget(&maxiLabel, 3, 5);
+  layout.addWidget(&maxiText, 4, 5);
+  layout.addWidget(&startButton, 5, 5);
+  layout.addWidget(&tsChartView, 6, 0, 1, -1);
+  layout.addWidget(&motifChartView, 7, 0, 8, 3);
+  layout.addWidget(&idxLabel, 7, 3, 1, 2);
+  layout.addWidget(&distLabel, 7, 5);
+  layout.addWidget(&motifList, 8, 3, 7, 2);
+  layout.addWidget(&distText, 8, 5);
+  layout.addWidget(&rangeLabel, 9, 5);
+  layout.addWidget(&rangeText, 10, 5);
 
   pane.setLayout(&layout);
 
@@ -570,9 +581,17 @@ void TsgGui::openData() {
     running = true;
 
     openFileDialog.exec();
+    QStringList files = openFileDialog.selectedFiles();
 
-    std::string tsFilePath = openFileDialog.selectedFiles()[0].toStdString();
+    if (files.isEmpty()) {
+
+      running = false;
+      return;
+    }
+
+    std::string tsFilePath = files[0].toStdString();
     std::string metaFilePath = tsFilePath;
+    browseText.setText(tsFilePath.c_str());
 
     size_t dir = tsFilePath.find_last_of("/");
     size_t pos = tsFilePath.rfind("meta_");

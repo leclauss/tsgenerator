@@ -36,6 +36,9 @@
 #include <QAreaSeries>
 #include <QPen>
 #include <QBrush>
+#include <QStringList>
+#include <QHBoxLayout>
+#include <QGroupBox>
 
 
 class TsgGui : public QApplication {
@@ -151,6 +154,11 @@ private:
   QLineEdit distText;
   QLabel rangeLabel;
   QLineEdit rangeText;
+  QGroupBox browseBox;
+  QHBoxLayout browseLayout;
+  QLabel browseLabel;
+  QLineEdit browseText;
+  QPushButton browseButton;
 
 public:
 
