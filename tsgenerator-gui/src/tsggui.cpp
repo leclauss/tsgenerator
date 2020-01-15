@@ -824,58 +824,66 @@ void TsgGui::saveData() {
 
     running = true;
 
-    try {
+    if (!timeSeries.empty() ||
+        (0 < window && !motifPositions.empty() && !dVector.empty())) {
 
-      //output stuff
-      OutputGenerator outputFile;
+      try {
 
-      outputFile.open();
-      outputFile.printTimeSeriesVertical(timeSeries);
+        //output stuff
+        OutputGenerator outputFile;
 
-      if (gen == "set motif") {
+        outputFile.open();
+        if (!timeSeries.empty())
+          outputFile.printTimeSeriesVertical(timeSeries);
 
-        outputFile.printMetaLine((std::vector<int>){ window }, "window");
-        outputFile.printMetaLine((std::vector<int>){ motifPositions[0][0] },
-            "set motif");
-        outputFile.printMetaLine(motifPositions[0], "matchings");
-        outputFile.printMetaLine((std::vector<double>){ dVector[0] }, "range");
-        outputFile.printMetaLine(motifPositions[1], "pair motif");
-        outputFile.printMetaLine((std::vector<double>){ dVector[1] }, "pair "
-            "motif distance");
+        if (0 < window && !motifPositions.empty() && !dVector.empty()) {
+
+          if (gen == "set motif") {
+
+            outputFile.printMetaLine((std::vector<int>){ window }, "window");
+            outputFile.printMetaLine((std::vector<int>){ motifPositions[0][0] },
+                "set motif");
+            outputFile.printMetaLine(motifPositions[0], "matchings");
+            outputFile.printMetaLine((std::vector<double>){ dVector[0] }, "range");
+            outputFile.printMetaLine(motifPositions[1], "pair motif");
+            outputFile.printMetaLine((std::vector<double>){ dVector[1] }, "pair "
+                "motif distance");
+          }
+          else if (gen == "latent motif") {
+
+            outputFile.printMetaLine((std::vector<int>){ window }, "window");
+            outputFile.printMetaLine(motif[0], "latent motif");
+            outputFile.printMetaLine(motifPositions[0], "matchings");
+            outputFile.printMetaLine((std::vector<double>){ dVector[0] }, "range");
+            outputFile.printMetaLine(motifPositions[1], "pair motif");
+            outputFile.printMetaLine((std::vector<double>){ dVector[1] }, "pair "
+                "motif distance");
+          }
+          else {
+
+            outputFile.printMetaLine((std::vector<int>){ window }, "window");
+            outputFile.printMetaLine(motifPositions[0], "pair motif");
+            outputFile.printMetaLine(dVector, "distance");
+          }
+        }
+
+        outputFile.close();
       }
-      else if (gen == "latent motif") {
+      catch (int e) {
 
-        outputFile.printMetaLine((std::vector<int>){ window }, "window");
-        outputFile.printMetaLine(motif[0], "latent motif");
-        outputFile.printMetaLine(motifPositions[0], "matchings");
-        outputFile.printMetaLine((std::vector<double>){ dVector[0] }, "range");
-        outputFile.printMetaLine(motifPositions[1], "pair motif");
-        outputFile.printMetaLine((std::vector<double>){ dVector[1] }, "pair "
-            "motif distance");
+        if (e == EXIT_FAILURE)
+          exit(e);
+        else {
+
+          std::cerr << "ERROR: Something unexpected happened!" << std::endl;
+          exit(EXIT_FAILURE);
+        }
       }
-      else {
-
-        outputFile.printMetaLine((std::vector<int>){ window }, "window");
-        outputFile.printMetaLine(motifPositions[0], "pair motif");
-        outputFile.printMetaLine(dVector, "distance");
-      }
-
-      outputFile.close();
-    }
-    catch (int e) {
-
-      if (e == EXIT_FAILURE)
-        exit(e);
-      else {
+      catch (...) {
 
         std::cerr << "ERROR: Something unexpected happened!" << std::endl;
         exit(EXIT_FAILURE);
       }
-    }
-    catch (...) {
-
-      std::cerr << "ERROR: Something unexpected happened!" << std::endl;
-      exit(EXIT_FAILURE);
     }
 
     running = false;
