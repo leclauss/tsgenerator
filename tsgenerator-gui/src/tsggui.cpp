@@ -487,17 +487,17 @@ void TsgGui::generateTS() {
 
     running = true;
     bool success = false;
-    std::string in;
+    tsg::word in;
 
     //read the input
     in = lengthText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        std::string::npos)
+        tsg::word::npos)
       length = std::stoi(in);
 
     in = windowText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        std::string::npos)
+        tsg::word::npos)
       window = std::stoi(in);
 
     in = deltaText.text().toStdString();
@@ -514,7 +514,7 @@ void TsgGui::generateTS() {
 
     in = sizeText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        std::string::npos)
+        tsg::word::npos)
       motifSize = std::stoi(in);
 
     in = heightText.text().toStdString();
@@ -523,12 +523,12 @@ void TsgGui::generateTS() {
 
     in = stepText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        std::string::npos)
+        tsg::word::npos)
       step = std::stoi(in);
 
     in = timesText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        std::string::npos)
+        tsg::word::npos)
       times = std::stoi(in);
 
     in = methodDrop.currentText().toStdString();
@@ -580,23 +580,28 @@ void TsgGui::openData() {
 
     running = true;
 
+    QString path = browseText.text();
+
+    if (!path.isEmpty())
+      openFileDialog.setDirectory(path);
+
     openFileDialog.exec();
     QStringList files = openFileDialog.selectedFiles();
 
-    if (files.isEmpty()) {
+    if (files.isEmpty() || !std::filesystem::exists(files[0].toStdString())) {
 
       running = false;
       return;
     }
 
-    std::string tsFilePath = files[0].toStdString();
-    std::string metaFilePath = tsFilePath;
+    tsg::word tsFilePath = files[0].toStdString();
+    tsg::word metaFilePath = tsFilePath;
     browseText.setText(tsFilePath.c_str());
 
     size_t dir = tsFilePath.find_last_of("/");
     size_t pos = tsFilePath.rfind("meta_");
 
-    if (dir < pos && pos != std::string::npos)
+    if (dir < pos && pos != tsg::word::npos)
       tsFilePath.erase(pos, 5);
     else
       metaFilePath.insert(tsFilePath.find_last_of("_"), "_meta");
@@ -604,10 +609,10 @@ void TsgGui::openData() {
     std::ifstream tsFile;
     std::ifstream metaFile;
     double value;
-    std::string doubleChars("-.0123456789");
-    std::string intChars("-0123456789");
-    std::string posIntChars("0123456789");
-    std::string alphabetChars(" abcdefghijklmnopqrstuvwxyz"
+    tsg::word doubleChars("-.0123456789");
+    tsg::word intChars("-0123456789");
+    tsg::word posIntChars("0123456789");
+    tsg::word alphabetChars(" abcdefghijklmnopqrstuvwxyz"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
     if (std::filesystem::exists(tsFilePath)) {
@@ -617,7 +622,7 @@ void TsgGui::openData() {
 
       tsFile.open(tsFilePath);
 
-      while (doubleChars.find(tsFile.peek()) == std::string::npos &&
+      while (doubleChars.find(tsFile.peek()) == tsg::word::npos &&
           tsFile.peek() != EOF)
         tsFile.ignore();
 
@@ -625,7 +630,7 @@ void TsgGui::openData() {
 
         timeSeries.push_back(value);
 
-        while (doubleChars.find(tsFile.peek()) == std::string::npos &&
+        while (doubleChars.find(tsFile.peek()) == tsg::word::npos &&
             tsFile.peek() != EOF)
           tsFile.ignore();
       }
@@ -668,14 +673,14 @@ void TsgGui::openData() {
       metaFile.open(metaFilePath);
 
       //read window
-      while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+      while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
           metaFile.peek() != EOF)
         metaFile.ignore();
 
       if (metaFile.peek() != EOF)
         metaFile >> window;
 
-      while (alphabetChars.find(metaFile.peek()) == std::string::npos &&
+      while (alphabetChars.find(metaFile.peek()) == tsg::word::npos &&
           metaFile.peek() != EOF)
         metaFile.ignore();
 
@@ -684,11 +689,11 @@ void TsgGui::openData() {
 
         gen = "set motif";
 
-        while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+        while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
 
-        while (alphabetChars.find(metaFile.peek()) == std::string::npos &&
+        while (alphabetChars.find(metaFile.peek()) == tsg::word::npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
       }
@@ -696,7 +701,7 @@ void TsgGui::openData() {
 
         gen = "latent motif";
 
-        while (doubleChars.find(metaFile.peek()) == std::string::npos &&
+        while (doubleChars.find(metaFile.peek()) == tsg::word::npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
 
@@ -705,12 +710,12 @@ void TsgGui::openData() {
 
           motif[0].push_back(value);
 
-          while (doubleChars.find(metaFile.peek()) == std::string::npos &&
+          while (doubleChars.find(metaFile.peek()) == tsg::word::npos &&
               metaFile.peek() != '\n' && metaFile.peek() != EOF)
             metaFile.ignore();
         }
 
-        while (alphabetChars.find(metaFile.peek()) == std::string::npos &&
+        while (alphabetChars.find(metaFile.peek()) == tsg::word::npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
       }
@@ -725,7 +730,7 @@ void TsgGui::openData() {
 
       if (metaFile.peek() == 'm') {
 
-        while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+        while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
 
@@ -734,7 +739,7 @@ void TsgGui::openData() {
 
         motifPositions[start].push_back(pos);
 
-        while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+        while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
             metaFile.peek() != '\n' && metaFile.peek() != EOF)
           metaFile.ignore();
 
@@ -752,19 +757,19 @@ void TsgGui::openData() {
           if (pos + window - 1 > length)
             length = pos + window - 1;
 
-          while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+          while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
               metaFile.peek() != '\n' && metaFile.peek() != EOF)
             metaFile.ignore();
         }
 
         start++;
 
-        while (alphabetChars.find(metaFile.peek()) == std::string::npos &&
+        while (alphabetChars.find(metaFile.peek()) == tsg::word::npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
 
         //get range
-        while (doubleChars.find(metaFile.peek()) == std::string::npos &&
+        while (doubleChars.find(metaFile.peek()) == tsg::word::npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
 
@@ -773,13 +778,13 @@ void TsgGui::openData() {
 
         dVector.push_back(value);
 
-        while (alphabetChars.find(metaFile.peek()) == std::string::npos &&
+        while (alphabetChars.find(metaFile.peek()) == tsg::word::npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
       }
 
       //pair motif locations
-      while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+      while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
           metaFile.peek() != EOF)
         metaFile.ignore();
 
@@ -790,17 +795,17 @@ void TsgGui::openData() {
         if (pos + window - 1 > length)
           length = pos + window - 1;
 
-        while (posIntChars.find(metaFile.peek()) == std::string::npos &&
+        while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
             metaFile.peek() != '\n' && metaFile.peek() != EOF)
           metaFile.ignore();
       }
 
-      while (alphabetChars.find(metaFile.peek()) == std::string::npos &&
+      while (alphabetChars.find(metaFile.peek()) == tsg::word::npos &&
           metaFile.peek() != EOF)
         metaFile.ignore();
 
       //pair motif distance
-      while (doubleChars.find(metaFile.peek()) == std::string::npos &&
+      while (doubleChars.find(metaFile.peek()) == tsg::word::npos &&
           metaFile.peek() != EOF)
         metaFile.ignore();
 

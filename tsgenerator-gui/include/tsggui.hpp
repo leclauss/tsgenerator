@@ -21,6 +21,7 @@
 #include <QWidget>
 #include <QGridLayout>
 #include <QListWidget>
+#include <QString>
 #include <QStringList>
 #include <QPushButton>
 #include <QLabel>
