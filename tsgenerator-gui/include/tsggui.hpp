@@ -40,6 +40,7 @@
 #include <QStringList>
 #include <QHBoxLayout>
 #include <QGroupBox>
+#include <QVBoxLayout>
 
 
 class TsgGui : public QApplication {
@@ -108,6 +109,8 @@ private:
   QMessageBox maxiMes;
   QWidget pane;
   QGridLayout layout;
+  QGroupBox tsBox;
+  QVBoxLayout tsLayout;
   ChartView tsChartView;
   Chart tsChart;
   QPen tsPen;
@@ -117,12 +120,15 @@ private:
   QLineSeries lowerSeries;
   QAreaSeries marker;
   QLineSeries tsSeries;
+  QGroupBox motifBox;
+  QVBoxLayout motifLayout;
   ChartView motifChartView;
   Chart motifChart;
+  QGroupBox motifListBox;
+  QVBoxLayout motifListLayout;
   QLineSeries motifSeries;
   QListWidget motifList;
   QStringList motifLocs;
-  QLabel idxLabel;
   QPushButton startButton;
   QLabel lengthLabel;
   QLineEdit lengthText;

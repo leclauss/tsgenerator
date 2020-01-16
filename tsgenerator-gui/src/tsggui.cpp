@@ -89,7 +89,6 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv) {
   maxiMes.setWindowTitle("maxi option");
   maxiMes.setText("The maxi option sets the maximum absolute value of the "
       "base time series.");
-  idxLabel.setText("motif locations");
   startButton.setText("start");
   lengthLabel.setText("length");
   lengthText.setPlaceholderText(std::to_string(length).c_str());
@@ -252,6 +251,21 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv) {
   browseBox.setTitle("data source");
   browseBox.setLayout(&browseLayout);
 
+  tsLayout.addWidget(&tsChartView);
+
+  tsBox.setTitle("time series");
+  tsBox.setLayout(&tsLayout);
+
+  motifLayout.addWidget(&motifChartView);
+
+  motifBox.setTitle("zoom");
+  motifBox.setLayout(&motifLayout);
+
+  motifListLayout.addWidget(&motifList);
+
+  motifListBox.setTitle("motif locations");
+  motifListBox.setLayout(&motifListLayout);
+
   layout.addWidget(&browseBox, 0, 0, 1, 6);
   layout.addWidget(&genLabel, 1, 0);
   layout.addWidget(&genDrop, 2, 0);
@@ -278,11 +292,10 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv) {
   layout.addWidget(&maxiLabel, 3, 5);
   layout.addWidget(&maxiText, 4, 5);
   layout.addWidget(&startButton, 5, 5);
-  layout.addWidget(&tsChartView, 6, 0, 1, -1);
-  layout.addWidget(&motifChartView, 7, 0, 8, 3);
-  layout.addWidget(&idxLabel, 7, 3, 1, 2);
+  layout.addWidget(&tsBox, 6, 0, 1, -1);
+  layout.addWidget(&motifBox, 7, 0, 8, 3);
+  layout.addWidget(&motifListBox, 7, 3, 8, 2);
   layout.addWidget(&distLabel, 7, 5);
-  layout.addWidget(&motifList, 8, 3, 7, 2);
   layout.addWidget(&distText, 8, 5);
   layout.addWidget(&rangeLabel, 9, 5);
   layout.addWidget(&rangeText, 10, 5);
@@ -482,6 +495,9 @@ void TsgGui::loadData() {
   motifList.setCurrentRow(0);
 
   selMotif = 0;
+
+  //set the motif chart title
+  motifBox.setTitle(motifLocs[selMotif]);
 }
 
 void TsgGui::generateTS() {
@@ -909,6 +925,9 @@ void TsgGui::plotMotif() {
     if (motifList.currentRow() != selMotif) {
 
       selMotif = motifList.currentRow();
+
+      //set the motif chart title
+      motifBox.setTitle(motifLocs[selMotif]);
 
       int pos = selMotif;
 
