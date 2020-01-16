@@ -241,6 +241,9 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv) {
   //add plot motif location trigger
   connect(&motifList, SIGNAL(itemSelectionChanged()), this, SLOT(plotMotif()));
 
+  //add open browser wenn enter is pressed
+  connect(&browseText, SIGNAL(returnPressed()), this, SLOT(openData()));
+
   //layout all items
   browseLayout.addWidget(&browseLabel);
   browseLayout.addWidget(&browseText);
