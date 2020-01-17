@@ -20,6 +20,7 @@
 #include <QMainWindow>
 #include <QWidget>
 #include <QGridLayout>
+#include <QList>
 #include <QListWidget>
 #include <QString>
 #include <QStringList>
@@ -63,7 +64,6 @@ private:
   double maxi = 20.0;
   tsg::word method = "boundedNormalRandomWalk";
   tsg::word gen = "latent motif";
-  int selMotif = 0;
 
   //final product
   tsg::rseq timeSeries;
@@ -116,9 +116,9 @@ private:
   QPen tsPen;
   QPen motifPen;
   QBrush brush;
-  QLineSeries upperSeries;
-  QLineSeries lowerSeries;
-  QAreaSeries marker;
+  std::vector<QLineSeries> upperSeriess;
+  std::vector<QLineSeries> lowerSeriess;
+  std::vector<QAreaSeries> markers;
   QLineSeries tsSeries;
   QGroupBox motifBox;
   QVBoxLayout motifLayout;
@@ -126,7 +126,7 @@ private:
   Chart motifChart;
   QGroupBox motifListBox;
   QVBoxLayout motifListLayout;
-  QLineSeries motifSeries;
+  std::vector<QLineSeries> motifSeries;
   QListWidget motifList;
   QStringList motifLocs;
   QPushButton startButton;

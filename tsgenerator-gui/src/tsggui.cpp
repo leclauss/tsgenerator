@@ -7,9 +7,11 @@
 #include <tsggui.hpp>
 
 
-TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv) {
+TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv),
+  upperSeriess(1000), lowerSeriess(1000), markers(1000), motifSeries(1000) {
 
-  //help message box
+  //enable to select multiple lines in list
+  motifList.setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   //set initialize widgets
   fileMenu.setTitle("File");
@@ -204,20 +206,27 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv) {
   motifPen.setColor(0xffbb00);
   brush.setColor(0xffddaa);
   brush.setStyle(Qt::SolidPattern);
-  marker.setPen(motifPen);
-  marker.setBrush(brush);
-  marker.setUpperSeries(&upperSeries);
-  marker.setLowerSeries(&lowerSeries);
+
+  for (int i = 0; i < (int)lowerSeriess.size(); i++) {
+
+    markers[i].setPen(motifPen);
+    markers[i].setBrush(brush);
+    markers[i].setUpperSeries(&upperSeriess[i]);
+    markers[i].setLowerSeries(&lowerSeriess[i]);
+  }
 
   //set time series color
   tsPen.setColor(0x0076ff);
   tsSeries.setPen(tsPen);
 
   //set motif plot color
-  motifSeries.setPen(motifPen);
+  for (int i = 0; i < (int)motifSeries.size(); i++)
+    motifSeries[i].setPen(motifPen);
 
   //add time series plot
-  tsChart.addSeries(&marker);
+  for (int i = 0; i < (int)lowerSeriess.size(); i++)
+    tsChart.addSeries(&markers[i]);
+
   tsChart.addSeries(&tsSeries);
   tsChart.createDefaultAxes();
   tsChart.legend()->hide();
@@ -228,7 +237,9 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv) {
   tsChartView.setMaximumSize(30000, 500);
 
   //add motif location plot
-  motifChart.addSeries(&motifSeries);
+  for (int i = 0; i < (int)motifSeries.size(); i++)
+    motifChart.addSeries(&motifSeries[i]);
+
   motifChart.createDefaultAxes();
   motifChart.legend()->hide();
 
@@ -240,7 +251,7 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv) {
   //add plot motif location trigger
   connect(&motifList, SIGNAL(itemSelectionChanged()), this, SLOT(plotMotif()));
 
-  //add open browser wenn enter is pressed
+  //add open browser when enter is pressed
   connect(&browseText, SIGNAL(returnPressed()), this, SLOT(openData()));
 
   //layout all items
@@ -315,12 +326,6 @@ TsgGui::~TsgGui() { }
 
 void TsgGui::loadData() {
 
-  double min = 0.0;
-  double max = 0.0;
-
-  //check if first time series
-  selMotif = 0;
-
   if (!dVector.empty()) {
 
     //update smallest distance and motif range
@@ -334,107 +339,6 @@ void TsgGui::loadData() {
       distText.setText(std::to_string(dVector[1]).c_str());
       rangeText.setText(std::to_string(dVector[0]).c_str());
     }
-  }
-
-  //highlight motif
-  upperSeries.clear();
-  lowerSeries.clear();
-
-  if (gen == "latent motif")
-    marker.hide();
-  else
-    marker.show();
-
-  int pos;
-
-  if (!motifPositions.empty() && !motifPositions[0].empty()) {
-
-    pos = motifPositions[0][selMotif];
-
-    upperSeries.append(pos, 100000000.0);
-    upperSeries.append(pos + window - 1, 100000000.0);
-    lowerSeries.append(pos, -100000000.0);
-    lowerSeries.append(pos + window - 1, -100000000.0);
-  }
-
-
-  //print ts
-  tsSeries.clear();
-
-  if (!timeSeries.empty()) {
-
-    tsSeries.append(0, timeSeries[0]);
-    min = timeSeries[0];
-    max = min;
-
-    for (int i = 1; i < length; i++) {
-
-      if (timeSeries[i] < min)
-        min = timeSeries[i];
-      if (timeSeries[i] > max)
-        max = timeSeries[i];
-
-      tsSeries.append(i, timeSeries[i]);
-    }
-
-    tsChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
-        + 0.1 * (max - min));
-  }
-
-  tsChart.axes(Qt::Horizontal)[0]->setRange(0.0, length);
-
-  //print motif location plot
-  motifSeries.clear();
-
-  if (gen == "latent motif") {
-
-    if (!motif.empty() && !motif[0].empty()) {
-
-      motifSeries.append(0, motif[0][0]);
-      min = motif[0][0];
-      max = min;
-
-      for (int i = 1; i < (int)motif[0].size(); i++) {
-
-        if (motif[0][i] < min)
-          min = motif[0][i];
-        if (motif[0][i] > max)
-          max = motif[0][i];
-        motifSeries.append(i, motif[0][i]);
-      }
-    }
-  }
-  else {
-
-    if (!timeSeries.empty() && !motifPositions.empty() &&
-        !motifPositions[0].empty()) {
-
-      motifSeries.append(motifPositions[0][selMotif],
-          timeSeries[motifPositions[0][selMotif]]);
-      min = timeSeries[motifPositions[0][selMotif]];
-      max = min;
-
-      for (int i = motifPositions[0][selMotif] + 1;
-          i < motifPositions[0][selMotif] + window; i++) {
-
-        if (timeSeries[i] < min)
-          min = timeSeries[i];
-        if (timeSeries[i] > max)
-          max = timeSeries[i];
-        motifSeries.append(i, timeSeries[i]);
-      }
-    }
-  }
-
-  if (!motifPositions.empty() && !motifPositions[0].empty()) {
-
-    if (gen == "latent motif")
-      motifChart.axes(Qt::Horizontal)[0]->setRange(0, window - 1);
-    else
-      motifChart.axes(Qt::Horizontal)[0]->setRange(motifPositions[0][selMotif],
-          motifPositions[0][selMotif] + window - 1);
-    motifChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
-        + 0.1 * (max - min));
   }
 
   //print motif select list
@@ -494,10 +398,106 @@ void TsgGui::loadData() {
   motifList.addItems(motifLocs);
   motifList.setCurrentRow(0);
 
-  selMotif = 0;
+  //highlight selected subsequences and plot zooms
+  QList selected = motifList.selectedItems();
+  int j = 0;
+  int pos;
 
-  //set the motif chart title
-  motifBox.setTitle(motifLocs[selMotif]);
+  double min = std::numeric_limits<double>::infinity();
+  double max = -std::numeric_limits<double>::infinity();
+
+  for (int i = 0; i < (int)markers.size(); i++)
+    markers[i].hide();
+
+  for (int i = 0; i < (int)motifSeries.size(); i++)
+    motifSeries[i].clear();
+
+  for (int i = 0; i < selected.size(); i++) {
+
+    if (j < (int)lowerSeriess.size()) {
+
+      if (selected[i]->text().indexOf(": ") >= 0)
+        {
+
+        pos = selected[i]->text().split(": ")[1].toInt();
+
+        upperSeriess[j].clear();
+        lowerSeriess[j].clear();
+
+        upperSeriess[j].append(pos, 100000000.0);
+        upperSeriess[j].append(pos + window - 1, 100000000.0);
+        lowerSeriess[j].append(pos, -100000000.0);
+        lowerSeriess[j].append(pos + window - 1, -100000000.0);
+
+        markers[j].show();
+
+        if (!timeSeries.empty() && !motifPositions.empty() &&
+            !motifPositions[0].empty()) {
+
+          for (int i = 0; i < window; i++) {
+
+            if (timeSeries[pos + i] < min)
+              min = timeSeries[pos + i];
+            if (timeSeries[pos + i] > max)
+              max = timeSeries[pos + i];
+            motifSeries[j].append(i, timeSeries[pos + i]);
+          }
+
+          j++;
+        }
+      }
+      else if (QString::compare(selected[i]->text(), "latent motif",
+            Qt::CaseInsensitive) == 0) {
+
+        if (!motif.empty() && !motif[0].empty()) {
+
+          for (int k = 0; k < (int)motif[0].size(); k++) {
+
+            if (motif[0][k] < min)
+              min = motif[0][k];
+            if (motif[0][k] > max)
+              max = motif[0][k];
+            motifSeries[j].append(k, motif[0][k]);
+          }
+
+          j++;
+        }
+      }
+    }
+  }
+
+  if (selected.size() > 0 && !motifPositions.empty() &&
+    !motifPositions[0].empty()) {
+
+    motifChart.axes(Qt::Horizontal)[0]->setRange(0, window - 1);
+    motifChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
+        + 0.1 * (max - min));
+  }
+
+  //plot ts
+  tsSeries.clear();
+
+  if (!timeSeries.empty()) {
+
+    tsSeries.append(0, timeSeries[0]);
+    min = timeSeries[0];
+    max = min;
+
+    for (int i = 1; i < length; i++) {
+
+      if (timeSeries[i] < min)
+        min = timeSeries[i];
+      if (timeSeries[i] > max)
+        max = timeSeries[i];
+
+      tsSeries.append(i, timeSeries[i]);
+    }
+
+    tsChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
+        + 0.1 * (max - min));
+
+    tsChart.axes(Qt::Horizontal)[0]->setRange(0.0, length);
+  }
 }
 
 void TsgGui::generateTS() {
@@ -919,91 +919,82 @@ void TsgGui::plotMotif() {
   if (!running) {
 
     running = true;
-    double min = 0.0;
-    double max = 0.0;
+    double min = std::numeric_limits<double>::infinity();
+    double max = -std::numeric_limits<double>::infinity();
 
-    if (motifList.currentRow() != selMotif) {
+    //upate subsequence marker
+    QList selected = motifList.selectedItems();
+    int j = 0;
+    int pos;
 
-      selMotif = motifList.currentRow();
+    for (int i = 0; i < (int)markers.size(); i++)
+      markers[i].hide();
 
-      //set the motif chart title
-      motifBox.setTitle(motifLocs[selMotif]);
+    for (int i = 0; i < (int)motifSeries.size(); i++)
+      motifSeries[i].clear();
 
-      int pos = selMotif;
+    for (int i = 0; i < selected.size(); i++) {
 
-      //upate subsequence marker
-      upperSeries.clear();
-      lowerSeries.clear();
+      if (j < (int)lowerSeriess.size()) {
 
+        if (selected[i]->text().indexOf(": ") >= 0 && j < (int)lowerSeriess.size())
+          {
 
-      if (gen == "latent motif")
-        pos--;
+          pos = selected[i]->text().split(": ")[1].toInt();
 
-      if (pos < 0 && !motif.empty() && !motif[0].empty()) {
+          upperSeriess[j].clear();
+          lowerSeriess[j].clear();
 
-        upperSeries.append(-length, 100000000.0);
-        upperSeries.append(-length + window - 1, 100000000.0);
-        lowerSeries.append(-length, -100000000.0);
-        lowerSeries.append(-length + window - 1, -100000000.0);
-      }
-      else if (!motifPositions.empty() && !motifPositions[0].empty()) {
+          upperSeriess[j].append(pos, 100000000.0);
+          upperSeriess[j].append(pos + window - 1, 100000000.0);
+          lowerSeriess[j].append(pos, -100000000.0);
+          lowerSeriess[j].append(pos + window - 1, -100000000.0);
 
-        upperSeries.append(motifPositions[0][pos], 100000000.0);
-        upperSeries.append(motifPositions[0][pos] + window - 1, 100000000.0);
-        lowerSeries.append(motifPositions[0][pos], -100000000.0);
-        lowerSeries.append(motifPositions[0][pos] + window - 1, -100000000.0);
-      }
+          markers[j].show();
 
-      //update motif location plot
-      motifSeries.clear();
+          if (!timeSeries.empty() && !motifPositions.empty() &&
+              !motifPositions[0].empty()) {
 
-      if (pos < 0 && !motif.empty() && !motif[0].empty()) {
+            for (int i = 0; i < window; i++) {
 
-        marker.hide();
+              if (timeSeries[pos + i] < min)
+                min = timeSeries[pos + i];
+              if (timeSeries[pos + i] > max)
+                max = timeSeries[pos + i];
+              motifSeries[j].append(i, timeSeries[pos + i]);
+            }
 
-        motifSeries.append(0, motif[0][0]);
-        min = motif[0][0];
-        max = min;
+            j++;
+          }
+        }
+        else if (QString::compare(selected[i]->text(), "latent motif",
+              Qt::CaseInsensitive) == 0) {
 
-        for (int i = 1; i < (int)motif[0].size(); i++) {
+          if (!motif.empty() && !motif[0].empty()) {
 
-          if (motif[0][i] < min)
-            min = motif[0][i];
-          if (motif[0][i] > max)
-            max = motif[0][i];
-          motifSeries.append(i, motif[0][i]);
+            for (int k = 0; k < (int)motif[0].size(); k++) {
+
+              if (motif[0][k] < min)
+                min = motif[0][k];
+              if (motif[0][k] > max)
+                max = motif[0][k];
+              motifSeries[j].append(k, motif[0][k]);
+            }
+
+            j++;
+          }
         }
       }
-      else if (!motifPositions.empty() && !motifPositions[0].empty()) {
+    }
 
-        marker.show();
+    if (selected.size() > 0 && !motifPositions.empty() &&
+        !motifPositions[0].empty()) {
 
-        motifSeries.append(motifPositions[0][pos],
-            timeSeries[motifPositions[0][pos]]);
-        min = timeSeries[motifPositions[0][pos]];
-        max = min;
-
-        for (int i = motifPositions[0][pos] + 1;
-            i < motifPositions[0][pos] + window; i++) {
-
-          if (timeSeries[i] < min)
-            min = timeSeries[i];
-          if (timeSeries[i] > max)
-            max = timeSeries[i];
-          motifSeries.append(i, timeSeries[i]);
-        }
-      }
-
-      if (pos < 0 && !motif.empty() && !motif[0].empty())
-        motifChart.axes(Qt::Horizontal)[0]->setRange(0, window - 1);
-      else if (!motifPositions.empty() && !motifPositions[0].empty())
-        motifChart.axes(Qt::Horizontal)[0]->setRange(motifPositions[0][pos],
-            motifPositions[0][pos] + window - 1);
-      if ((!motif.empty() && !motif[0].empty()) ||
-          (!motifPositions.empty() && !motifPositions[0].empty()))
+      motifChart.axes(Qt::Horizontal)[0]->setRange(0, window - 1);
       motifChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
           + 0.1 * (max - min));
     }
+
 
     running = false;
   }

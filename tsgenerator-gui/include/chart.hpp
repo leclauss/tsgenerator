@@ -32,6 +32,7 @@
 #define CHART_HPP
 
 #include <QChart>
+#include <QAbstractSeries>
 
 class QGestureEvent;
 
@@ -39,6 +40,7 @@ QT_CHARTS_USE_NAMESPACE
 
 class Chart : public QChart
 {
+
 public:
     explicit Chart(QGraphicsItem *parent = 0, Qt::WindowFlags wFlags = 0);
     ~Chart();
@@ -48,9 +50,6 @@ protected:
 
 private:
     bool gestureEvent(QGestureEvent *event);
-
-private:
-
 };
 
 #endif // CHART_HPP
