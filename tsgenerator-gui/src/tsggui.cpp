@@ -269,7 +269,7 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv),
 
   motifLayout.addWidget(&motifChartView);
 
-  motifBox.setTitle("zoom");
+  motifBox.setTitle("z-normalized zoom");
   motifBox.setLayout(&motifLayout);
 
   motifListLayout.addWidget(&motifList);
@@ -412,9 +412,15 @@ void TsgGui::loadData() {
   for (int i = 0; i < (int)motifSeries.size(); i++)
     motifSeries[i].clear();
 
+  double rWindow = 1.0 / (double)window;
+
   for (int i = 0; i < selected.size(); i++) {
 
     if (j < (int)lowerSeriess.size()) {
+
+      double mean = 0.0;
+      double std = 0.0;
+      double value = 0.0;
 
       if (selected[i]->text().indexOf(": ") >= 0)
         {
@@ -434,13 +440,33 @@ void TsgGui::loadData() {
         if (!timeSeries.empty() && !motifPositions.empty() &&
             !motifPositions[0].empty()) {
 
+          for (int i = pos; i < pos + window; i++)
+            mean += timeSeries[i];
+
+          mean *= rWindow;
+
+          for (int i = pos; i < pos + window; i++)
+            std += timeSeries[i] * timeSeries[i] - mean * mean;
+
+          std *= rWindow;
+
+          if (std <= 1.0)
+            std = 1.0;
+          else
+            std = sqrt(std);
+
+          std = 1.0 / std;
+
           for (int i = 0; i < window; i++) {
 
-            if (timeSeries[pos + i] < min)
-              min = timeSeries[pos + i];
-            if (timeSeries[pos + i] > max)
-              max = timeSeries[pos + i];
-            motifSeries[j].append(i, timeSeries[pos + i]);
+            value = (timeSeries[pos + i] - mean) * std;
+
+            if (value < min)
+              min = value;
+            if (value > max)
+              max = value;
+
+            motifSeries[j].append(i, value);
           }
 
           j++;
@@ -451,13 +477,33 @@ void TsgGui::loadData() {
 
         if (!motif.empty() && !motif[0].empty()) {
 
+          for (int i = 0; i < window; i++)
+            mean += motif[0][i];
+
+          mean *= rWindow;
+
+          for (int i = 0; i < window; i++)
+            std += motif[0][i] * motif[0][i] - mean * mean;
+
+          std *= rWindow;
+
+          if (std <= 1.0)
+            std = 1.0;
+          else
+            std = sqrt(std);
+
+          std = 1.0 / std;
+
           for (int k = 0; k < (int)motif[0].size(); k++) {
 
-            if (motif[0][k] < min)
-              min = motif[0][k];
-            if (motif[0][k] > max)
-              max = motif[0][k];
-            motifSeries[j].append(k, motif[0][k]);
+            value = (motif[0][k] - mean) * std;
+
+            if (value < min)
+              min = value;
+            if (value > max)
+              max = value;
+
+            motifSeries[j].append(k, value);
           }
 
           j++;
@@ -933,12 +979,18 @@ void TsgGui::plotMotif() {
     for (int i = 0; i < (int)motifSeries.size(); i++)
       motifSeries[i].clear();
 
+    double rWindow = 1.0 / (double)window;
+
     for (int i = 0; i < selected.size(); i++) {
 
       if (j < (int)lowerSeriess.size()) {
 
-        if (selected[i]->text().indexOf(": ") >= 0 && j < (int)lowerSeriess.size())
-          {
+        double mean = 0.0;
+        double std = 0.0;
+        double value = 0.0;
+
+        if (selected[i]->text().indexOf(": ") >= 0 &&
+            j < (int)lowerSeriess.size()) {
 
           pos = selected[i]->text().split(": ")[1].toInt();
 
@@ -955,13 +1007,33 @@ void TsgGui::plotMotif() {
           if (!timeSeries.empty() && !motifPositions.empty() &&
               !motifPositions[0].empty()) {
 
+            for (int i = pos; i < pos + window; i++)
+              mean += timeSeries[i];
+
+            mean *= rWindow;
+
+            for (int i = pos; i < pos + window; i++)
+              std += timeSeries[i] * timeSeries[i] - mean * mean;
+
+            std *= rWindow;
+
+            if (std <= 1.0)
+              std = 1.0;
+            else
+              std = sqrt(std);
+
+            std = 1.0 / std;
+
             for (int i = 0; i < window; i++) {
 
-              if (timeSeries[pos + i] < min)
-                min = timeSeries[pos + i];
-              if (timeSeries[pos + i] > max)
-                max = timeSeries[pos + i];
-              motifSeries[j].append(i, timeSeries[pos + i]);
+              value = (timeSeries[pos + i] - mean) * std;
+
+              if (value < min)
+                min = value;
+              if (value > max)
+                max = value;
+
+              motifSeries[j].append(i, value);
             }
 
             j++;
@@ -972,13 +1044,33 @@ void TsgGui::plotMotif() {
 
           if (!motif.empty() && !motif[0].empty()) {
 
+            for (int i = 0; i < window; i++)
+              mean += motif[0][i];
+
+            mean *= rWindow;
+
+            for (int i = 0; i < window; i++)
+              std += motif[0][i] * motif[0][i] - mean * mean;
+
+            std *= rWindow;
+
+            if (std <= 1.0)
+              std = 1.0;
+            else
+              std = sqrt(std);
+
+            std = 1.0 / std;
+
             for (int k = 0; k < (int)motif[0].size(); k++) {
 
-              if (motif[0][k] < min)
-                min = motif[0][k];
-              if (motif[0][k] > max)
-                max = motif[0][k];
-              motifSeries[j].append(k, motif[0][k]);
+              value = (motif[0][k] - mean) * std;
+
+              if (value < min)
+                min = value;
+              if (value > max)
+                max = value;
+
+              motifSeries[j].append(k, value);
             }
 
             j++;
