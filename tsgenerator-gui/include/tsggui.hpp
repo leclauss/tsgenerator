@@ -13,6 +13,7 @@
 #include <chartview.hpp>
 #include <iostream>
 #include <vector>
+#include <map>
 #include <string>
 #include <sstream>
 #include <QObject>
@@ -64,6 +65,7 @@ private:
   double maxi = 20.0;
   tsg::word method = "boundedNormalRandomWalk";
   tsg::word gen = "latent motif";
+  std::map<tsg::word, tsg::iseqs> disc;
 
   //final product
   tsg::rseq timeSeries;

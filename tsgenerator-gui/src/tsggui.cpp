@@ -17,7 +17,8 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv),
   fileMenu.setTitle("File");
   openAct.setText("open");
   openFileDialog.setWindowTitle("open file");
-  openFileDialog.setFileMode(QFileDialog::ExistingFile);
+  openFileDialog.setFileMode(QFileDialog::Directory);
+  openFileDialog.setOption(QFileDialog::ShowDirsOnly, true);
   openFileDialog.setDirectory(".");
   openFileDialog.setNameFilter("*.csv");
   saveAct.setText("save");
@@ -651,32 +652,75 @@ void TsgGui::openData() {
       openFileDialog.setDirectory(path);
 
     openFileDialog.exec();
-    QStringList files = openFileDialog.selectedFiles();
+    QStringList selectedFiles = openFileDialog.selectedFiles();
 
-    if (files.isEmpty() || !std::filesystem::exists(files[0].toStdString())) {
+    if (selectedFiles.isEmpty() ||
+        !std::filesystem::exists(selectedFiles[0].toStdString())) {
 
       running = false;
       return;
     }
 
-    tsg::word tsFilePath = files[0].toStdString();
-    tsg::word metaFilePath = tsFilePath;
-    browseText.setText(tsFilePath.c_str());
+    tsg::word tmp;
+    std::size_t pos;
+    tsg::word dirPath = selectedFiles[0].toStdString();
+    tsg::par outPaths;
+    tsg::word tsFilePath;
+    tsg::word metaFilePath;
+    tsg::word posIntChars("0123456789");
 
-    size_t dir = tsFilePath.find_last_of("/");
-    size_t pos = tsFilePath.rfind("meta_");
+    //process all files in the directory
+    for (const auto &entry : std::filesystem::directory_iterator(dirPath)) {
 
-    if (dir < pos && pos != tsg::word::npos)
-      tsFilePath.erase(pos, 5);
-    else
-      metaFilePath.insert(tsFilePath.find_last_of("_"), "_meta");
+      tmp = entry.path().filename();
+
+      pos = tmp.rfind(".out");
+
+      //motif discovery output files
+      if (pos != tsg::word::npos) {
+
+        outPaths.push_back(entry.path().filename());
+        continue;
+      }
+
+      pos = tmp.rfind(".csv");
+
+      if (pos != tsg::word::npos) {
+
+        tmp.replace(pos, 4, "");
+        pos = tmp.rfind("time_series_meta_");
+
+        //meta data file
+        if (pos != tsg::word::npos) {
+
+          tmp.replace(pos, 17, "");
+
+          if (tmp.find_first_not_of(posIntChars) == tsg::word::npos)
+            metaFilePath = dirPath + "/time_series_meta_" + tmp + ".csv";
+
+          continue;
+        }
+
+        pos = tmp.rfind("time_series_");
+
+        //time series file
+        if (pos != tsg::word::npos) {
+
+          tmp.replace(pos, 12, "");
+
+          if (tmp.find_first_not_of(posIntChars) == tsg::word::npos)
+            tsFilePath = dirPath + "/time_series_" + tmp + ".csv";
+        }
+      }
+    }
+
+    browseText.setText(dirPath.c_str());
 
     std::ifstream tsFile;
     std::ifstream metaFile;
     double value;
     tsg::word doubleChars("-.0123456789");
     tsg::word intChars("-0123456789");
-    tsg::word posIntChars("0123456789");
     tsg::word alphabetChars(" abcdefghijklmnopqrstuvwxyz"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
@@ -880,6 +924,18 @@ void TsgGui::openData() {
       dVector.push_back(value);
 
       metaFile.close();
+    }
+
+    //add motif discovery results
+    for (auto &file : outPaths) {
+
+      tmp = dirPath + "/" + file;
+
+      tsg::iseqs motifs(1);
+
+      //read file and add motifs
+
+      disc.insert(std::pair<tsg::word, tsg::iseqs>(tmp, motifs));
     }
 
     loadData();
