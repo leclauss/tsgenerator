@@ -396,6 +396,18 @@ void TsgGui::loadData() {
     }
   }
 
+  //add algorithm results to motif list
+  tsg::word alg;
+
+  for (auto &item : disc) {
+
+    alg = item.first;
+
+    for (int i = 0; i < (int)item.second.size(); i++)
+      motifLocs.append((alg + " > matchings " + std::to_string(i)).c_str());
+  }
+
+  //print the list
   motifList.addItems(motifLocs);
   motifList.setCurrentRow(0);
 
@@ -557,13 +569,11 @@ void TsgGui::generateTS() {
 
     //read the input
     in = lengthText.text().toStdString();
-    if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        tsg::word::npos)
+    if (in.length() > 0 && in.find_first_not_of("0123456789") == in.npos)
       length = std::stoi(in);
 
     in = windowText.text().toStdString();
-    if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        tsg::word::npos)
+    if (in.length() > 0 && in.find_first_not_of("0123456789") == in.npos)
       window = std::stoi(in);
 
     in = deltaText.text().toStdString();
@@ -579,8 +589,7 @@ void TsgGui::generateTS() {
       type = in;
 
     in = sizeText.text().toStdString();
-    if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        tsg::word::npos)
+    if (in.length() > 0 && in.find_first_not_of("0123456789") == in.npos)
       motifSize = std::stoi(in);
 
     in = heightText.text().toStdString();
@@ -588,13 +597,11 @@ void TsgGui::generateTS() {
       height = std::stod(in);
 
     in = stepText.text().toStdString();
-    if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        tsg::word::npos)
+    if (in.length() > 0 && in.find_first_not_of("0123456789") == in.npos)
       step = std::stoi(in);
 
     in = timesText.text().toStdString();
-    if (in.length() > 0 && in.find_first_not_of("0123456789") ==
-        tsg::word::npos)
+    if (in.length() > 0 && in.find_first_not_of("0123456789") == in.npos)
       times = std::stoi(in);
 
     in = methodDrop.currentText().toStdString();
@@ -630,6 +637,9 @@ void TsgGui::generateTS() {
 
     if (success) {
 
+      //clear discovered motifs data
+      disc.clear();
+
       loadData();
     }
     else {
@@ -645,11 +655,26 @@ void TsgGui::openData() {
   if (!running) {
 
     running = true;
+    size_t pos;
 
     QString path = browseText.text();
+    tsg::word tmp = path.toStdString();
 
-    if (!path.isEmpty())
-      openFileDialog.setDirectory(path);
+    if (!tmp.empty()) {
+
+      pos = tmp.find_last_of("/");
+
+      if (pos == tmp.npos) {
+
+        openFileDialog.setDirectory("/");
+        openFileDialog.selectFile(tmp.c_str());
+      }
+      else {
+
+        openFileDialog.setDirectory(tmp.substr(0, pos).c_str());
+        openFileDialog.selectFile(tmp.substr(pos + 1).c_str());
+      }
+    }
 
     openFileDialog.exec();
     QStringList selectedFiles = openFileDialog.selectedFiles();
@@ -661,8 +686,6 @@ void TsgGui::openData() {
       return;
     }
 
-    tsg::word tmp;
-    std::size_t pos;
     tsg::word dirPath = selectedFiles[0].toStdString();
     tsg::par outPaths;
     tsg::word tsFilePath;
@@ -672,12 +695,15 @@ void TsgGui::openData() {
     //process all files in the directory
     for (const auto &entry : std::filesystem::directory_iterator(dirPath)) {
 
+      //clear discovered motifs data
+      disc.clear();
+
       tmp = entry.path().filename();
 
       pos = tmp.rfind(".out");
 
       //motif discovery output files
-      if (pos != tsg::word::npos) {
+      if (pos != tmp.npos) {
 
         outPaths.push_back(entry.path().filename());
         continue;
@@ -685,17 +711,17 @@ void TsgGui::openData() {
 
       pos = tmp.rfind(".csv");
 
-      if (pos != tsg::word::npos) {
+      if (pos != tmp.npos) {
 
         tmp.replace(pos, 4, "");
         pos = tmp.rfind("time_series_meta_");
 
         //meta data file
-        if (pos != tsg::word::npos) {
+        if (pos != tmp.npos) {
 
           tmp.replace(pos, 17, "");
 
-          if (tmp.find_first_not_of(posIntChars) == tsg::word::npos)
+          if (tmp.find_first_not_of(posIntChars) == tmp.npos)
             metaFilePath = dirPath + "/time_series_meta_" + tmp + ".csv";
 
           continue;
@@ -704,11 +730,11 @@ void TsgGui::openData() {
         pos = tmp.rfind("time_series_");
 
         //time series file
-        if (pos != tsg::word::npos) {
+        if (pos != tmp.npos) {
 
           tmp.replace(pos, 12, "");
 
-          if (tmp.find_first_not_of(posIntChars) == tsg::word::npos)
+          if (tmp.find_first_not_of(posIntChars) == tmp.npos)
             tsFilePath = dirPath + "/time_series_" + tmp + ".csv";
         }
       }
@@ -731,7 +757,7 @@ void TsgGui::openData() {
 
       tsFile.open(tsFilePath);
 
-      while (doubleChars.find(tsFile.peek()) == tsg::word::npos &&
+      while (doubleChars.find(tsFile.peek()) == doubleChars.npos &&
           tsFile.peek() != EOF)
         tsFile.ignore();
 
@@ -739,7 +765,7 @@ void TsgGui::openData() {
 
         timeSeries.push_back(value);
 
-        while (doubleChars.find(tsFile.peek()) == tsg::word::npos &&
+        while (doubleChars.find(tsFile.peek()) == doubleChars.npos &&
             tsFile.peek() != EOF)
           tsFile.ignore();
       }
@@ -782,14 +808,14 @@ void TsgGui::openData() {
       metaFile.open(metaFilePath);
 
       //read window
-      while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
+      while (posIntChars.find(metaFile.peek()) == posIntChars.npos &&
           metaFile.peek() != EOF)
         metaFile.ignore();
 
       if (metaFile.peek() != EOF)
         metaFile >> window;
 
-      while (alphabetChars.find(metaFile.peek()) == tsg::word::npos &&
+      while (alphabetChars.find(metaFile.peek()) == alphabetChars.npos &&
           metaFile.peek() != EOF)
         metaFile.ignore();
 
@@ -798,11 +824,11 @@ void TsgGui::openData() {
 
         gen = "set motif";
 
-        while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
+        while (posIntChars.find(metaFile.peek()) == posIntChars.npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
 
-        while (alphabetChars.find(metaFile.peek()) == tsg::word::npos &&
+        while (alphabetChars.find(metaFile.peek()) == alphabetChars.npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
       }
@@ -810,7 +836,7 @@ void TsgGui::openData() {
 
         gen = "latent motif";
 
-        while (doubleChars.find(metaFile.peek()) == tsg::word::npos &&
+        while (doubleChars.find(metaFile.peek()) == doubleChars.npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
 
@@ -819,12 +845,12 @@ void TsgGui::openData() {
 
           motif[0].push_back(value);
 
-          while (doubleChars.find(metaFile.peek()) == tsg::word::npos &&
+          while (doubleChars.find(metaFile.peek()) == doubleChars.npos &&
               metaFile.peek() != '\n' && metaFile.peek() != EOF)
             metaFile.ignore();
         }
 
-        while (alphabetChars.find(metaFile.peek()) == tsg::word::npos &&
+        while (alphabetChars.find(metaFile.peek()) == alphabetChars.npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
       }
@@ -839,7 +865,7 @@ void TsgGui::openData() {
 
       if (metaFile.peek() == 'm') {
 
-        while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
+        while (posIntChars.find(metaFile.peek()) == posIntChars.npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
 
@@ -848,7 +874,7 @@ void TsgGui::openData() {
 
         motifPositions[start].push_back(pos);
 
-        while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
+        while (posIntChars.find(metaFile.peek()) == posIntChars.npos &&
             metaFile.peek() != '\n' && metaFile.peek() != EOF)
           metaFile.ignore();
 
@@ -866,19 +892,19 @@ void TsgGui::openData() {
           if (pos + window - 1 > length)
             length = pos + window - 1;
 
-          while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
+          while (posIntChars.find(metaFile.peek()) == posIntChars.npos &&
               metaFile.peek() != '\n' && metaFile.peek() != EOF)
             metaFile.ignore();
         }
 
         start++;
 
-        while (alphabetChars.find(metaFile.peek()) == tsg::word::npos &&
+        while (alphabetChars.find(metaFile.peek()) == alphabetChars.npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
 
         //get range
-        while (doubleChars.find(metaFile.peek()) == tsg::word::npos &&
+        while (doubleChars.find(metaFile.peek()) == doubleChars.npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
 
@@ -887,13 +913,13 @@ void TsgGui::openData() {
 
         dVector.push_back(value);
 
-        while (alphabetChars.find(metaFile.peek()) == tsg::word::npos &&
+        while (alphabetChars.find(metaFile.peek()) == alphabetChars.npos &&
             metaFile.peek() != EOF)
           metaFile.ignore();
       }
 
       //pair motif locations
-      while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
+      while (posIntChars.find(metaFile.peek()) == posIntChars.npos &&
           metaFile.peek() != EOF)
         metaFile.ignore();
 
@@ -904,17 +930,17 @@ void TsgGui::openData() {
         if (pos + window - 1 > length)
           length = pos + window - 1;
 
-        while (posIntChars.find(metaFile.peek()) == tsg::word::npos &&
+        while (posIntChars.find(metaFile.peek()) == posIntChars.npos &&
             metaFile.peek() != '\n' && metaFile.peek() != EOF)
           metaFile.ignore();
       }
 
-      while (alphabetChars.find(metaFile.peek()) == tsg::word::npos &&
+      while (alphabetChars.find(metaFile.peek()) == alphabetChars.npos &&
           metaFile.peek() != EOF)
         metaFile.ignore();
 
       //pair motif distance
-      while (doubleChars.find(metaFile.peek()) == tsg::word::npos &&
+      while (doubleChars.find(metaFile.peek()) == doubleChars.npos &&
           metaFile.peek() != EOF)
         metaFile.ignore();
 
@@ -927,15 +953,47 @@ void TsgGui::openData() {
     }
 
     //add motif discovery results
+    std::ifstream outFile;
+    tsg::word line;
+    int i = 0;
+    size_t mPos = 0;
+
     for (auto &file : outPaths) {
 
       tmp = dirPath + "/" + file;
 
+      i = 0;
       tsg::iseqs motifs(1);
 
       //read file and add motifs
+      outFile.open(tmp);
+
+      while (std::getline(outFile, line)) {
+
+        mPos = line.find_last_of("-");
+
+        if (line.find_last_not_of(intChars) == line.npos &&
+            (mPos == 0 || mPos == line.npos)) {
+
+          motifs[i].push_back(std::stoi(line));
+        }
+        else {
+
+          motifs.resize(motifs.size() + 1);
+          i++;
+        }
+      }
+
+      pos = tmp.find_last_of("/");
+
+      if (pos != tmp.npos)
+        tmp.replace(0, pos + 1, "");
+
+      tmp.replace(tmp.rfind(".out"), 4, "");
 
       disc.insert(std::pair<tsg::word, tsg::iseqs>(tmp, motifs));
+
+      outFile.close();
     }
 
     loadData();
@@ -1093,6 +1151,67 @@ void TsgGui::plotMotif() {
             }
 
             j++;
+          }
+        }
+        else if (selected[i]->text().indexOf(" > ") >= 0 &&
+            j < (int)lowerSeriess.size()) {
+
+          //determine the matching subsequences
+          tsg::word alg = selected[i]->text().toStdString();
+          pos = alg.find(" > matchings ");
+          int k = std::stoi(alg.substr(pos + 13));
+
+          alg.replace(pos, alg.size() - pos, "");
+
+          tsg::iseq motif = disc[alg][k];
+
+          //print the subsequences
+          for (int &pos : motif) {
+
+            upperSeriess[j].clear();
+            lowerSeriess[j].clear();
+
+            upperSeriess[j].append(pos, 100000000.0);
+            upperSeriess[j].append(pos + window - 1, 100000000.0);
+            lowerSeriess[j].append(pos, -100000000.0);
+            lowerSeriess[j].append(pos + window - 1, -100000000.0);
+
+            markers[j].show();
+
+            if (!timeSeries.empty() && !motifPositions.empty() &&
+                !motifPositions[0].empty()) {
+
+              for (int i = pos; i < pos + window; i++)
+                mean += timeSeries[i];
+
+              mean *= rWindow;
+
+              for (int i = pos; i < pos + window; i++)
+                std += timeSeries[i] * timeSeries[i] - mean * mean;
+
+              std *= rWindow;
+
+              if (std <= 1.0)
+                std = 1.0;
+              else
+                std = sqrt(std);
+
+              std = 1.0 / std;
+
+              for (int i = 0; i < window; i++) {
+
+                value = (timeSeries[pos + i] - mean) * std;
+
+                if (value < min)
+                  min = value;
+                if (value > max)
+                  max = value;
+
+                motifSeries[j].append(i, value);
+              }
+
+              j++;
+            }
           }
         }
         else if (QString::compare(selected[i]->text(), "latent motif",
