@@ -888,7 +888,7 @@ namespace tsg {
     //determine similarity of the top motif pair in the random synthetic time
     //series
     tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
-    d = similarity(timeSeries_out, positionOne, positionTwo,
+    d = 0.499999999 * similarity(timeSeries_out, positionOne, positionTwo,
         std::numeric_limits<double>::max());
 
     //declaration stuff
