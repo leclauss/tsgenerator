@@ -48,9 +48,9 @@ int main(int argc, char *argv[]) {
 
     //default parameters
     int length = 1000;
-    int window = 30;
+    int window = 50;
     double delta = 1.0;
-    double noise = 0.1;
+    double noise = 2.0;
     tsg::word type("box");
     int size = 3;
     double height = 10.0;
@@ -308,29 +308,28 @@ int main(int argc, char *argv[]) {
 
       if (gen == "set motif") {
 
-        outputFile.printMetaLine((std::vector<int>){ window }, "window");
-        outputFile.printMetaLine((std::vector<int>){ motifPositions[0][0] },
+        outputFile.printMetaLine((tsg::iseq){ window }, "window");
+        outputFile.printMetaLine((tsg::iseq){ motifPositions[0][0] },
             "set motif");
         outputFile.printMetaLine(motifPositions[0], "matchings");
-        outputFile.printMetaLine((std::vector<double>){ dVector[0] }, "range");
+        outputFile.printMetaLine((tsg::rseq){ dVector[0] }, "range");
         outputFile.printMetaLine(motifPositions[1], "pair motif");
-        outputFile.printMetaLine((std::vector<double>){ dVector[1] }, "pair "
+        outputFile.printMetaLine((tsg::rseq){ dVector[1] }, "pair "
             "motif distance");
       }
       else if (gen == "latent motif") {
 
-        outputFile.printMetaLine((std::vector<int>){ window }, "window");
-        //tbd
-        outputFile.printMetaLine((std::vector<double>){}, "latent motif");
+        outputFile.printMetaLine((tsg::iseq){ window }, "window");
+        outputFile.printMetaLine(motif[0], "latent motif");
         outputFile.printMetaLine(motifPositions[0], "matchings");
-        outputFile.printMetaLine((std::vector<double>){ dVector[0] }, "range");
+        outputFile.printMetaLine((tsg::rseq){ dVector[0] }, "range");
         outputFile.printMetaLine(motifPositions[1], "pair motif");
-        outputFile.printMetaLine((std::vector<double>){ dVector[1] }, "pair "
+        outputFile.printMetaLine((tsg::rseq){ dVector[1] }, "pair "
             "motif distance");
       }
       else {
 
-        outputFile.printMetaLine((std::vector<int>){ window }, "window");
+        outputFile.printMetaLine((tsg::iseq){ window }, "window");
         outputFile.printMetaLine(motifPositions[0], "pair motif");
         outputFile.printMetaLine(dVector, "distance");
       }
