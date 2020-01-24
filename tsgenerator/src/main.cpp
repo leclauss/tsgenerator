@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
           exit(EXIT_FAILURE);
         }
 
-        gen = std::stod(payload[0]);
+        gen = payload[0];
       }
 
       if (checkArg(argTokens, "-l", payload) || checkArg(argTokens, "--length",
@@ -275,75 +275,80 @@ int main(int argc, char *argv[]) {
       tsg::rseq timeSeries;
       tsg::rseq dVector;
       tsg::iseqs motifPositions;
-      tsg::TSGenerator tSGenerator(length, window, delta, noise, type, size,
-          height, step, times, method, maxi, gen);
-      tSGenerator.run(timeSeries, motif, dVector, motifPositions);
+      bool success = false;
 
-      //output stuff
-      OutputGenerator outputFile;
+      try {
 
-      if (checkArg(argTokens, "-o", payload) || checkArg(argTokens, "--out",
-            payload)) {
+        tsg::TSGenerator tSGenerator(length, window, delta, noise, type, size,
+            height, step, times, method, maxi, gen);
+        tSGenerator.run(timeSeries, motif, dVector, motifPositions);
 
-        if (payload.empty()) {
-
-          std::cerr << "ERROR: The output file name is unset." << std::endl;
-          exit(EXIT_FAILURE);
-        }
-        else
-          outputFile.setFileName(payload[0]);
+        success = true;
       }
+      catch (...) {
 
-      outputFile.open();
-
-      if (checkArg(argTokens, "-ho", payload) || checkArg(argTokens,
-            "--horizontalOutput", payload)) {
-
-        outputFile.printTimeSeriesHorizontal(timeSeries);
-      }
-      else {
-
-        outputFile.printTimeSeriesVertical(timeSeries);
-      }
-
-      if (gen == "set motif") {
-
-        outputFile.printMetaLine((tsg::iseq){ window }, "window");
-        outputFile.printMetaLine((tsg::iseq){ motifPositions[0][0] },
-            "set motif");
-        outputFile.printMetaLine(motifPositions[0], "matchings");
-        outputFile.printMetaLine((tsg::rseq){ dVector[0] }, "range");
-        outputFile.printMetaLine(motifPositions[1], "pair motif");
-        outputFile.printMetaLine((tsg::rseq){ dVector[1] }, "pair "
-            "motif distance");
-      }
-      else if (gen == "latent motif") {
-
-        outputFile.printMetaLine((tsg::iseq){ window }, "window");
-        outputFile.printMetaLine(motif[0], "latent motif");
-        outputFile.printMetaLine(motifPositions[0], "matchings");
-        outputFile.printMetaLine((tsg::rseq){ dVector[0] }, "range");
-        outputFile.printMetaLine(motifPositions[1], "pair motif");
-        outputFile.printMetaLine((tsg::rseq){ dVector[1] }, "pair "
-            "motif distance");
-      }
-      else {
-
-        outputFile.printMetaLine((tsg::iseq){ window }, "window");
-        outputFile.printMetaLine(motifPositions[0], "pair motif");
-        outputFile.printMetaLine(dVector, "distance");
-      }
-
-      outputFile.close();
-    }
-    catch (int e) {
-
-      if (e == EXIT_FAILURE)
-        exit(e);
-      else {
-
-        std::cerr << "ERROR: Something unexpected happened!" << std::endl;
+        std::cerr << "ERROR: Cannot generate time series!" << std::endl;
         exit(EXIT_FAILURE);
+      }
+
+      if (success) {
+
+        //output stuff
+        OutputGenerator outputFile;
+
+        if (checkArg(argTokens, "-o", payload) || checkArg(argTokens, "--out",
+              payload)) {
+
+          if (payload.empty()) {
+
+            std::cerr << "ERROR: The output file name is unset." << std::endl;
+            exit(EXIT_FAILURE);
+          }
+          else
+            outputFile.setFileName(payload[0]);
+        }
+
+        outputFile.open();
+
+        if (checkArg(argTokens, "-ho", payload) || checkArg(argTokens,
+              "--horizontalOutput", payload)) {
+
+          outputFile.printTimeSeriesHorizontal(timeSeries);
+        }
+        else {
+
+          outputFile.printTimeSeriesVertical(timeSeries);
+        }
+
+        if (gen == "set motif") {
+
+          outputFile.printMetaLine((tsg::iseq){ window }, "window");
+          outputFile.printMetaLine((tsg::iseq){ motifPositions[0][0] },
+              "set motif");
+          outputFile.printMetaLine(motifPositions[0], "matchings");
+          outputFile.printMetaLine((tsg::rseq){ dVector[0] }, "range");
+          outputFile.printMetaLine(motifPositions[1], "pair motif");
+          outputFile.printMetaLine((tsg::rseq){ dVector[1] }, "pair "
+              "motif distance");
+        }
+        else if (gen == "latent motif") {
+
+          outputFile.printMetaLine((tsg::iseq){ window }, "window");
+          outputFile.printMetaLine(motif[0], "latent motif");
+          outputFile.printMetaLine(motifPositions[0], "matchings");
+          outputFile.printMetaLine((tsg::rseq){ dVector[0] }, "range");
+          outputFile.printMetaLine(motifPositions[1], "pair motif");
+          outputFile.printMetaLine((tsg::rseq){ dVector[1] }, "pair "
+              "motif distance");
+        }
+        else {
+
+          outputFile.printMetaLine((tsg::iseq){ window }, "window");
+          outputFile.printMetaLine(motifPositions[0], "pair motif");
+          outputFile.printMetaLine(dVector, "distance");
+        }
+
+        outputFile.close();
       }
     }
     catch (...) {

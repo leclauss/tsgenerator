@@ -625,11 +625,6 @@ void TsgGui::generateTS() {
 
       success = true;
     }
-    catch (int e) {
-
-      if (e != EXIT_FAILURE)
-        std::cerr << "ERROR: Something unexpected happened!" << std::endl;
-    }
     catch (...) {
 
       std::cerr << "ERROR: Something unexpected happened!" << std::endl;
