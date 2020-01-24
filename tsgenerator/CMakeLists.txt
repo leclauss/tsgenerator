@@ -75,7 +75,7 @@ endif ()
 
 # add the libraries
 find_library(TSG_LOCATION NAMES ${LIB_NAME}
-  HINTS ../libs/${ARCH}/tsgenerator)
+  HINTS ../libs/${ARCH}/${LIB_NAME})
 
 add_library(TSG STATIC IMPORTED)
 set_target_properties(TSG PROPERTIES

@@ -76,7 +76,7 @@ else ()
   set(QT5_CFLAGS -fPIC)
 
   find_package(PkgConfig REQUIRED)
-  pkg_check_modules(TSG REQUIRED tsgenerator)
+  pkg_check_modules(TSG REQUIRED ${LIB_NAME})
 endif ()
 
 
@@ -88,8 +88,8 @@ find_package(Qt5 COMPONENTS Widgets Charts REQUIRED
   HINTS ${UNIX_QT5}
   ${WIN_QT5})
 
-find_library(TSG_LOCATION NAMES tsgenerator
-  HINTS ../libs/${ARCH}/tsgenerator)
+find_library(TSG_LOCATION NAMES ${LIB_NAME}
+  HINTS ../libs/${ARCH}/${LIB_NAME})
 
 add_library(TSG STATIC IMPORTED)
 set_target_properties(TSG PROPERTIES
