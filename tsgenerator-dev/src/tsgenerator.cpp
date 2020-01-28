@@ -760,7 +760,10 @@ namespace tsg {
       std::normal_distribution<double> distributionNoise(0.0, abs(noise)
           * 0.25 <= 0.0 ? std::numeric_limits<double>::min() : noise * 0.25);
 
-      noise -= lth;
+      if (noise > 0.0)
+        noise -= lth;
+      else
+        noise = 0.0;
 
       //copy motif
       for (int i = 0; i < window; i++)

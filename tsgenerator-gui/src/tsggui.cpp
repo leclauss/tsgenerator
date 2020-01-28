@@ -535,6 +535,7 @@ void TsgGui::loadData() {
 
   //plot ts
   tsSeries.clear();
+  tsChart.removeSeries(&tsSeries);
 
   if (!timeSeries.empty()) {
 
@@ -551,6 +552,8 @@ void TsgGui::loadData() {
 
       tsSeries.append(i, timeSeries[i]);
     }
+
+    tsChart.addSeries(&tsSeries);
 
     tsChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
         + 0.1 * (max - min));
