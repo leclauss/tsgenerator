@@ -105,6 +105,7 @@ install(FILES
   include/tpm.hpp
   include/tsm.hpp
   include/tsgtypes.hpp
+  include/tsgutils.hpp
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_LIB_NAME})
 
 install(FILES ${CMAKE_BINARY_DIR}/tsgenerator.pc

@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
           throw(EXIT_FAILURE);
         }
 
-        height = std::stoi(payload[0]);
+        height = std::stod(payload[0]);
       }
 
       if (checkArg(argTokens, "-st", payload) || checkArg(argTokens,
@@ -218,7 +218,7 @@ int main(int argc, char *argv[]) {
           throw(EXIT_FAILURE);
         }
 
-        step = std::stoi(payload[0]);
+        step = std::stod(payload[0]);
       }
 
       if (checkArg(argTokens, "-ti", payload) || checkArg(argTokens,
@@ -268,7 +268,7 @@ int main(int argc, char *argv[]) {
           throw(EXIT_FAILURE);
         }
 
-        maxi = std::stoi(payload[0]);
+        maxi = std::stod(payload[0]);
       }
 
       //generate the time series

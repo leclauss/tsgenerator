@@ -414,6 +414,8 @@ namespace tsg {
     for (auto &item : collect)
       neighborhood.push_back(item);
 
+    std::sort(neighborhood.begin(), neighborhood.end());
+
     collect.clear();
 
     //most promissing candidate
@@ -430,6 +432,11 @@ namespace tsg {
       //get largest set motif in the neighborhood
       for (int j = 0; j < (int)neighborhood.size(); j++) {
 
+        //if there does not exist a set motif in the remaining neighborhood
+        //matching more subsequences then the most promissing one
+        if ((int)neighborhood.size() - j <= (int)mpc.size())
+          break;
+
         if (!motif.empty()) {
 
           motif.clear();
@@ -443,8 +450,8 @@ namespace tsg {
         for (int k = 0; k < (int)neighborhood.size(); k++)
           if (distADM(j, k) < range)
             motif.push_back(neighborhood[k]);
-
-        std::sort(motif.begin(), motif.end());
+        //motif is sorted in ascending order as the neighborhood is already
+        //sorted
 
         //filter overlapping subsequences from motif
         int last = 0;
@@ -486,6 +493,8 @@ namespace tsg {
 
       for (auto &item : collect)
         neighborhood.push_back(item);
+
+      std::sort(neighborhood.begin(), neighborhood.end());
 
       collect.clear();
     }

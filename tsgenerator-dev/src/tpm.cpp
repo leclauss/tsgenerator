@@ -65,6 +65,6 @@ namespace tsg {
       }
     }
 
-    return bsf;
+    return sqrt(bsf);
   }
 }

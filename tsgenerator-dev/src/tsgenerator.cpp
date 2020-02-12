@@ -87,8 +87,8 @@ namespace tsg {
     }
 
     // get the method
-    method = (int)(std::distance(methods.begin(), std::find(methods.begin(),
-            methods.end(), method_in)));
+    method = (int)(std::distance(methods.begin(),
+          std::find(methods.begin(), methods.end(), method_in)));
 
     // check if method exists
     if (method >= (int) methods.size()) {

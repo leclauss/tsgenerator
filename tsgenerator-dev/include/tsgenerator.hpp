@@ -29,6 +29,58 @@
 
 namespace tsg
 {
+
+  ///\brief This list contains all methods for generating base time series.
+  ///
+  ///This variable stores the names of all mehtods available in this
+  ///implementation. To add a method one has to declare the function in the
+  ///basets.hpp file and define the function in the basets.cpp file as well.
+  ///Also, one has to modify the base time series method chooser in the file
+  ///tsgenerator.cpp.
+  const par methods{
+    "simpleRandomWalk",
+    "realRandomWalk",
+    "normalRandomWalk",
+    "linearRandomWalk",
+    "boundedSimpleRandomWalk",
+    "boundedRealRandomWalk",
+    "boundedNormalRandomWalk",
+    "boundedLinearRandomWalk",
+    "uniformRandom",
+    "normalRandom",
+    "piecewiseLinearRandom",
+    "splineRepeated"
+  };
+
+  ///\brief This list contains all motif types.
+  ///
+  ///This variable stores the names of all motifs available in this
+  ///implementation. To add a motif one has to declare the motif in the
+  ///motifcollection.hpp file and define the motif in the motifcollection.cpp
+  ///file as well. Also, one has to modify the addMotif() function in the file
+  ///tsgenerator.cpp.
+  const par motifTypes{
+    "box",
+    "triangle",
+    "semicircle",
+    "trapezoid",
+    "positiveflank",
+    "negativeflank",
+    "sine",
+    "cosine"
+  };
+
+  ///\brief This list contains all available motif generation types.
+  ///
+  ///This variable stores the names of all motif generation types currently
+  ///available.
+  const par gens{
+    "pair motif",
+    "set motif",
+    "latent motif"
+  };
+
+
   ///\brief This class represents the TSGenerator.
   ///
   ///The TSGenerator consists of setter functions and a run function as well as
@@ -144,34 +196,6 @@ namespace tsg
     ///
     ///This variable stores the running sum of squares of the time series.
     rseq sumSquares;
-
-    ///\brief This list contains all motif types.
-    ///
-    ///This variable stores the names of all motifs available in this
-    ///implementation. To add a motif one has to declare the motif in the
-    ///motifcollection.hpp file and define the motif in the motifcollection.cpp
-    ///file as well. Also, one has to modify the addMotif() function in the file
-    ///tsgenerator.cpp.
-    par motifTypes{"box", "triangle", "semicircle", "trapezoid",
-      "positiveflank", "negativeflank", "sine", "cosine"};
-
-    ///\brief This list contains all methods for generating base time series.
-    ///
-    ///This variable stores the names of all mehtods available in this
-    ///implementation. To add a method one has to declare the function in the
-    ///basets.hpp file and define the function in the basets.cpp file as well.
-    ///Also, one has to modify the base time series method chooser in the file
-    ///tsgenerator.cpp.
-    par methods{"simpleRandomWalk", "realRandomWalk", "normalRandomWalk",
-      "linearRandomWalk", "boundedSimpleRandomWalk", "boundedRealRandomWalk",
-      "boundedNormalRandomWalk", "boundedLinearRandomWalk", "uniformRandom",
-      "normalRandom", "piecewiseLinearRandom", "splineRepeated"};
-
-    ///\brief This list contains all available motif generation types.
-    ///
-    ///This variable stores the names of all motif generation types currently
-    ///available.
-    par gens{"pair motif", "set motif", "latent motif"};
 
 
     ///\brief Calculates the running sum and sum of squares of a sequence.
