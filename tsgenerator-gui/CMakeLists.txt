@@ -89,7 +89,9 @@ find_package(Qt5 COMPONENTS Widgets Charts REQUIRED
   ${WIN_QT5})
 
 find_library(TSG_LOCATION NAMES ${LIB_NAME}
-  HINTS ../libs/${ARCH}/${LIB_NAME})
+  HINTS
+  ${TSG_LIBRARY_DIRS}
+  ../libs/${ARCH}/${LIB_NAME})
 
 add_library(TSG STATIC IMPORTED)
 set_target_properties(TSG PROPERTIES
