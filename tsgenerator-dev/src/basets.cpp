@@ -122,7 +122,7 @@ namespace tsg {
     //add the remaining values
     for (int i = 1; i < length_in; i++) {
 
-      value = delta_in * distribution(randomEngine) - 2 * delta_in;
+      value = delta_in * (2 * distribution(randomEngine) - 1);
 
       if (noise_in / 2.0 > 0.0)
         value += distributionNoise(randomEngine);
