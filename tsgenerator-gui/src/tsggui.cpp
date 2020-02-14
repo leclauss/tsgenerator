@@ -163,38 +163,21 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv),
   gui.setMenuBar(&menuBar);
 
   //add the types
-  types.append("box");
-  types.append("triangle");
-  types.append("semicircle");
-  types.append("trapezoid");
-  types.append("positiveflank");
-  types.append("negativeflank");
-  types.append("sine");
-  types.append("cosine");
+  for (auto &item : tsg::motifTypes)
+    types.append(item.c_str());
 
   typeDrop.addItems(types);
 
   //add the methods
-  methods.append("simpleRandomWalk");
-  methods.append("realRandomWalk");
-  methods.append("normalRandomWalk");
-  methods.append("linearRandomWalk");
-  methods.append("boundedSimpleRandomWalk");
-  methods.append("boundedRealRandomWalk");
-  methods.append("boundedNormalRandomWalk");
-  methods.append("boundedLinearRandomWalk");
-  methods.append("uniformRandom");
-  methods.append("normalRandom");
-  methods.append("piecewiseLinearRandom");
-  methods.append("splineRepeated");
+  for (auto &item : tsg::methods)
+    methods.append(item.c_str());
 
   methodDrop.addItems(methods);
   methodDrop.setCurrentIndex(6);
 
   //add the generators
-  gens.append("pair motif");
-  gens.append("set motif");
-  gens.append("latent motif");
+  for (auto &item : tsg::gens)
+    gens.append(item.c_str());
 
   genDrop.addItems(gens);
   genDrop.setCurrentIndex(2);
