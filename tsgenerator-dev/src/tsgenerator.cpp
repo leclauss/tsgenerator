@@ -716,6 +716,7 @@ namespace tsg {
     std::normal_distribution<double> distribution(0.0, abs(noise) * 0.25 <= 0.0
         ? std::numeric_limits<double>::min() : noise * 0.25);
     double value;
+    double min, max;
 
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
@@ -734,6 +735,28 @@ namespace tsg {
 
     //inject sequence into the time series
     value = timeSeries_out[motifPos0];
+
+    //make sure we are in maxi when maxi can handle the motif height
+    if (abs(height) <= 2 * maxi) {
+
+      max = motif[0];
+      min = max;
+
+      for (int i = 0; i < window; i++) {
+
+        if (motif[i] < min)
+          min = motif[i];
+
+        if (motif[i] > max)
+          max = motif[i];
+      }
+
+      if (value + max > maxi)
+        value = maxi - max;
+
+      if (value - min < -maxi)
+        value = -maxi - min;
+    }
 
     for (int i = 0; i < window; i++)
       timeSeries_out[i + motifPos0] = value + motif[i];
@@ -793,13 +816,34 @@ namespace tsg {
     for(int i = 0; i < length + 1000; i++) {
 
       //inject the second motif sequence
-      tmp[0] = timeSeries_out[motifPos1];
-      timeSeries_out[motifPos1] = tmp[0] + second[0];
+      value = timeSeries_out[motifPos1];
 
-      for (int i = 1; i < window; i++) {
+      //make sure we are in maxi when maxi can handle the motif height
+      if (abs(height) <= 2 * maxi) {
+
+        max = second[0];
+        min = max;
+
+        for (int i = 0; i < window; i++) {
+
+          if (second[i] < min)
+            min = second[i];
+
+          if (second[i] > max)
+            max = second[i];
+        }
+
+        if (value + max > maxi)
+          value = maxi - max;
+
+        if (value - min < -maxi)
+          value = -maxi - min;
+      }
+
+      for (int i = 0; i < window; i++) {
 
         tmp[i] = timeSeries_out[i + motifPos1];
-        timeSeries_out[i + motifPos1] = tmp[0] + second[i];
+        timeSeries_out[i + motifPos1] = value + second[i];
       }
 
       //update the runnings
@@ -860,6 +904,7 @@ namespace tsg {
         ? std::numeric_limits<double>::min() : noise * 0.25);
     int position;
     double value;
+    double min, max;
 
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
@@ -882,6 +927,28 @@ namespace tsg {
     //inject sequence into the time series
     value = timeSeries_out[position];
 
+    //make sure we are in maxi when maxi can handle the motif height
+    if (abs(height) <= 2 * maxi) {
+
+      max = motif[0];
+      min = max;
+
+      for (int i = 0; i < window; i++) {
+
+        if (motif[i] < min)
+          min = motif[i];
+
+        if (motif[i] > max)
+          max = motif[i];
+      }
+
+      if (value + max > maxi)
+        value = maxi - max;
+
+      if (value - min < -maxi)
+        value = -maxi - min;
+    }
+
     for (int i = 0; i < window; i++)
       timeSeries_out[i + position] = value + motif[i];
 
@@ -896,7 +963,6 @@ namespace tsg {
 
     //declaration stuff
     int retryItr = 0;
-    double min, max;
     double lth = noise / length;
 
 
