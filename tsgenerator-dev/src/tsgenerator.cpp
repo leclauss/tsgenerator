@@ -472,7 +472,7 @@ namespace tsg {
   }
 
   bool TSGenerator::smallerDistance(const rseq &timeSeries_in, const iseq
-      &motifPositions_in, double similarity_in) {
+      &motifPositions_in, const double similarity_in) {
 
     //lower and upper positions of the overlapping subsequences
     int lowerBound = std::max(0, motifPositions_in.back() - window + 1);
