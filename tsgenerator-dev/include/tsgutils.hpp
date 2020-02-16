@@ -397,7 +397,7 @@ namespace tsg {
               //non overlapping and ...
           if (abs(newMotifItr - i) >= window &&
               //... matching
-              zNormEuclSimilarity(timeSeries_in, i, newMotifItr, window, sums,
+              zNormEuclDist(timeSeries_in, i, newMotifItr, window, sums,
                 sumSquares, range_in) <= range_in) {
 
             subsequence sub;
@@ -449,8 +449,8 @@ namespace tsg {
           j < candidates[i].position + candidates[i].length;
           j++)
         if (abs(motifPositions_in.back() - j) >= window &&
-            zNormEuclSimilarity(timeSeries_in, motifPositions_in.back(), j,
-              window, sums, sumSquares, range_in) <= range_in) {
+            zNormEuclDist(timeSeries_in, motifPositions_in.back(), j, window,
+              sums, sumSquares, range_in) <= range_in) {
 
           last = j;
           motifSize++;
@@ -483,8 +483,8 @@ namespace tsg {
 
       for (int j = rightNewSubsequence.position;
           j < rightNewSubsequence.position + rightNewSubsequence.length; j++)
-        if (abs(i - j) >= window && zNormEuclSimilarity(timeSeries_in, i, j,
-              window, sums, sumSquares, range_in) <= range_in) {
+        if (abs(i - j) >= window && zNormEuclDist(timeSeries_in, i, j, window,
+              sums, sumSquares, range_in) <= range_in) {
 
           motifSize++;
           break;
@@ -495,7 +495,7 @@ namespace tsg {
       for (int j = 0; j < (int)candidates.size(); j++)
         for (int k = std::max(candidates[j].position, last + window);
             k < candidates[j].position + candidates[j].length; k++)
-          if (abs(i - k) >= window && zNormEuclSimilarity(timeSeries_in, i, k,
+          if (abs(i - k) >= window && zNormEuclDist(timeSeries_in, i, k,
                 window, sums, sumSquares, range_in) <= range_in) {
 
             last = k;
@@ -517,8 +517,8 @@ namespace tsg {
 
       for (int j = leftNewSubsequence.position; j
           < leftNewSubsequence.position + leftNewSubsequence.length; j++)
-        if (abs(i - j) >= window && zNormEuclSimilarity(timeSeries_in, i, j,
-              window, sums, sumSquares, range_in) <= range_in) {
+        if (abs(i - j) >= window && zNormEuclDist(timeSeries_in, i, j, window,
+              sums, sumSquares, range_in) <= range_in) {
 
           motifSize++;
           break;
@@ -529,7 +529,7 @@ namespace tsg {
       for (int j = 0; j < (int)candidates.size(); j++)
         for (int k = std::max(candidates[j].position, last + window);
             k < candidates[j].position + candidates[j].length; k++)
-          if (abs(i - k) >= window && zNormEuclSimilarity(timeSeries_in, i, k,
+          if (abs(i - k) >= window && zNormEuclDist(timeSeries_in, i, k,
                 window, sums, sumSquares, range_in) <= range_in) {
 
             last = k;
