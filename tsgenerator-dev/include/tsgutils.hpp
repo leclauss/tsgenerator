@@ -241,8 +241,8 @@ namespace tsg {
 
     tsg::rseq sums = sums_in;
     tsg::rseq sumSquares = sumSquares_in;
-    double length = sequence_in.size();
-    double window = window_in;
+    int length = sequence_in.size();
+    int window = window_in;
     if (sequence_in.empty()) {
 
       std::cerr << "ERROR: Time series is empty!" << std::endl;
@@ -310,8 +310,8 @@ namespace tsg {
       &motifPositions_in, const int window_in, const tsg::rseq sums_in, const
       tsg::rseq sumSquares_in, const double similarity_in) {
 
-    double length = timeSeries_in.size();
-    double window = window_in;
+    int length = timeSeries_in.size();
+    int window = window_in;
 
     //lower and upper positions of the overlapping subsequences
     int lowerBound = std::max(0, motifPositions_in.back() - window + 1);
@@ -359,8 +359,8 @@ namespace tsg {
       &motifPositions_in, const int window_in, const tsg::rseq sums_in, const
       tsg::rseq sumSquares_in, double range_in) {
 
-    double length = timeSeries_in.size();
-    double window = window_in;
+    int length = timeSeries_in.size();
+    int window = window_in;
     tsg::rseq sums = sums_in;
     tsg::rseq sumSquares = sumSquares_in;
 
