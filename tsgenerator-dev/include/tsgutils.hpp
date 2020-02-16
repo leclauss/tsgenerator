@@ -219,7 +219,7 @@ namespace tsg {
     }
   };
 
-  ///\brief Computes the similarity of two subsequences in a sequence.
+  ///\brief Computes the distance of two subsequences in a sequence.
   ///
   ///\param [in] &sequence_in Hands over the sequence.
   ///\param [in] pos0_in Hands over the position of the first subsequence.
@@ -229,17 +229,21 @@ namespace tsg {
   ///\param [in] sumSquares_in Hands over the running sum of squares.
   ///\param [in] bestSoFar_in Hands over the best similarity so far.
   ///
-  ///\return The similarity of the two z-normalized subsequences.
+  ///\return The distance of the two z-normalized subsequences.
   ///
-  ///This function computes the similarity of two subsequences. Therefore, the
+  ///This function computes the distance of two subsequences. Therefore, the
   ///subsequences are first z-normalized and the Euclidean Distance is
-  ///computed. The return value is the similarity of the two z-normalized
+  ///computed. The return value is the distance of the two z-normalized
   ///subsequences.
   double zNormEuclDist(const rseq &sequence_in, const int pos0_in, const int
       pos1_in, const int window_in, const tsg::rseq sums_in, const tsg::rseq
       sumSquares_in, const double bestSoFar_in) {
 
-    if (timeSeries_in.empty()) {
+    tsg::rseq sums = sums_in;
+    tsg::rseq sumSquares = sumSquares_in;
+    double length = sequence_in.size();
+    double window = window_in;
+    if (sequence_in.empty()) {
 
       std::cerr << "ERROR: Time series is empty!" << std::endl;
       throw(EXIT_FAILURE);
@@ -259,10 +263,6 @@ namespace tsg {
       throw(EXIT_FAILURE);
     }
 
-    tsg::rseq &sums = sums_in;
-    tsg::rseq &sumSquares = sumSquares_in;
-    double length = sequence_in.size();
-    double window = window_in;
     double rWindow = 1.0 / window;
 
     double mean0 = sums[pos0_in] * rWindow;
@@ -282,8 +282,8 @@ namespace tsg {
 
     for (int i = 0; i < window && sumOfSquares < bestSoFar; i++) {
 
-      norm0 = (timeSeries_in[pos0_in + i] - mean0) / stdDev0;
-      norm1 = (timeSeries_in[pos1_in + i] - mean1) / stdDev1;
+      norm0 = (sequence_in[pos0_in + i] - mean0) / stdDev0;
+      norm1 = (sequence_in[pos1_in + i] - mean1) / stdDev1;
       diff = norm0 - norm1;
       sumOfSquares += diff * diff;
     }
@@ -311,7 +311,7 @@ namespace tsg {
       tsg::rseq sumSquares_in, const double similarity_in) {
 
     double length = timeSeries_in.size();
-    double window = window_in,
+    double window = window_in;
 
     //lower and upper positions of the overlapping subsequences
     int lowerBound = std::max(0, motifPositions_in.back() - window + 1);
@@ -361,8 +361,8 @@ namespace tsg {
 
     double length = timeSeries_in.size();
     double window = window_in;
-    tsg::rseq &sums = sums_in;
-    tsg::rseq &sumSquares = sumSquares_in;
+    tsg::rseq sums = sums_in;
+    tsg::rseq sumSquares = sumSquares_in;
 
     //lower and upper positions of the subsequences overlapping the new motif
     //set
