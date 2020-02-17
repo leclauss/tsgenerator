@@ -321,7 +321,7 @@ namespace tsg {
     //add the remaining values
     for (int i = 1; i < length_in; i++) {
 
-      value = delta_in * distribution(randomEngine) - 2 * delta_in;
+      value = delta_in * (2 * distribution(randomEngine) - 1);
 
       //check if border is crossed
       if (timeSeries_out[i - 1] + value < -maxi_in)
