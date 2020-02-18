@@ -41,6 +41,12 @@ protected:
   ///the meta data of the time series.
   std::ofstream metaFile;
 
+  ///\brief Stores the path to the output folder.
+  ///
+  ///This variable stores the path to the output folder used to store the
+  ///output files.
+  std::string dir;
+
   ///\brief Stores the name of the meta output file.
   ///
   ///This variable stores the name of the file containing the meta data of the
@@ -83,12 +89,13 @@ public:
   ///
   ///\param [in] outputFileName_in Hands over the output file name.
   ///\param [in] delimiter_in Hands over the delimiter sequence.
+  ///\param [in] path_in Hands over the path for the output files.
   ///
   ///The constructor creates a new output directory path and sets up the file
   ///name with default file name "time_series". It chooses another directory
   ///path, if a directory with the same name already exists.
   OutputGenerator(const std::string outputFileName_in, const std::string
-      delimiter_in = ",");
+      delimiter_in = ",", const std::string path_in = ".");
 
   ///\brief Destroys the file pointers.
   ///

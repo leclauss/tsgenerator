@@ -12,23 +12,17 @@ OutputGenerator::OutputGenerator(const std::string delimiter_in)
   : OutputGenerator("time_series", delimiter_in) {}
 
 OutputGenerator::OutputGenerator(const std::string fileName_in, const
-    std::string delimiter_in)
+    std::string delimiter_in, const std::string path_in)
   : delimiter(delimiter_in) {
 
-  std::string dirName = "./time_series_";
+  dir = "time_series_";
 
-  while (std::filesystem::exists("./time_series_"
-        + std::to_string(folderNumber)))
-    folderNumber++;
-
-  std::filesystem::create_directory("./time_series_"
-      + std::to_string(folderNumber));
+  if (path_in.back() == '/')
+    dir = path_in + dir;
+  else
+    dir = path_in + "/" + dir;
 
   baseFileName = fileName_in;
-  metaFileName = "./time_series_" + std::to_string(folderNumber)
-    + "/" + fileName_in + "_meta";
-  tsFileName = "./time_series_" + std::to_string(folderNumber)
-    + "/" + fileName_in;
 }
 
 OutputGenerator::~OutputGenerator() {
@@ -39,6 +33,15 @@ OutputGenerator::~OutputGenerator() {
 void OutputGenerator::open() {
 
   close();
+
+  while (std::filesystem::exists(dir + std::to_string(folderNumber)))
+    folderNumber++;
+
+  std::filesystem::create_directory(dir + std::to_string(folderNumber));
+
+  metaFileName = dir + std::to_string(folderNumber) + "/" + baseFileName
+    + "_meta";
+  tsFileName = dir + std::to_string(folderNumber) + "/" + baseFileName;
 
   tsFileName += "_" + std::to_string(folderNumber) + ".csv";
   metaFileName += "_" + std::to_string(folderNumber) + ".csv";
