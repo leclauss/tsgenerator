@@ -583,8 +583,8 @@ void TsgGui::generateTS() {
       height = std::stod(in);
 
     in = stepText.text().toStdString();
-    if (in.length() > 0 && in.find_first_not_of("0123456789") == in.npos)
-      step = std::stoi(in);
+    if (check_if_float(in))
+      step = std::stod(in);
 
     in = timesText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") == in.npos)
