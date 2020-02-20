@@ -76,26 +76,17 @@ protected:
 
 public:
 
-  ///\brief Initializes the output generator.
-  ///
-  ///\param [in] delimiter_in Sets the delimiter sequence.
-  ///
-  ///The constructor creates a new output directory path and sets up the file
-  ///name with default file name "time_series". It chooses another directory
-  ///path, if a directory with the same name already exists.
-  OutputGenerator(const std::string delimiter_in = ",");
-
   ///\brief Initializes the output generator, i.e. creates output directory.
   ///
   ///\param [in] outputFileName_in Hands over the output file name.
-  ///\param [in] delimiter_in Hands over the delimiter sequence.
   ///\param [in] path_in Hands over the path for the output files.
+  ///\param [in] delimiter_in Hands over the delimiter sequence.
   ///
   ///The constructor creates a new output directory path and sets up the file
   ///name with default file name "time_series". It chooses another directory
   ///path, if a directory with the same name already exists.
-  OutputGenerator(const std::string outputFileName_in, const std::string
-      delimiter_in = ",", const std::string path_in = ".");
+  OutputGenerator(const std::string outputFileName_in = "time_series", const
+      std::string path_in = ".", const std::string delimiter_in = ",");
 
   ///\brief Destroys the file pointers.
   ///

@@ -8,11 +8,8 @@
 #include <outputgenerator.hpp>
 
 
-OutputGenerator::OutputGenerator(const std::string delimiter_in)
-  : OutputGenerator("time_series", delimiter_in) {}
-
 OutputGenerator::OutputGenerator(const std::string fileName_in, const
-    std::string delimiter_in, const std::string path_in)
+    std::string path_in, const std::string delimiter_in)
   : delimiter(delimiter_in) {
 
   dir = "time_series_";
