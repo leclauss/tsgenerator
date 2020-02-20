@@ -737,7 +737,9 @@ namespace tsg {
     value = timeSeries_out[motifPos0];
 
     //make sure we are in maxi when maxi can handle the motif height
-    if (abs(height) <= 2 * maxi) {
+    if (method > 3
+        && method < 8
+        && abs(height) <= 2 * maxi) {
 
       max = motif[0];
       min = max;
@@ -819,7 +821,9 @@ namespace tsg {
       value = timeSeries_out[motifPos1];
 
       //make sure we are in maxi when maxi can handle the motif height
-      if (abs(height) <= 2 * maxi) {
+      if (method > 3
+        && method < 8
+        && abs(height) <= 2 * maxi) {
 
         max = second[0];
         min = max;
@@ -928,7 +932,9 @@ namespace tsg {
     value = timeSeries_out[position];
 
     //make sure we are in maxi when maxi can handle the motif height
-    if (abs(height) <= 2 * maxi) {
+    if (method > 3
+        && method < 8
+        && abs(height) <= 2 * maxi) {
 
       max = motif[0];
       min = max;
@@ -998,7 +1004,9 @@ namespace tsg {
           value = subsequence[0];
 
           //make sure we are in maxi when maxi can handle the motif height
-          if (abs(height) <= 2 * maxi) {
+          if (method > 3
+              && method < 8
+              && abs(height) <= 2 * maxi) {
 
             max = newSubsequence[0];
             min = max;
@@ -1165,7 +1173,9 @@ namespace tsg {
           value = subsequence[0];
 
           //make sure we are in maxi when maxi can handle the motif height
-          if (abs(height) <= 2 * maxi) {
+          if (method > 3
+              && method < 8
+              && abs(height) <= 2 * maxi) {
 
             max = newSubsequence[0];
             min = max;
