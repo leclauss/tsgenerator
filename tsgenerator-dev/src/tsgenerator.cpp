@@ -505,181 +505,75 @@ namespace tsg {
   bool TSGenerator::largerMotifSet(const rseq &timeSeries_in,
       const iseq &motifPositions_in, double range_in) {
 
-    //lower and upper positions of the subsequences overlapping the new motif
-    //set
-    int lowerBound = std::max(0, motifPositions_in.back() - window + 1);
-    int upperBound = std::min(motifPositions_in.back() + window, length
-        - window + 1);
+    int motif = motifPositions_in.back();
+    int start = motif - window + 1;
+    int end = motif + window - 1;
 
-    bool candidate = true;
-    subsequences candidates;
+    if (start < 0)
+      start = 0;
 
-    //process all subsequences
-    for (int i = 0; i < length - window + 1; i++) {
+    if (end > (int)timeSeries_in.size() - window)
+      end = timeSeries_in.size() - window;
 
-      candidate = true;
+    //collect new matches
+    iseq mats;
 
-      //check if subsequence is overlapping to any motif set subsequence
-      for (int position : motifPositions_in)
-        if (abs(position - i) < window)
-          {
+    for (int i = start; i <= end; i++) {
 
-          //then ignore it
-          candidate = false;
-          break;
-        }
+      for (int j = 0; j <= (int)timeSeries_in.size() - window; j++) {
 
-      //if candidate found
-      if (candidate)
-        //check if subsequence is within range of any subsequence overlapping
-        //the new added motif subsequence
-        for (int newMotifItr = lowerBound; newMotifItr < upperBound;
-            newMotifItr++)
-              //non overlapping and ...
-          if (abs(newMotifItr - i) >= window &&
-              //... matching
-              similarity(timeSeries_in, i, newMotifItr, range_in) <= range_in)
-            {
+        if (similarity(timeSeries_in, i, j, range_in) <= range_in) {
 
-            subsequence sub;
-            sub.position = i;
-            sub.length = 1;
-            candidates.push_back(sub);
-            break;
+          bool ins = false;
+
+          for (int k = 0; k < (int)mats.size(); k++) {
+
+            if (mats[k] == j) {
+
+              ins = true;
+              k = mats.size();
+            }
+            else if (j < mats[k]) {
+
+              ins = true;
+              mats.insert(mats.begin() + k, j);
+              k = mats.size();
+            }
           }
-    }
 
-    iseq positions;
-    int newMotif = motifPositions_in.back();
-
-    for (int position : motifPositions_in)
-      positions.push_back(position);
-
-    //get all positions of time series subsequences overlapping the injected
-    //motif positions
-    for (int position : positions)
-      if (position != newMotif) {
-
-        //left of the injected motifs
-        subsequence leftSubsequences;
-        leftSubsequences.position = std::max(0, position - window + 1);
-        leftSubsequences.length = position - leftSubsequences.position;
-        candidates.push_back(leftSubsequences);
-
-        //right of the injected motifs
-        subsequence rightSubsequences;
-        rightSubsequences.position = position + 1;
-        rightSubsequences.length   = std::min(position + window
-            - rightSubsequences.position, length - window
-            + 1 - rightSubsequences.position);
-        candidates.push_back(rightSubsequences);
+          if (!ins)
+            mats.push_back(j);
+        }
       }
-
-    std::sort(candidates.begin(), candidates.end(), [](subsequence const &a,
-          subsequence const &b) {
-        return a.position < b.position;
-        });
-
-    int motifSize = 1;
-    int last = -window;
-    iseq motif;
-
-    //if the new motif has to much matches with left and right overlapping sets
-    for (int i = 0; i < (int)candidates.size(); i++)
-      for (int j = std::max(candidates[i].position, last + window);
-          j < candidates[i].position + candidates[i].length;
-          j++)
-        if (abs(motifPositions_in.back() - j) >= window &&
-            similarity(timeSeries_in, motifPositions_in.back(), j, range_in) <=
-            range_in) {
-
-          last = j;
-          motifSize++;
-          break;
-        }
-
-    if (motifSize > (int)motifPositions_in.size())
-      return true;
-
-
-    subsequence leftNewSubsequence;
-    leftNewSubsequence.position = std::max(0, motifPositions_in.back() - window
-        + 1);
-    leftNewSubsequence.length   = motifPositions_in.back()
-      - leftNewSubsequence.position;
-
-    subsequence rightNewSubsequence;
-    rightNewSubsequence.position = motifPositions_in.back() + 1;
-    rightNewSubsequence.length   = std::min(motifPositions_in.back() + window
-        - rightNewSubsequence.position, length - window
-        + 1 - rightNewSubsequence.position);
-
-
-    //if one subsequence of the overlapping set of subsequences left of the new
-    //motif has to much matches with the left and right overlapping sets
-    for (int i = leftNewSubsequence.position; i < leftNewSubsequence.position
-        + leftNewSubsequence.length; i++) {
-
-      motifSize = 1;
-
-      for (int j = rightNewSubsequence.position;
-          j < rightNewSubsequence.position + rightNewSubsequence.length; j++)
-        if (abs(i - j) >= window && similarity(timeSeries_in, i, j, range_in)
-            <= range_in) {
-
-          motifSize++;
-          break;
-        }
-
-      last = -window;
-
-      for (int j = 0; j < (int)candidates.size(); j++)
-        for (int k = std::max(candidates[j].position, last + window);
-            k < candidates[j].position + candidates[j].length; k++)
-          if (abs(i - k) >= window && similarity(timeSeries_in, i, k, range_in)
-              <= range_in) {
-
-            last = k;
-            motifSize++;
-            break;
-          }
-
-      if (motifSize > (int)motifPositions_in.size())
-        return true;
     }
 
+    //no matchings no larger set motif
+    if ((int)mats.size() < 1)
+      return false;
 
-    //if one subsequence of the overlapping set of subsequences right of the
-    //new motif has to much matches with the left and right overlapping sets
-    for (int i = rightNewSubsequence.position; i < rightNewSubsequence.position
-        + rightNewSubsequence.length; i++) {
+    //check matches for larger set motif
+    for (int i = 0; i < (int)mats.size(); i++) {
 
-      motifSize = 1;
+      int size = 1;
 
-      for (int j = leftNewSubsequence.position; j
-          < leftNewSubsequence.position + leftNewSubsequence.length; j++)
-        if (abs(i - j) >= window && similarity(timeSeries_in, i, j, range_in)
-            <= range_in) {
+      for (int j = 0; j <= (int)timeSeries_in.size() - window; j++) {
 
-          motifSize++;
-          break;
-        }
+        //subseqeunce not overlapping the ith set motif
+        if (!(abs(j - mats[i]) < window)) {
 
-      last = -window;
+          //matching
+          if (similarity(timeSeries_in, mats[i], j, range_in) <= range_in) {
 
-      for (int j = 0; j < (int)candidates.size(); j++)
-        for (int k = std::max(candidates[j].position, last + window);
-            k < candidates[j].position + candidates[j].length; k++)
-          if (abs(i - k) >= window && similarity(timeSeries_in, i, k, range_in)
-              <= range_in) {
+            //filter overlaps
+            j += window - 1;
+            size++;
 
-            last = k;
-            motifSize++;
-            break;
+            //is the set motif larger?
+            if (size > (int)motifPositions_in.size())
+              return true;
           }
-
-      if (motifSize > (int)motifPositions_in.size())
-        return true;
+        }
+      }
     }
 
     return false;
@@ -964,13 +858,13 @@ namespace tsg {
     //determine similarity of the top motif pair in the random synthetic time
     //series
     tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
-    d = 0.499999999 * similarity(timeSeries_out, positionOne, positionTwo,
+    d = 0.9999999 * similarity(timeSeries_out, positionOne, positionTwo,
         std::numeric_limits<double>::max());
 
     //declaration stuff
     int retryItr = 0;
-    double lth = noise / length;
-
+    int retries = 20;
+    double lth = noise / retries;
 
     //inject sequences into the time series
     for (int motifItr = 1; motifItr < size; motifItr++) {
@@ -981,7 +875,7 @@ namespace tsg {
       pos_out[0].push_back(position);
 
       //try to inject another sequence
-      while (retryItr < length + 100) {
+      while (retryItr < retries + 1) {
 
         //try to inject another sequence
         std::normal_distribution<double> distributionNoise(0.0, abs(noise)
@@ -1060,7 +954,7 @@ namespace tsg {
           noise -= lth;
         }
 
-        if (retryItr == length + 100 - 1) {
+        if (retryItr == retries) {
 
           std::cerr << "ERROR: Cannot add motif set subsequence!" <<
             " Retry or change your settings!" << std::endl;
@@ -1116,7 +1010,7 @@ namespace tsg {
     //determine similarity of the top motif pair in the random synthetic time
     //series
     tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
-    d = similarity(timeSeries_out, positionOne, positionTwo,
+    d = 0.49999999 * similarity(timeSeries_out, positionOne, positionTwo,
         std::numeric_limits<double>::max());
 
     //calculate temporary motif set center subsequence in the window size
@@ -1130,16 +1024,15 @@ namespace tsg {
     stdDev = 0.0;
     meanStdDev(motifCenter, mean, stdDev);
 
-    d *= 0.49999999;
-
     motif_out[0] = motifCenter;
 
     //declaration stuff
     int position;
     int retryItr = 0;
+    int retries = 20;
     double value;
     double min, max;
-    double lth = noise / length;
+    double lth = noise / retries;
 
 
     //inject sequences into the time series
@@ -1151,7 +1044,7 @@ namespace tsg {
       pos_out[0].push_back(position);
 
       //try to inject another sequence
-      while (retryItr < length + 100) {
+      while (retryItr < retries + 1) {
 
         std::normal_distribution<double> distributionNoise(0.0, abs(noise)
             * 0.25 <= 0.0 ? std::numeric_limits<double>::min() : noise * 0.25);
@@ -1229,7 +1122,7 @@ namespace tsg {
           noise -= lth;
         }
 
-        if (retryItr == length + 100 - 1) {
+        if (retryItr == retries) {
 
           std::cerr << "ERROR: Cannot add motif set subsequence!" <<
             " Retry or change your settings!" << std::endl;
