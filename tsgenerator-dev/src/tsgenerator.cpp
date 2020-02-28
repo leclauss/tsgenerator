@@ -861,6 +861,8 @@ namespace tsg {
     d = 0.9999999 * similarity(timeSeries_out, positionOne, positionTwo,
         std::numeric_limits<double>::max());
 
+    d_out.push_back(d);
+
     //declaration stuff
     int retryItr = 0;
     int retries = 20;
@@ -968,8 +970,6 @@ namespace tsg {
       //remove the position from available positions
       freePositions.removePosition();
     }
-
-    d_out.push_back(d);
   }
 
   void TSGenerator::injectLatentMotif(rseq &timeSeries_out, rseqs &motif_out,
@@ -1012,6 +1012,8 @@ namespace tsg {
     tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
     d = 0.49999999 * similarity(timeSeries_out, positionOne, positionTwo,
         std::numeric_limits<double>::max());
+
+    d_out.push_back(d);
 
     //calculate temporary motif set center subsequence in the window size
     //dimentional room of subsequence values
@@ -1135,8 +1137,6 @@ namespace tsg {
       //remove the position from available positions
       freePositions.removePosition();
     }
-
-    d_out.push_back(d);
   }
 
   void TSGenerator::run(rseq &timeSeries_out, rseqs &motif_out, rseq &d_out,
