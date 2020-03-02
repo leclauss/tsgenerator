@@ -502,8 +502,8 @@ namespace tsg {
     return false;
   }
 
-  bool TSGenerator::largerMotifSet(const rseq &timeSeries_in,
-      const iseq &motifPositions_in, double range_in) {
+  bool TSGenerator::largerMotifSet(const rseq &timeSeries_in, const iseq
+      &motifPositions_in, double range_in) {
 
     int motif = motifPositions_in.back();
     int start = motif - window + 1;
@@ -577,6 +577,88 @@ namespace tsg {
     }
 
     return false;
+  }
+
+  int TSGenerator::largerMotifSet(const rseq &timeSeries_in, const iseq
+      motifPositions_in, const int size_in, const double range_in) {
+
+    int motif = motifPositions_in.back();
+    int start = motif - window + 1;
+    int end = motif + window - 1;
+
+    if (start < 0)
+      start = 0;
+
+    if (end > (int)timeSeries_in.size() - window)
+      end = timeSeries_in.size() - window;
+
+    //collect new matches
+    iseq mats;
+
+    for (int i = start; i <= end; i++) {
+
+      for (int j = 0; j <= (int)timeSeries_in.size() - window; j++) {
+
+        if (similarity(timeSeries_in, i, j, range_in) <= range_in) {
+
+          bool ins = false;
+
+          for (int k = 0; k < (int)mats.size(); k++) {
+
+            if (mats[k] == j) {
+
+              ins = true;
+              k = mats.size();
+            }
+            else if (j < mats[k]) {
+
+              ins = true;
+              mats.insert(mats.begin() + k, j);
+              k = mats.size();
+            }
+          }
+
+          if (!ins)
+            mats.push_back(j);
+        }
+      }
+    }
+
+    //no matchings no larger set motif
+    if ((int)mats.size() < 1)
+      return 1;
+
+    //check matches for larger set motif
+    int largestSize = 1;
+
+    for (int i = 0; i < (int)mats.size(); i++) {
+
+      int size = 1;
+
+      for (int j = 0; j <= (int)timeSeries_in.size() - window; j++) {
+
+        //subsequences not overlapping the set motif i
+        if (!(abs(j - mats[i]) < window)) {
+
+          //matching
+          if (similarity(timeSeries_in, mats[i], j, range_in) <= range_in) {
+
+            //filter overlaps
+            j += window - 1;
+            size++;
+
+            //is the set motif larger?
+            if (size > size_in)
+              return size;
+          }
+        }
+      }
+
+      if (size > largestSize)
+        largestSize = size;
+    }
+
+    return largestSize;
   }
 
   void TSGenerator::injectPairMotif(rseq &timeSeries_out, rseqs &motif_out) {
@@ -970,6 +1052,99 @@ namespace tsg {
       //remove the position from available positions
       freePositions.removePosition();
     }
+
+    //inject smaller set motif to harden the algorithm
+    position = freePositions.calculateRandomPosition();
+
+    retryItr = 0;
+    retries = 20;
+    tsg::iseq secPos;
+    tsg::rseq sec;
+    secPos.push_back(position);
+
+    for (int i = position; i < position + window; i++)
+      sec.push_back(timeSeries_out[i] - timeSeries_out[position]);
+
+    //remove the position from available positions
+    freePositions.removePosition();
+
+    int secSize = largerMotifSet(timeSeries_out, secPos, pos_out[0].size()
+        - 1, d);
+
+    if (secSize > (int)pos_out[0].size()) {
+
+      std::cerr << "ERROR: Imossible error?" << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    //there is already a hidden motif with this subseqeunce
+    if (secSize >= (int)pos_out[0].size() - 1)
+      return;
+
+    //harden the time series by injecting smaller motif
+    for (int motifItr = 1; motifItr < size - 1; motifItr++) {
+
+      //compute the random position for the subsequence
+      position = freePositions.calculateRandomPosition();
+
+      secPos.push_back(position);
+
+      //try to inject another sequence
+      while (retryItr < retries + 1) {
+
+        //backup subsequence at position
+        for (int i = 0; i < window; i++)
+          subsequence[i] = timeSeries_out[position + i];
+
+        value = subsequence.back() - subsequence[0];
+        value = subsequence[0] + value / 2.0;
+
+        //inject sequence into the time series
+        for (int i = 0; i < window; i++)
+          timeSeries_out[i + position] = value + sec[i];
+
+        //update the running sum and sum of square
+        updateRunnings(timeSeries_out, position);
+
+        secSize = largerMotifSet(timeSeries_out, secPos, pos_out[0].size()
+            - 1, d);
+
+        if (secSize <= (int)pos_out[0].size()) {
+
+          if (secSize > (int)pos_out[0].size() - 1)
+            return;
+
+          break;
+        }
+        else {
+
+          //restore old subsequence
+          for (int i = 0; i < window; i++)
+            timeSeries_out[position + i] = subsequence[i];
+
+          //update the running mean and variance
+          updateRunnings(timeSeries_out, position);
+
+          //get new random position in the synthetic time series
+          position = freePositions.calculateRandomPosition();
+
+          pos_out[0].back() = position;
+        }
+
+        if (retryItr == retries) {
+
+          std::cerr << "ERROR: Cannot add smaller motif set subsequence!" <<
+            " Retry or change your settings!" << std::endl;
+          throw(EXIT_FAILURE);
+        }
+
+        retryItr++;
+
+      }
+
+      //remove the position from available positions
+      freePositions.removePosition();
+    }
   }
 
   void TSGenerator::injectLatentMotif(rseq &timeSeries_out, rseqs &motif_out,
@@ -1132,6 +1307,99 @@ namespace tsg {
         }
 
         retryItr++;
+      }
+
+      //remove the position from available positions
+      freePositions.removePosition();
+    }
+
+    //inject smaller set motif to harden the algorithm
+    position = freePositions.calculateRandomPosition();
+
+    retryItr = 0;
+    retries = 20;
+    tsg::iseq secPos;
+    tsg::rseq sec;
+    secPos.push_back(position);
+
+    for (int i = position; i < position + window; i++)
+      sec.push_back(timeSeries_out[i] - timeSeries_out[position]);
+
+    //remove the position from available positions
+    freePositions.removePosition();
+
+    int secSize = largerMotifSet(timeSeries_out, secPos, pos_out[0].size()
+        - 1, 2.0 * d);
+
+    if (secSize > (int)pos_out[0].size()) {
+
+      std::cerr << "ERROR: Imossible error?" << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    //there is already a hidden motif with this subseqeunce
+    if (secSize >= (int)pos_out[0].size() - 1)
+      return;
+
+    //harden the time series by injecting smaller motif
+    for (int motifItr = 1; motifItr < size - 1; motifItr++) {
+
+      //compute the random position for the subsequence
+      position = freePositions.calculateRandomPosition();
+
+      secPos.push_back(position);
+
+      //try to inject another sequence
+      while (retryItr < retries + 1) {
+
+        //backup subsequence at position
+        for (int i = 0; i < window; i++)
+          subsequence[i] = timeSeries_out[position + i];
+
+        value = subsequence.back() - subsequence[0];
+        value = subsequence[0] + value / 2.0;
+
+        //inject sequence into the time series
+        for (int i = 0; i < window; i++)
+          timeSeries_out[i + position] = value + sec[i];
+
+        //update the running sum and sum of square
+        updateRunnings(timeSeries_out, position);
+
+        secSize = largerMotifSet(timeSeries_out, secPos, pos_out[0].size()
+            - 1, 2.0 * d);
+
+        if (secSize <= (int)pos_out[0].size()) {
+
+          if (secSize > (int)pos_out[0].size() - 1)
+            return;
+
+          break;
+        }
+        else {
+
+          //restore old subsequence
+          for (int i = 0; i < window; i++)
+            timeSeries_out[position + i] = subsequence[i];
+
+          //update the running mean and variance
+          updateRunnings(timeSeries_out, position);
+
+          //get new random position in the synthetic time series
+          position = freePositions.calculateRandomPosition();
+
+          pos_out[0].back() = position;
+        }
+
+        if (retryItr == retries) {
+
+          std::cerr << "ERROR: Cannot add smaller motif set subsequence!" <<
+            " Retry or change your settings!" << std::endl;
+          throw(EXIT_FAILURE);
+        }
+
+        retryItr++;
+
       }
 
       //remove the position from available positions
