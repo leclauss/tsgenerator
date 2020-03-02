@@ -693,6 +693,8 @@ namespace tsg {
         ? std::numeric_limits<double>::min() : noise * 0.25);
     double value;
     double min, max;
+    std::uniform_real_distribution<double> distHeight(0.6, 1.4);
+    double stretch = distHeight(randomEngine);
 
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
@@ -701,9 +703,12 @@ namespace tsg {
     calculateSubsequence(motif, type, height);
     motif_out[0] = motif;
 
-    //add noise
-    for (auto &value : motif)
-      value += distribution(randomEngine);
+    //stretch and add noise
+    for (auto &item : motif) {
+
+      item += distribution(randomEngine);
+      item *= stretch;
+    }
 
     //get new random position in the synthetic time series
     motifPos0 = freePositions.calculateRandomPosition();
@@ -739,6 +744,10 @@ namespace tsg {
     for (int i = 0; i < window; i++)
       timeSeries_out[i + motifPos0] = value + motif[i];
 
+    //unstretch motif
+    for (auto &item : motif)
+      item /= stretch;
+
     //compute running mean and std dev
     calcRunnings(timeSeries_out);
 
@@ -758,8 +767,7 @@ namespace tsg {
 
     do {
 
-      std::normal_distribution<double> distributionNoise(0.0, abs(noise)
-          * 0.25 <= 0.0 ? std::numeric_limits<double>::min() : noise * 0.25);
+      stretch = distHeight(randomEngine);
 
       if (noise > 0.0)
         noise -= lth;
@@ -770,9 +778,12 @@ namespace tsg {
       for (int i = 0; i < window; i++)
         second[i] = motif[i];
 
-      //add noise
-      for (auto &value : second)
-        value += distributionNoise(randomEngine);
+      //stretch and add noise
+      for (auto &item : second) {
+
+        item += distribution(randomEngine);
+        item *= stretch;
+      }
 
       mean = 0.0;
       stdDev = 0.0;
@@ -885,6 +896,8 @@ namespace tsg {
     int position;
     double value;
     double min, max;
+    std::uniform_real_distribution<double> distHeight(0.6, 1.4);
+    double stretch = distHeight(randomEngine);
 
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
@@ -894,9 +907,12 @@ namespace tsg {
 
     motif_out[0] = motif;
 
-    //add noise
-    for (auto &value : motif)
-      value += distribution(randomEngine);
+    //stretch and add noise
+    for (auto &item : motif) {
+
+      item += distribution(randomEngine);
+      item *= stretch;
+    }
 
     //get new random position in the synthetic time series
     position = freePositions.calculateRandomPosition();
@@ -934,6 +950,10 @@ namespace tsg {
     for (int i = 0; i < window; i++)
       timeSeries_out[i + position] = value + motif[i];
 
+    //unstretch
+    for (auto &item : motif)
+      item /= stretch;
+
     //compute running mean and std dev
     calcRunnings(timeSeries_out);
 
@@ -968,9 +988,14 @@ namespace tsg {
         //copy another motif sequence ...
         rseq newSubsequence(motif);
 
-        //... with noise
-        for (auto &item : newSubsequence)
+        //... stretch and add noise
+        stretch = distHeight(randomEngine);
+
+        for (auto &item : newSubsequence) {
+
           item += distributionNoise(randomEngine);
+          item *= stretch;
+        }
 
         //check if the sequence is within range d of the motif
         if (similarity(motif, newSubsequence, d) < d) {
@@ -1175,6 +1200,8 @@ namespace tsg {
     double d = std::numeric_limits<double>::max();
     std::normal_distribution<double> distribution(0.0, abs(noise) * 0.25 <= 0.0
         ? std::numeric_limits<double>::min() : noise * 0.25);
+    std::uniform_real_distribution<double> distHeight(0.6, 1.4);
+    double stretch;
 
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
@@ -1229,9 +1256,14 @@ namespace tsg {
         //copy another motif sequence ...
         rseq newSubsequence(motifCenter);
 
-        //... with noise
-        for (auto &item : newSubsequence)
+        //... stretch and add noise
+        stretch = distHeight(randomEngine);
+
+        for (auto &item : newSubsequence) {
+
           item += distributionNoise(randomEngine);
+          item *= stretch;
+        }
 
         //check if the sequence is within range d of the center
         if (similarity(motifCenter, newSubsequence, d) < d) {
