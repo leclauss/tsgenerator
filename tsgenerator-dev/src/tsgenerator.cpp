@@ -689,8 +689,8 @@ namespace tsg {
     rseq motif;
     rseq subsequence(window, 0.0);
     double d = std::numeric_limits<double>::max();
-    std::normal_distribution<double> distribution(0.0, abs(noise) * 0.25 <= 0.0
-        ? std::numeric_limits<double>::min() : noise * 0.25);
+    std::normal_distribution<double> distribution(0.0, abs(noise) * 0.5 <= 0.0
+        ? std::numeric_limits<double>::min() : noise * 0.5);
     double value;
     double min, max;
     std::uniform_real_distribution<double> distHeight(0.6, 1.4);
@@ -754,8 +754,7 @@ namespace tsg {
     //determine simlarity of the top motif pair in the random synthetic time
     //series
     tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
-    d = similarity(timeSeries_out, pos0, pos1,
-        std::numeric_limits<double>::max());
+    d = similarity(timeSeries_out, pos0, pos1, d);
 
     //compute the second motif sequence
     double lth = noise / length;
@@ -891,13 +890,13 @@ namespace tsg {
     rseq motif;
     rseq subsequence(window, 0.0);
     double d = std::numeric_limits<double>::max();
-    std::normal_distribution<double> distribution(0.0, abs(noise) * 0.25 <= 0.0
-        ? std::numeric_limits<double>::min() : noise * 0.25);
+    std::normal_distribution<double> distNoise(0.0, abs(noise) * 0.5 <= 0.0
+        ? std::numeric_limits<double>::min() : noise * 0.5);
     int position;
     double value;
     double min, max;
-    std::uniform_real_distribution<double> distHeight(0.6, 1.4);
-    double stretch = distHeight(randomEngine);
+    std::uniform_real_distribution<double> distStretch(0.6, 1.4);
+    double stretch = distStretch(randomEngine);
 
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
@@ -910,7 +909,7 @@ namespace tsg {
     //stretch and add noise
     for (auto &item : motif) {
 
-      item += distribution(randomEngine);
+      item += distNoise(randomEngine);
       item *= stretch;
     }
 
@@ -960,15 +959,14 @@ namespace tsg {
     //determine similarity of the top motif pair in the random synthetic time
     //series
     tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
-    d = 0.9999999 * similarity(timeSeries_out, positionOne, positionTwo,
-        std::numeric_limits<double>::max());
+    d = 0.9999999 * similarity(timeSeries_out, positionOne, positionTwo, d);
 
     d_out.push_back(d);
 
     //declaration stuff
-    int retryItr = 0;
     int retries = 20;
     double lth = noise / retries;
+    double noiseBackup = noise;
 
     //inject sequences into the time series
     for (int motifItr = 1; motifItr < size; motifItr++) {
@@ -979,21 +977,30 @@ namespace tsg {
       pos_out[0].push_back(position);
 
       //try to inject another sequence
-      while (retryItr < retries + 1) {
+      noise = noiseBackup;
 
-        //try to inject another sequence
-        std::normal_distribution<double> distributionNoise(0.0, abs(noise)
-            * 0.25 <= 0.0 ? std::numeric_limits<double>::min() : noise * 0.25);
+      for (int retry = 0; retry <= retries; retry++) {
+
+        if (retry == retries) {
+
+          std::cerr << "ERROR: Cannot add another set motif subsequence!" <<
+            " Retry or change your settings!" << std::endl;
+          throw(EXIT_FAILURE);
+        }
+
+        //new random noise for retry
+        std::normal_distribution<double> distNoiseRetry(0.0, abs(noise) * 0.5
+            <= 0.0 ? std::numeric_limits<double>::min() : noise * 0.5);
 
         //copy another motif sequence ...
         rseq newSubsequence(motif);
 
         //... stretch and add noise
-        stretch = distHeight(randomEngine);
+        stretch = distStretch(randomEngine);
 
         for (auto &item : newSubsequence) {
 
-          item += distributionNoise(randomEngine);
+          item += distNoiseRetry(randomEngine);
           item *= stretch;
         }
 
@@ -1041,37 +1048,21 @@ namespace tsg {
 
             break;
           }
-          else {
 
-            //restore old subsequence
-            for (int i = 0; i < window; i++)
-              timeSeries_out[position + i] = subsequence[i];
+          //restore old subsequence
+          for (int i = 0; i < window; i++)
+            timeSeries_out[position + i] = subsequence[i];
 
-            //update the running mean and variance
-            updateRunnings(timeSeries_out, position);
+          //update the running mean and variance
+          updateRunnings(timeSeries_out, position);
 
-            //get new random position in the synthetic time series
-            position = freePositions.calculateRandomPosition();
+          //get new random position in the synthetic time series
+          position = freePositions.calculateRandomPosition();
 
-            pos_out[0].back() = position;
-
-            noise -= lth;
-          }
-        }
-        else {
-
-          noise -= lth;
+          pos_out[0].back() = position;
         }
 
-        if (retryItr == retries) {
-
-          std::cerr << "ERROR: Cannot add another set motif subsequence!" <<
-            " Retry or change your settings!" << std::endl;
-          throw(EXIT_FAILURE);
-        }
-
-        retryItr++;
-
+        noise -= lth;
       }
 
       //remove the position from available positions
@@ -1081,8 +1072,7 @@ namespace tsg {
     //inject smaller set motif to harden the algorithm
     position = freePositions.calculateRandomPosition();
 
-    retryItr = 0;
-    retries = 20;
+    retries = size * 5;
     tsg::iseq secPos;
     tsg::rseq sec;
     secPos.push_back(position);
@@ -1098,7 +1088,7 @@ namespace tsg {
 
     if (secSize > (int)pos_out[0].size()) {
 
-      std::cerr << "ERROR: Imossible error?" << std::endl;
+      std::cerr << "ERROR: Impossible error?" << std::endl;
       throw(EXIT_FAILURE);
     }
 
@@ -1115,7 +1105,14 @@ namespace tsg {
       secPos.push_back(position);
 
       //try to inject another sequence
-      while (retryItr < retries + 1) {
+      for (int retry = 0; retry <= retries; retry++) {
+
+        if (retry == retries) {
+
+          std::cerr << "ERROR: Cannot add smaller motif set subsequence!" <<
+            " Retry or change your settings!" << std::endl;
+          throw(EXIT_FAILURE);
+        }
 
         //backup subsequence at position
         for (int i = 0; i < window; i++)
@@ -1141,30 +1138,18 @@ namespace tsg {
 
           break;
         }
-        else {
 
-          //restore old subsequence
-          for (int i = 0; i < window; i++)
-            timeSeries_out[position + i] = subsequence[i];
+        //restore old subsequence
+        for (int i = 0; i < window; i++)
+          timeSeries_out[position + i] = subsequence[i];
 
-          //update the running mean and variance
-          updateRunnings(timeSeries_out, position);
+        //update the running mean and variance
+        updateRunnings(timeSeries_out, position);
 
-          //get new random position in the synthetic time series
-          position = freePositions.calculateRandomPosition();
+        //get new random position in the synthetic time series
+        position = freePositions.calculateRandomPosition();
 
-          pos_out[0].back() = position;
-        }
-
-        if (retryItr == retries) {
-
-          std::cerr << "ERROR: Cannot add smaller motif set subsequence!" <<
-            " Retry or change your settings!" << std::endl;
-          throw(EXIT_FAILURE);
-        }
-
-        retryItr++;
-
+        pos_out[0].back() = position;
       }
 
       //remove the position from available positions
@@ -1198,9 +1183,9 @@ namespace tsg {
     rseq subsequence(window, 0.0);
     double mean, stdDev;
     double d = std::numeric_limits<double>::max();
-    std::normal_distribution<double> distribution(0.0, abs(noise) * 0.25 <= 0.0
-        ? std::numeric_limits<double>::min() : noise * 0.25);
-    std::uniform_real_distribution<double> distHeight(0.6, 1.4);
+    std::normal_distribution<double> distNoise(0.0, abs(noise) * 0.5 <= 0.0
+        ? std::numeric_limits<double>::min() : noise * 0.5);
+    std::uniform_real_distribution<double> distStretch(0.6, 1.4);
     double stretch;
 
     //generate a base time series
@@ -1212,17 +1197,16 @@ namespace tsg {
     //determine similarity of the top motif pair in the random synthetic time
     //series
     tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
-    d = 0.49999999 * similarity(timeSeries_out, positionOne, positionTwo,
-        std::numeric_limits<double>::max());
+    d = 0.49999999 * similarity(timeSeries_out, positionOne, positionTwo, d);
 
     d_out.push_back(d);
 
-    //calculate temporary motif set center subsequence in the window size
-    //dimentional room of subsequence values
+    //calculate motif set center subsequence in the window size dimentional
+    //room of subsequence values
     calculateSubsequence(motifCenter, type, height);
 
-    for (auto &value : motifCenter)
-      value += distribution(randomEngine);
+    for (auto &item : motifCenter)
+      item += distNoise(randomEngine);
 
     mean = 0.0;
     stdDev = 0.0;
@@ -1232,11 +1216,11 @@ namespace tsg {
 
     //declaration stuff
     int position;
-    int retryItr = 0;
-    int retries = 20;
     double value;
     double min, max;
+    int retries = 20;
     double lth = noise / retries;
+    double noiseBackup = noise;
 
 
     //inject sequences into the time series
@@ -1248,20 +1232,30 @@ namespace tsg {
       pos_out[0].push_back(position);
 
       //try to inject another sequence
-      while (retryItr < retries + 1) {
+      noise = noiseBackup;
 
-        std::normal_distribution<double> distributionNoise(0.0, abs(noise)
-            * 0.25 <= 0.0 ? std::numeric_limits<double>::min() : noise * 0.25);
+      for (int retry = 0; retry <= retries; retry++) {
+
+        if (retry == retries) {
+
+          std::cerr << "ERROR: Cannot add another latent motif subsequence!" <<
+            " Retry or change your settings!" << std::endl;
+          throw(EXIT_FAILURE);
+        }
+
+        //new random noise
+        std::normal_distribution<double> distNoiseRetry(0.0, abs(noise) * 0.5
+            <= 0.0 ? std::numeric_limits<double>::min() : noise * 0.5);
 
         //copy another motif sequence ...
         rseq newSubsequence(motifCenter);
 
         //... stretch and add noise
-        stretch = distHeight(randomEngine);
+        stretch = distStretch(randomEngine);
 
         for (auto &item : newSubsequence) {
 
-          item += distributionNoise(randomEngine);
+          item += distNoiseRetry(randomEngine);
           item *= stretch;
         }
 
@@ -1309,36 +1303,21 @@ namespace tsg {
 
             break;
           }
-          else {
 
-            //restore old subsequence
-            for (int i = 0; i < window; i++)
-              timeSeries_out[position + i] = subsequence[i];
+          //restore old subsequence
+          for (int i = 0; i < window; i++)
+            timeSeries_out[position + i] = subsequence[i];
 
-            //update the running mean and variance
-            updateRunnings(timeSeries_out, position);
+          //update the running mean and variance
+          updateRunnings(timeSeries_out, position);
 
-            //get new random position in the synthetic time series
-            position = freePositions.calculateRandomPosition();
+          //get new random position in the synthetic time series
+          position = freePositions.calculateRandomPosition();
 
-            pos_out[0].back() = position;
-
-            noise -= lth;
-          }
-        }
-        else {
-
-          noise -= lth;
+          pos_out[0].back() = position;
         }
 
-        if (retryItr == retries) {
-
-          std::cerr << "ERROR: Cannot add another latent motif subsequence!" <<
-            " Retry or change your settings!" << std::endl;
-          throw(EXIT_FAILURE);
-        }
-
-        retryItr++;
+        noise -= lth;
       }
 
       //remove the position from available positions
@@ -1348,8 +1327,7 @@ namespace tsg {
     //inject smaller set motif to harden the algorithm
     position = freePositions.calculateRandomPosition();
 
-    retryItr = 0;
-    retries = 20;
+    retries = size * 5;
     tsg::iseq secPos;
     tsg::rseq sec;
     secPos.push_back(position);
@@ -1365,7 +1343,7 @@ namespace tsg {
 
     if (secSize > (int)pos_out[0].size()) {
 
-      std::cerr << "ERROR: Imossible error?" << std::endl;
+      std::cerr << "ERROR: Impossible error?" << std::endl;
       throw(EXIT_FAILURE);
     }
 
@@ -1382,7 +1360,14 @@ namespace tsg {
       secPos.push_back(position);
 
       //try to inject another sequence
-      while (retryItr < retries + 1) {
+      for (int retry = 0; retry <= retries; retry++) {
+
+        if (retry == retries) {
+
+          std::cerr << "ERROR: Cannot add smaller motif set subsequence!" <<
+            " Retry or change your settings!" << std::endl;
+          throw(EXIT_FAILURE);
+        }
 
         //backup subsequence at position
         for (int i = 0; i < window; i++)
@@ -1422,16 +1407,6 @@ namespace tsg {
 
           pos_out[0].back() = position;
         }
-
-        if (retryItr == retries) {
-
-          std::cerr << "ERROR: Cannot add smaller motif set subsequence!" <<
-            " Retry or change your settings!" << std::endl;
-          throw(EXIT_FAILURE);
-        }
-
-        retryItr++;
-
       }
 
       //remove the position from available positions
