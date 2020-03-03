@@ -1065,7 +1065,7 @@ namespace tsg {
 
         if (retryItr == retries) {
 
-          std::cerr << "ERROR: Cannot add motif set subsequence!" <<
+          std::cerr << "ERROR: Cannot add another set motif subsequence!" <<
             " Retry or change your settings!" << std::endl;
           throw(EXIT_FAILURE);
         }
@@ -1333,7 +1333,7 @@ namespace tsg {
 
         if (retryItr == retries) {
 
-          std::cerr << "ERROR: Cannot add motif set subsequence!" <<
+          std::cerr << "ERROR: Cannot add another latent motif subsequence!" <<
             " Retry or change your settings!" << std::endl;
           throw(EXIT_FAILURE);
         }
