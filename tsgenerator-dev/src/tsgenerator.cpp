@@ -518,6 +518,11 @@ namespace tsg {
     //collect new matches
     iseq mats;
 
+    //trivial matches
+    for (int i = start; i <= end; i++)
+      mats.push_back(i);
+
+    //all other matches
     for (int i = start; i <= end; i++) {
 
       for (int j = 0; j <= (int)timeSeries_in.size() - window; j++) {
@@ -595,6 +600,11 @@ namespace tsg {
     //collect new matches
     iseq mats;
 
+    //trivial matches
+    for (int i = start; i <= end; i++)
+      mats.push_back(i);
+
+    //all other matches
     for (int i = start; i <= end; i++) {
 
       for (int j = 0; j <= (int)timeSeries_in.size() - window; j++) {
