@@ -969,7 +969,7 @@ namespace tsg {
           updateRunnings(timeSeries_out, position);
 
           if (largerMotifSet(timeSeries_out, position, pos_out[0].size(),
-                d) < (int)pos_out[0].size()) {
+                d) <= (int)pos_out[0].size()) {
 
             break;
           }
@@ -1217,7 +1217,7 @@ namespace tsg {
           updateRunnings(timeSeries_out, position);
 
           if (largerMotifSet(timeSeries_out, position, pos_out[0].size(),
-                2.0 * d) < (int)pos_out[0].size()) {
+                2.0 * d) <= (int)pos_out[0].size()) {
 
             break;
           }
