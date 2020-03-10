@@ -552,10 +552,6 @@ namespace tsg {
       }
     }
 
-    //no matchings no larger set motif
-    if ((int)mats.size() < 1)
-      return false;
-
     //check matches for larger set motif
     for (int i = 0; i < (int)mats.size(); i++) {
 
@@ -584,10 +580,10 @@ namespace tsg {
     return false;
   }
 
-  int TSGenerator::largerMotifSet(const rseq &timeSeries_in, const iseq
-      motifPositions_in, const int size_in, const double range_in) {
+  int TSGenerator::largerMotifSet(const rseq &timeSeries_in, const int pos_in,
+      const int size_in, const double range_in) {
 
-    int motif = motifPositions_in.back();
+    int motif = pos_in;
     int start = motif - window + 1;
     int end = motif + window - 1;
 
@@ -633,10 +629,6 @@ namespace tsg {
         }
       }
     }
-
-    //no matchings no larger set motif
-    if ((int)mats.size() < 1)
-      return 1;
 
     //check matches for larger set motif
     int largestSize = 1;
@@ -1083,9 +1075,7 @@ namespace tsg {
     position = freePositions.calculateRandomPosition();
 
     retries = size * 5;
-    tsg::iseq secPos;
     tsg::rseq sec;
-    secPos.push_back(position);
 
     for (int i = position; i < position + window; i++)
       sec.push_back(timeSeries_out[i] - timeSeries_out[position]);
@@ -1093,7 +1083,7 @@ namespace tsg {
     //remove the position from available positions
     freePositions.removePosition();
 
-    int secSize = largerMotifSet(timeSeries_out, secPos, size, d);
+    int secSize = largerMotifSet(timeSeries_out, position, size, d);
 
     if (secSize > size) {
 
@@ -1110,8 +1100,6 @@ namespace tsg {
 
       //compute the random position for the subsequence
       position = freePositions.calculateRandomPosition();
-
-      secPos.push_back(position);
 
       //try to inject another sequence
       for (int retry = 0; retry <= retries; retry++) {
@@ -1137,7 +1125,7 @@ namespace tsg {
         //update the running sum and sum of square
         updateRunnings(timeSeries_out, position);
 
-        secSize = largerMotifSet(timeSeries_out, secPos, size, d);
+        secSize = largerMotifSet(timeSeries_out, position, size, d);
 
         if (secSize <= size) {
 
@@ -1334,9 +1322,7 @@ namespace tsg {
     position = freePositions.calculateRandomPosition();
 
     retries = size * 5;
-    tsg::iseq secPos;
     tsg::rseq sec;
-    secPos.push_back(position);
 
     for (int i = position; i < position + window; i++)
       sec.push_back(timeSeries_out[i] - timeSeries_out[position]);
@@ -1344,7 +1330,7 @@ namespace tsg {
     //remove the position from available positions
     freePositions.removePosition();
 
-    int secSize = largerMotifSet(timeSeries_out, secPos, size, 2.0 * d);
+    int secSize = largerMotifSet(timeSeries_out, position, size, 2.0 * d);
 
     if (secSize > size) {
 
@@ -1361,8 +1347,6 @@ namespace tsg {
 
       //compute the random position for the subsequence
       position = freePositions.calculateRandomPosition();
-
-      secPos.push_back(position);
 
       //try to inject another sequence
       for (int retry = 0; retry <= retries; retry++) {
@@ -1388,7 +1372,7 @@ namespace tsg {
         //update the running sum and sum of square
         updateRunnings(timeSeries_out, position);
 
-        secSize = largerMotifSet(timeSeries_out, secPos, size, 2.0 * d);
+        secSize = largerMotifSet(timeSeries_out, position, size, 2.0 * d);
 
         if (secSize <= size) {
 

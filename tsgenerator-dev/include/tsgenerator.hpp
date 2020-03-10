@@ -327,8 +327,7 @@ namespace tsg
     ///\brief Checks if there is a larger motif set.
     ///
     ///\param [in] &timeSereis_in Hands over the time series.
-    ///\param [in] &subsequencePositions_in Hands over the position of the new
-    ///subsequence.
+    ///\param [in] &pos_in Hands over the position of the new subsequence.
     ///\param [in] size_in Hands over the size of the injected motif.
     ///\param [in] range_in Hands over the motif set range.
     ///
@@ -337,8 +336,8 @@ namespace tsg
     ///
     ///This function computes the largest set motif size for a given
     ///subsequence.
-    int largerMotifSet(const rseq &timeSeries_in, const iseq motifPositions_in,
-        const int size_in, const double range_in);
+    int largerMotifSet(const rseq &timeSeries_in, const int pos_in, const int
+        size_in, const double range_in);
 
     ///\brief Injects a pair motif into the time series.
     ///
