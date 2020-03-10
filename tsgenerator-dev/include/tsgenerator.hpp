@@ -314,19 +314,6 @@ namespace tsg
     ///\brief Checks if there is a larger motif set.
     ///
     ///\param [in] &timeSereis_in Hands over the time series.
-    ///\param [in] &subsequencePositions_in Hands over the position of the new
-    ///subsequence.
-    ///\param [in] range_in Hands over the motif set range.
-    ///
-    ///\return true if there exists an larger motif set.
-    ///
-    ///This function checks if there is a larger motif set with given position.
-    bool largerMotifSet(const rseq &timeSeries_in, const iseq
-        &motifPositions_in, double range_in);
-
-    ///\brief Checks if there is a larger motif set.
-    ///
-    ///\param [in] &timeSereis_in Hands over the time series.
     ///\param [in] &pos_in Hands over the position of the new subsequence.
     ///\param [in] size_in Hands over the size of the injected motif.
     ///\param [in] range_in Hands over the motif set range.

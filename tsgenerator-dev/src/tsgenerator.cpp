@@ -502,84 +502,6 @@ namespace tsg {
     return false;
   }
 
-  bool TSGenerator::largerMotifSet(const rseq &timeSeries_in, const iseq
-      &motifPositions_in, double range_in) {
-
-    int motif = motifPositions_in.back();
-    int start = motif - window + 1;
-    int end = motif + window - 1;
-
-    if (start < 0)
-      start = 0;
-
-    if (end > (int)timeSeries_in.size() - window)
-      end = timeSeries_in.size() - window;
-
-    //collect new matches
-    iseq mats;
-
-    //trivial matches
-    for (int i = start; i <= end; i++)
-      mats.push_back(i);
-
-    //all other matches
-    for (int i = start; i <= end; i++) {
-
-      for (int j = 0; j <= (int)timeSeries_in.size() - window; j++) {
-
-        if (similarity(timeSeries_in, i, j, range_in) <= range_in) {
-
-          bool ins = false;
-
-          for (int k = 0; k < (int)mats.size(); k++) {
-
-            if (mats[k] == j) {
-
-              ins = true;
-              k = mats.size();
-            }
-            else if (j < mats[k]) {
-
-              ins = true;
-              mats.insert(mats.begin() + k, j);
-              k = mats.size();
-            }
-          }
-
-          if (!ins)
-            mats.push_back(j);
-        }
-      }
-    }
-
-    //check matches for larger set motif
-    for (int i = 0; i < (int)mats.size(); i++) {
-
-      int size = 1;
-
-      for (int j = 0; j <= (int)timeSeries_in.size() - window; j++) {
-
-        //subseqeunce not overlapping the ith set motif
-        if (!(abs(j - mats[i]) < window)) {
-
-          //matching
-          if (similarity(timeSeries_in, mats[i], j, range_in) <= range_in) {
-
-            //filter overlaps
-            j += window - 1;
-            size++;
-
-            //is the set motif larger?
-            if (size > (int)motifPositions_in.size())
-              return true;
-          }
-        }
-      }
-    }
-
-    return false;
-  }
-
   int TSGenerator::largerMotifSet(const rseq &timeSeries_in, const int pos_in,
       const int size_in, const double range_in) {
 
@@ -1046,7 +968,8 @@ namespace tsg {
           //update the running sum and sum of square
           updateRunnings(timeSeries_out, position);
 
-          if (!largerMotifSet(timeSeries_out, pos_out[0], d)) {
+          if (largerMotifSet(timeSeries_out, position, pos_out[0].size(),
+                d) < (int)pos_out[0].size()) {
 
             break;
           }
@@ -1293,7 +1216,8 @@ namespace tsg {
           //update the running sum and sum of square
           updateRunnings(timeSeries_out, position);
 
-          if (!largerMotifSet(timeSeries_out, pos_out[0], 2.0 * d)) {
+          if (largerMotifSet(timeSeries_out, position, pos_out[0].size(),
+                2.0 * d) < (int)pos_out[0].size()) {
 
             break;
           }
