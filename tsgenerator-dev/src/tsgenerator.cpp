@@ -1093,17 +1093,16 @@ namespace tsg {
     //remove the position from available positions
     freePositions.removePosition();
 
-    int secSize = largerMotifSet(timeSeries_out, secPos, pos_out[0].size()
-        - 1, d);
+    int secSize = largerMotifSet(timeSeries_out, secPos, size, d);
 
-    if (secSize > (int)pos_out[0].size()) {
+    if (secSize > size) {
 
       std::cerr << "ERROR: Impossible error?" << std::endl;
       throw(EXIT_FAILURE);
     }
 
     //there is already a hidden motif with this subseqeunce
-    if (secSize >= (int)pos_out[0].size() - 1)
+    if (secSize >= size - 1)
       return;
 
     //harden the time series by injecting smaller motif
@@ -1138,12 +1137,11 @@ namespace tsg {
         //update the running sum and sum of square
         updateRunnings(timeSeries_out, position);
 
-        secSize = largerMotifSet(timeSeries_out, secPos, pos_out[0].size()
-            - 1, d);
+        secSize = largerMotifSet(timeSeries_out, secPos, size, d);
 
-        if (secSize <= (int)pos_out[0].size()) {
+        if (secSize <= size) {
 
-          if (secSize > (int)pos_out[0].size() - 1)
+          if (secSize > size - 1)
             return;
 
           break;
@@ -1346,17 +1344,16 @@ namespace tsg {
     //remove the position from available positions
     freePositions.removePosition();
 
-    int secSize = largerMotifSet(timeSeries_out, secPos, pos_out[0].size()
-        - 1, 2.0 * d);
+    int secSize = largerMotifSet(timeSeries_out, secPos, size, 2.0 * d);
 
-    if (secSize > (int)pos_out[0].size()) {
+    if (secSize > size) {
 
       std::cerr << "ERROR: Impossible error?" << std::endl;
       throw(EXIT_FAILURE);
     }
 
     //there is already a hidden motif with this subseqeunce
-    if (secSize >= (int)pos_out[0].size() - 1)
+    if (secSize >= size - 1)
       return;
 
     //harden the time series by injecting smaller motif
@@ -1391,12 +1388,11 @@ namespace tsg {
         //update the running sum and sum of square
         updateRunnings(timeSeries_out, position);
 
-        secSize = largerMotifSet(timeSeries_out, secPos, pos_out[0].size()
-            - 1, 2.0 * d);
+        secSize = largerMotifSet(timeSeries_out, secPos, size, 2.0 * d);
 
-        if (secSize <= (int)pos_out[0].size()) {
+        if (secSize <= size) {
 
-          if (secSize > (int)pos_out[0].size() - 1)
+          if (secSize > size - 1)
             return;
 
           break;
