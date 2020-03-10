@@ -1158,8 +1158,6 @@ namespace tsg {
 
         //get new random position in the synthetic time series
         position = freePositions.calculateRandomPosition();
-
-        pos_out[0].back() = position;
       }
 
       //remove the position from available positions
@@ -1414,8 +1412,6 @@ namespace tsg {
 
           //get new random position in the synthetic time series
           position = freePositions.calculateRandomPosition();
-
-          pos_out[0].back() = position;
         }
       }
 
