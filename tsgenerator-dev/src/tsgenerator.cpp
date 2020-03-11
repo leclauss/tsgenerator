@@ -995,28 +995,26 @@ namespace tsg {
     }
 
     //inject smaller set motif to harden the algorithm
-    position = freePositions.calculateRandomPosition();
-
     retries = size * 5;
     tsg::rseq sec;
+    int secSize;
+
+    do {
+
+      position = freePositions.calculateRandomPosition();
+
+      secSize = largerMotifSet(timeSeries_out, position, size - 1, d);
+
+      //there is already a smaller motif with this subseqeunce
+      if (secSize == size - 1)
+        return;
+    } while (secSize >= size);
 
     for (int i = position; i < position + window; i++)
       sec.push_back(timeSeries_out[i] - timeSeries_out[position]);
 
     //remove the position from available positions
     freePositions.removePosition();
-
-    int secSize = largerMotifSet(timeSeries_out, position, size, d);
-
-    if (secSize > size) {
-
-      std::cerr << "ERROR: Impossible error?" << std::endl;
-      throw(EXIT_FAILURE);
-    }
-
-    //there is already a hidden motif with this subseqeunce
-    if (secSize >= size - 1)
-      return;
 
     //harden the time series by injecting smaller motif
     for (int motifItr = 1; motifItr < size - 1; motifItr++) {
@@ -1048,11 +1046,11 @@ namespace tsg {
         //update the running sum and sum of square
         updateRunnings(timeSeries_out, position);
 
-        secSize = largerMotifSet(timeSeries_out, position, size, d);
+        secSize = largerMotifSet(timeSeries_out, position, size - 1, d);
 
-        if (secSize <= size) {
+        if (secSize < size) {
 
-          if (secSize > size - 1)
+          if (secSize >= size - 1)
             return;
 
           break;
@@ -1243,28 +1241,26 @@ namespace tsg {
     }
 
     //inject smaller set motif to harden the algorithm
-    position = freePositions.calculateRandomPosition();
-
     retries = size * 5;
     tsg::rseq sec;
+    int secSize;
+
+    do {
+
+      position = freePositions.calculateRandomPosition();
+
+      secSize = largerMotifSet(timeSeries_out, position, size - 1, 2.0 * d);
+
+      //there is already a hidden motif with this subseqeunce
+      if (secSize == size - 1)
+        return;
+    } while (secSize >= size);
 
     for (int i = position; i < position + window; i++)
       sec.push_back(timeSeries_out[i] - timeSeries_out[position]);
 
     //remove the position from available positions
     freePositions.removePosition();
-
-    int secSize = largerMotifSet(timeSeries_out, position, size, 2.0 * d);
-
-    if (secSize > size) {
-
-      std::cerr << "ERROR: Impossible error?" << std::endl;
-      throw(EXIT_FAILURE);
-    }
-
-    //there is already a hidden motif with this subseqeunce
-    if (secSize >= size - 1)
-      return;
 
     //harden the time series by injecting smaller motif
     for (int motifItr = 1; motifItr < size - 1; motifItr++) {
@@ -1296,11 +1292,11 @@ namespace tsg {
         //update the running sum and sum of square
         updateRunnings(timeSeries_out, position);
 
-        secSize = largerMotifSet(timeSeries_out, position, size, 2.0 * d);
+        secSize = largerMotifSet(timeSeries_out, position, size - 1, 2.0 * d);
 
-        if (secSize <= size) {
+        if (secSize < size) {
 
-          if (secSize > size - 1)
+          if (secSize >= size - 1)
             return;
 
           break;
