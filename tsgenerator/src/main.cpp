@@ -47,18 +47,19 @@ int main(int argc, char *argv[]) {
     }
 
     //default parameters
-    int length = 1000;
-    int window = 50;
-    double delta = 1.0;
-    double noise = 2.0;
-    tsg::word type("box");
-    int size = 3;
-    double height = 10.0;
-    double step = 1.0;
-    int times = 3;
-    double maxi = 20.0;
-    tsg::word method("boundedNormalRandomWalk");
-    tsg::word gen("latent motif");
+    int length = tsg::defaultLength;
+    int window = tsg::defaultWindow;
+    double delta = tsg::defaultDelta;
+    double noise = tsg::defaultNoise;
+    tsg::word type(tsg::defaultType);
+    int size = tsg::defaultMotifSize;
+    double height = tsg::defaultHeight;
+    double step = tsg::defaultStep;
+    int times = tsg::defaultTimes;
+    double maxi = tsg::defaultMaxi;
+    int smaller = tsg::defaultSmaller;
+    tsg::word method(tsg::defaultMethod);
+    tsg::word gen(tsg::defaultGen);
     tsg::rseqs motif;
 
     try {
@@ -271,6 +272,26 @@ int main(int argc, char *argv[]) {
         maxi = std::stod(payload[0]);
       }
 
+      if (checkArg(argTokens, "-sm", payload) || checkArg(argTokens,
+            "--smaller", payload)) {
+
+        if (payload.empty()) {
+
+          std::cerr << "ERROR: Number of smaller motifs is missing an " <<
+            "argument." << std::endl;
+          exit(EXIT_FAILURE);
+        }
+
+        if (payload[0].find_first_not_of("0123456789") != tsg::word::npos) {
+
+          std::cerr << "ERROR: " << (payload[0]) << " is not a valid number!"
+            << std::endl;
+          exit(EXIT_FAILURE);
+        }
+
+        smaller = std::stoi(payload[0]);
+      }
+
       //generate the time series
       tsg::rseq timeSeries;
       tsg::rseq dVector;
@@ -280,7 +301,7 @@ int main(int argc, char *argv[]) {
       try {
 
         tsg::TSGenerator tSGenerator(length, window, delta, noise, type, size,
-            height, step, times, method, maxi, gen);
+            height, step, times, method, maxi, gen, smaller);
         tSGenerator.run(timeSeries, motif, dVector, motifPositions);
 
         success = true;

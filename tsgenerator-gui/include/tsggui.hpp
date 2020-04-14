@@ -52,19 +52,21 @@ class TsgGui : public QApplication {
 private:
 
   //default parameters
+  int length = tsg::defaultLength;
+  int window = tsg::defaultWindow;
+  double delta = tsg::defaultDelta;
+  double noise = tsg::defaultNoise;
+  tsg::word type = tsg::defaultType;
+  int motifSize = tsg::defaultMotifSize;
+  double height = tsg::defaultHeight;
+  double step = tsg::defaultStep;
+  int times = tsg::defaultTimes;
+  double maxi = tsg::defaultMaxi;
+  int smaller = tsg::defaultSmaller;
+  tsg::word method = tsg::defaultMethod;
+  tsg::word gen = tsg::defaultGen;
+
   bool running = false;
-  int length = 1000;
-  int window = 30;
-  double delta = 1.0;
-  double noise = 2.0;
-  tsg::word type = "box";
-  int motifSize = 3;
-  double height = 10.0;
-  double step = 1.0;
-  int times = 3;
-  double maxi = 20.0;
-  tsg::word method = "boundedNormalRandomWalk";
-  tsg::word gen = "latent motif";
   std::map<tsg::word, tsg::iseqs> disc;
 
   //final product
@@ -109,6 +111,8 @@ private:
   QMessageBox timesMes;
   QAction maxiAct;
   QMessageBox maxiMes;
+  QAction smallerAct;
+  QMessageBox smallerMes;
   QWidget pane;
   QGridLayout layout;
   QGroupBox tsBox;
@@ -150,6 +154,8 @@ private:
   QLineEdit timesText;
   QLabel maxiLabel;
   QLineEdit maxiText;
+  QLabel smallerLabel;
+  QLineEdit smallerText;
   QLabel typeLabel;
   QComboBox typeDrop;
   QStringList types;
@@ -282,5 +288,10 @@ public slots:
   ///
   ///This function opens a message box with a help text for the maxi option.
   void showMaxiHelp();
+
+  ///\brief This function opens the smaller option help text.
+  ///
+  ///This function opens a message box with a help text for the smaller option.
+  void showSmallerHelp();
 };
 

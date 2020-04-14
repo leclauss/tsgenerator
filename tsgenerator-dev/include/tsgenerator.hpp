@@ -169,11 +169,31 @@ namespace tsg
     ///series generation.
     int gen = 2;
 
+    ///\brief This variable contains the number of smaller motifs.
+    ///
+    ///This variable stores the number of smaller motifs. After injecting the
+    ///motif further smaller motifs are injected to harden the syntethic time
+    ///series. Is ignored in the case of pair motif injection.
+    int smaller = 1;
+
     ///\brief This variable contains the free positions.
     ///
     ///This variable stores the positions of free subsequences in the time
     ///series between the motif sets subsequences.
     FreePositions freePositions;
+
+    ///\brief This variable represents the motif.
+    ///
+    ///This variable stores the values of the motif shifted by the mean. It is
+    ///used to generate matching subsequences. The mean of this sequence is
+    ///0.0.
+    rseq mMotif;
+
+    ///\brief This variable represents the z-normalized motif.
+    ///
+    ///This variable stores the values of the z-normalized motif. It is used to
+    ///generate matching subsequences.
+    rseq zMotif;
 
     ///\brief This variable stores the random engine.
     ///
@@ -241,41 +261,6 @@ namespace tsg
     void meanStdDev(const rseq &sequence_in, double &mean_out, double
         &variance_out);
 
-    ///\brief Computes the similarity of a sequence and a subsequence in the time
-    ///series.
-    ///
-    ///\param [in] &timeSeries_in Hands over the time series.
-    ///\param [in] &sequence_in Hands over the sequence.
-    ///\param [in] mean_in Hands over the mean of sequence_in.
-    ///\param [in] stdDev_in Hands over the standard deviation of sequence_in.
-    ///\param [in] pos_in Hands over the position of the subsequence in the time
-    ///series.
-    ///\param [in] bestSoFar_in Hands over the best similarity so far.
-    ///
-    ///\return The similarity of the two z-normalized sequence and subsequence.
-    ///
-    ///This function computes the similarity of a sequence and a subsequence in
-    ///the time series. Therefore, the sequence and the subsequence are first
-    ///z-normalized and the Euclidean Distance is computed. The return value is
-    ///the similarity of the z-normalized sequence and subsequence.
-    double similarity(const rseq &timeSeries_in, const rseq &subsequence_in,
-        const double mean_in, const double stdDev_in, const int pos_in, const
-        double bestSoFar_in);
-
-    ///\brief Computes the similarity of two sequences.
-    ///
-    ///\param [in] &sequence0_in Hands over the first sequence.
-    ///\param [in] &sequence1_in Hands over the second sequence.
-    ///\param [in] bestSoFar_in Hands over the best similarity so far.
-    ///
-    ///\return The similarity of the two z-normalized sequences.
-    ///
-    ///This function computes the similarity of two sequences. Therefore, the
-    ///sequences are first z-normalized and the Euclidean Distance is computed.
-    ///The return value is the similarity of the two z-normalized sequneces.
-    double similarity(const rseq &sequence0_in, const rseq &sequence1_in, const
-        double bestSoFar_in);
-
     ///\brief Computes a motif set subsequence.
     ///
     ///\param [out] subsequence_out Hands over the calculated raw subsequence.
@@ -325,6 +310,24 @@ namespace tsg
     ///subsequence.
     int largerMotifSet(const rseq &timeSeries_in, const int pos_in, const int
         size_in, const double range_in);
+
+    ///\brief Generate a Match.
+    ///
+    ///\param [in] range_in Hands over the motif range.
+    ///\param [out] &match_out Returns the match.
+    ///
+    ///This function computes a non z-normalized motif match based on the
+    ///z-normalized motif zmotif.
+    void generateMatch(const double range_in, rseq &match_out);
+
+    ///\brief Mean to 0 and store motif as well as Z-normalize and store motif.
+    ///
+    ///\param [in] &motif_in Hands over the motif sequence.
+    ///
+    ///This function stores two versions of the motif. First a version with
+    ///mean equal to 0 and a second z-normalized version in the variables
+    ///mMotif and zMotif.
+    void mzNormMotif(const rseq &motif_in);
 
     ///\brief Injects a pair motif into the time series.
     ///
@@ -382,14 +385,17 @@ namespace tsg
     ///\param [in] max_in Hands over the maximum absolute value of the time
     ///series.
     ///\param [in] gen_in Hands over the motif generation type.
+    ///\param [in] smaller_in Hands over the number of smaller motifs to harden
+    ///time series.
     ///
     ///The constructor checks whether a true random engine is available and
     ///stores the result in the trueRandomEngineAvailable variable.
     TSGenerator(const int length_in, const int window_in, const double
         delta_in, const double noise_in, const int type_in, const int size_in,
-        const double height_in, const double step_in = 1.0, const int times_in
-        = 3, const int method_in = 5, const double maxi_in = 100.0, const int
-        gen_in = 2);
+        const double height_in, const double step_in = defaultStep, const int
+        times_in = defaultTimes, const int method_in = 5, const double maxi_in
+        = defaultMaxi, const int gen_in = 1, const int smaller_in
+        = defaultSmaller);
 
     ///\brief The constructor initializes the TSGenerator.
     ///
@@ -410,14 +416,17 @@ namespace tsg
     ///\param [in] maxi_in Hands over the maximum absolute value of the time
     ///series.
     ///\param [in] gen_in Hands over the motif generation type.
+    ///\param [in] smaller_in Hands over the number of smaller motifs to harden
+    ///time series.
     ///
     ///The constructor checks whether a true random engine is available and
     ///stores the result in the trueRandomEngineAvailable variable.
     TSGenerator(const int length_in, const int window_in, const double
         delta_in, const double noise_in, const word type_in, const int size_in,
         const double height_in, const double step_in = 1.0, const int times_in
-        = 3, const word method_in = "boundedNormalRandomWalk", const double
-        maxi_in = 100.0, const word gen_in = "latent motif");
+        = defaultMotifSize, const word method_in = defaultMethod, const double
+        maxi_in = defaultMaxi, const word gen_in = defaultGen, const int
+        smaller_in = defaultSmaller);
 
     ///\brief Frees the memory allocated by the TSGenerator.
     ///

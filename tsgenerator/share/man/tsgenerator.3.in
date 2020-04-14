@@ -44,6 +44,10 @@ Sets the number of values computed to generate a repeating pattern when generati
 .BR \-ma ", " \-\-maxi " FLOAT"
 Sets the maximum absolute value in the base times series.
 .TP
+.BR \-sm ", " \-\-smaller " INTEGER"
+Sets the number of smaller motifs injected after the motif is injected to
+harden the time series.
+.TP
 .BR \-o ", " \-\-out " STRING"
 Sets the base file name of the output files.
 .TP

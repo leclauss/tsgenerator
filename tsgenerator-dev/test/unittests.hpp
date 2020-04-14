@@ -1575,33 +1575,6 @@ public:
   }
 
   // --------------------------------------------------------------------------
-  ///\brief Runs the similarity function.
-  ///
-  ///\param [in] &timeSeriesOne_in Hands over the time series.
-  ///\param [in] &subsequenceOne_in Hands over the first subsequence in the
-  ///time series.
-  ///\param [in] meanOne_in Hands over the mean of timeSeriesOne_in.
-  ///\param [in] stdDevOne_in Hands over the standard deviation of
-  ///timeSeriesOne_in.
-  ///\param [in] subsequenceTwoPos_in Hands over the position of the second
-  ///subsequence in the time series.
-  ///\param [in] bestSoFar_in Hands over the best similarity so far.
-  ///
-  ///\return The similarity of the two z-normalized time series.
-  ///
-  ///This function runs the similarity function since the similarity function
-  ///is protected.
-  // --------------------------------------------------------------------------
-  double testSimilarity(const tsg::rseq &timeSeries_in, const
-      tsg::rseq &subsequenceOne_in, const double meanOne_in, const double
-      stdDevOne_in, const int subsequenceTwoPos_in, const double bestSoFar_in)
-    {
-
-    return similarity(timeSeries_in, subsequenceOne_in, meanOne_in,
-        stdDevOne_in, subsequenceTwoPos_in, bestSoFar_in);
-  }
-
-  // --------------------------------------------------------------------------
   ///\brief Runs the calculate motif set subsequence function.
   ///
   ///\param [out] subsequence_out Hands over the calculated raw subsequence.

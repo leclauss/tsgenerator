@@ -85,6 +85,84 @@ namespace tsg {
   ///
   ///The interval sequence is a seuqence of intervals.
   typedef std::vector<interval> intervals;
+
+  ///\brief This is the default time series length default.
+  ///
+  ///The default time series length sets the default number of values of the
+  ///synthetic times series.
+  const int defaultLength = 4000;
+
+  ///\brief This is the default window size value.
+  ///
+  ///The default windows size sets the default number of values of
+  ///a subsequnece of the synthetic times series.
+  const int defaultWindow = 30;
+
+  ///\brief This is the default delta value.
+  ///
+  ///The default delta sets the default maximal absolute of difference of two
+  ///values in the base time series.
+  const double defaultDelta = 1.0;
+
+  ///\brief This is the default noise value.
+  ///
+  ///The default noise sets the default maximal absolute of difference to
+  ///a value of the synthetic time series or a subsequence.
+  const double defaultNoise = 2.0;
+
+  ///\brief This is the default type.
+  ///
+  ///The default type sets the default shape of the top motif injected into the
+  ///base time series.
+  const word defaultType = "box";
+
+  ///\brief This is the default motif size value.
+  ///
+  ///The default motif size sets the default number of subsequnces non-self
+  ///matched by the motif. Ignored for pair motifs.
+  const int defaultMotifSize = 3;
+
+  ///\brief This is the default motif height value.
+  ///
+  ///The default motif height sets the default absolute base difference in
+  ///a motif sequence.
+  const double defaultHeight = 10.0;
+
+  ///\brief This is the default step value.
+  ///
+  ///The default step sets the default maximal absolut difference in
+  ///x direction between two values when generating a base time series some
+  ///kind of approximations between the values.
+  const double defaultStep = 1.0;
+
+  ///\brief This is the default times value.
+  ///
+  ///The default times sets the default number of values generated for
+  ///a repeating pattern when generating the base time series.
+  const int defaultTimes = 3;
+
+  ///\brief This is the default maxi value.
+  ///
+  ///The default maxi sets the default maximal absolut difference between any
+  ///pair of values in the synthetic times series.
+  const double defaultMaxi = 20.0;
+
+  ///\brief This is the default smaller value.
+  ///
+  ///The default smaller sets the default number of smaller motifs injected
+  ///into the time series after injecting the top pair motif.
+  const int defaultSmaller = 1;
+
+  ///\brief This is the default method value.
+  ///
+  ///The default method sets the default base time series generation procedure.
+  const word defaultMethod = "boundedNormalRandomWalk";
+
+  ///\brief This is the default generator value.
+  ///
+  ///The default generator sets the default injection procedure like pair
+  ///motif, set motif or latent motif injection.
+  const word defaultGen = "latent motif";
 }
 
 #endif

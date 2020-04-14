@@ -92,30 +92,36 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv),
   maxiMes.setWindowTitle("maxi option");
   maxiMes.setText("The maxi option sets the maximum absolute value of the "
       "base time series.");
+  smallerAct.setText("smaller");
+  smallerMes.setWindowTitle("smaller option");
+  smallerMes.setText("The smaller option sets the number of smaller motifs "
+      "injected into the time series after injecting the top motif.");
   startButton.setText("start");
-  lengthLabel.setText("length");
+  lengthLabel.setText("length:");
   lengthText.setPlaceholderText(std::to_string(length).c_str());
-  windowLabel.setText("window");
+  windowLabel.setText("window:");
   windowText.setPlaceholderText(std::to_string(window).c_str());
-  sizeLabel.setText("size");
+  sizeLabel.setText("size:");
   sizeText.setPlaceholderText(std::to_string(motifSize).c_str());
-  deltaLabel.setText("delta");
+  deltaLabel.setText("delta:");
   deltaText.setPlaceholderText(std::to_string(delta).c_str());
-  noiseLabel.setText("noise");
+  noiseLabel.setText("noise:");
   noiseText.setPlaceholderText(std::to_string(noise).c_str());
-  heightLabel.setText("height");
+  heightLabel.setText("height:");
   heightText.setPlaceholderText(std::to_string(height).c_str());
-  stepLabel.setText("step");
+  stepLabel.setText("step:");
   stepText.setPlaceholderText(std::to_string(step).c_str());
-  timesLabel.setText("times");
+  timesLabel.setText("times:");
   timesText.setPlaceholderText(std::to_string(times).c_str());
-  maxiLabel.setText("maxi");
+  maxiLabel.setText("maxi:");
   maxiText.setPlaceholderText(std::to_string(maxi).c_str());
-  typeLabel.setText("type");
-  methodLabel.setText("method");
-  genLabel.setText("generator");
-  distLabel.setText("distance");
-  rangeLabel.setText("range");
+  smallerLabel.setText("smaller:");
+  smallerText.setPlaceholderText(std::to_string(smaller).c_str());
+  typeLabel.setText("type:");
+  methodLabel.setText("method:");
+  genLabel.setText("generator:");
+  distLabel.setText("distance:");
+  rangeLabel.setText("range:");
   browseLabel.setText("data file:");
   browseButton.setText("browse");
 
@@ -261,39 +267,41 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv),
   motifListBox.setTitle("motif locations");
   motifListBox.setLayout(&motifListLayout);
 
-  layout.addWidget(&browseBox, 0, 0, 1, 6);
+  layout.addWidget(&browseBox, 0, 0, 1, 12);
   layout.addWidget(&genLabel, 1, 0);
-  layout.addWidget(&genDrop, 2, 0);
-  layout.addWidget(&typeLabel, 1, 1);
+  layout.addWidget(&genDrop, 1, 1);
+  layout.addWidget(&typeLabel, 2, 0);
   layout.addWidget(&typeDrop, 2, 1);
+  layout.addWidget(&smallerLabel, 3, 0);
+  layout.addWidget(&smallerText, 3, 1);
   layout.addWidget(&methodLabel, 1, 2);
-  layout.addWidget(&methodDrop, 2, 2);
-  layout.addWidget(&lengthLabel, 1, 3);
+  layout.addWidget(&methodDrop, 1, 3);
+  layout.addWidget(&lengthLabel, 2, 2);
   layout.addWidget(&lengthText, 2, 3);
   layout.addWidget(&windowLabel, 1, 4);
-  layout.addWidget(&windowText, 2, 4);
-  layout.addWidget(&sizeLabel, 1, 5);
+  layout.addWidget(&windowText, 1, 5);
+  layout.addWidget(&sizeLabel, 2, 4);
   layout.addWidget(&sizeText, 2, 5);
-  layout.addWidget(&noiseLabel, 3, 0);
-  layout.addWidget(&noiseText, 4, 0);
-  layout.addWidget(&deltaLabel, 3, 1);
-  layout.addWidget(&deltaText, 4, 1);
-  layout.addWidget(&heightLabel, 3, 2);
-  layout.addWidget(&heightText, 4, 2);
-  layout.addWidget(&stepLabel, 3, 3);
-  layout.addWidget(&stepText, 4, 3);
-  layout.addWidget(&timesLabel, 3, 4);
-  layout.addWidget(&timesText, 4, 4);
-  layout.addWidget(&maxiLabel, 3, 5);
-  layout.addWidget(&maxiText, 4, 5);
-  layout.addWidget(&startButton, 5, 5);
+  layout.addWidget(&noiseLabel, 1, 6);
+  layout.addWidget(&noiseText, 1, 7);
+  layout.addWidget(&deltaLabel, 2, 6);
+  layout.addWidget(&deltaText, 2, 7);
+  layout.addWidget(&heightLabel, 1, 8);
+  layout.addWidget(&heightText, 1, 9);
+  layout.addWidget(&stepLabel, 2, 8);
+  layout.addWidget(&stepText, 2, 9);
+  layout.addWidget(&timesLabel, 1, 10);
+  layout.addWidget(&timesText, 1, 11);
+  layout.addWidget(&maxiLabel, 2, 10);
+  layout.addWidget(&maxiText, 2, 11);
+  layout.addWidget(&startButton, 3, 11);
   layout.addWidget(&tsBox, 6, 0, 1, -1);
-  layout.addWidget(&motifBox, 7, 0, 8, 3);
-  layout.addWidget(&motifListBox, 7, 3, 8, 2);
-  layout.addWidget(&distLabel, 7, 5);
-  layout.addWidget(&distText, 8, 5);
-  layout.addWidget(&rangeLabel, 9, 5);
-  layout.addWidget(&rangeText, 10, 5);
+  layout.addWidget(&motifBox, 7, 0, 8, 6);
+  layout.addWidget(&motifListBox, 7, 6, 8, 5);
+  layout.addWidget(&distLabel, 7, 11);
+  layout.addWidget(&distText, 8, 11);
+  layout.addWidget(&rangeLabel, 9, 11);
+  layout.addWidget(&rangeText, 10, 11);
 
   pane.setLayout(&layout);
 
@@ -557,56 +565,86 @@ void TsgGui::generateTS() {
     in = lengthText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") == in.npos)
       length = std::stoi(in);
+    else
+      length = tsg::defaultLength;
 
     in = windowText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") == in.npos)
       window = std::stoi(in);
+    else
+      window = tsg::defaultWindow;
 
     in = deltaText.text().toStdString();
     if (check_if_float(in))
       delta = std::stod(in);
+    else
+      delta = tsg::defaultDelta;
 
     in = noiseText.text().toStdString();
     if (check_if_float(in))
       noise = std::stod(in);
+    else
+      noise = tsg::defaultNoise;
 
     in = typeDrop.currentText().toStdString();
     if (in.length())
       type = in;
+    else
+      type = tsg::defaultType;
 
     in = sizeText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") == in.npos)
       motifSize = std::stoi(in);
+    else
+      motifSize = tsg::defaultMotifSize;
 
     in = heightText.text().toStdString();
     if (check_if_float(in))
       height = std::stod(in);
+    else
+      height = tsg::defaultHeight;
 
     in = stepText.text().toStdString();
     if (check_if_float(in))
       step = std::stod(in);
+    else
+      step = tsg::defaultStep;
 
     in = timesText.text().toStdString();
     if (in.length() > 0 && in.find_first_not_of("0123456789") == in.npos)
       times = std::stoi(in);
+    else
+      times = tsg::defaultTimes;
 
     in = methodDrop.currentText().toStdString();
     if (in.length())
       method = in;
+    else
+      method = tsg::defaultMethod;
 
     in = genDrop.currentText().toStdString();
     if (in.length())
       gen = in;
+    else
+      gen = tsg::defaultGen;
 
     in = maxiText.text().toStdString();
     if (check_if_float(in))
       maxi = std::stod(in);
+    else
+      maxi = tsg::defaultMaxi;
+
+    in = smallerText.text().toStdString();
+    if (check_if_float(in))
+      smaller = std::stod(in);
+    else
+      smaller = tsg::defaultSmaller;
 
     try {
 
       //generate the time series
       tsg::TSGenerator tSGenerator(length, window, delta, noise, type,
-          motifSize, height, step, times, method, maxi, gen);
+          motifSize, height, step, times, method, maxi, gen, smaller);
       tSGenerator.run(timeSeries, motif, dVector, motifPositions);
 
       success = true;
@@ -1312,5 +1350,10 @@ void TsgGui::showTimesHelp() {
 void TsgGui::showMaxiHelp() {
 
   maxiMes.show();
+}
+
+void TsgGui::showSmallerHelp() {
+
+  smallerMes.show();
 }
 
