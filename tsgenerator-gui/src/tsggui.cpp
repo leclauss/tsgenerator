@@ -520,8 +520,7 @@ void TsgGui::loadData() {
     !motifPositions[0].empty()) {
 
     motifChart.axes(Qt::Horizontal)[0]->setRange(0, window - 1);
-    motifChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
-        + 0.1 * (max - min));
+    motifChart.axes(Qt::Vertical)[0]->setRange(min, max);
   }
 
   //plot ts
@@ -544,12 +543,11 @@ void TsgGui::loadData() {
       tsSeries.append(i, timeSeries[i]);
     }
 
-    tsChart.addSeries(&tsSeries);
-
-    tsChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
-        + 0.1 * (max - min));
+    tsChart.axes(Qt::Vertical)[0]->setRange(min, max);
 
     tsChart.axes(Qt::Horizontal)[0]->setRange(0.0, length);
+
+    tsChart.addSeries(&tsSeries);
   }
 }
 
@@ -1278,8 +1276,7 @@ void TsgGui::plotMotif() {
         !motifPositions[0].empty()) {
 
       motifChart.axes(Qt::Horizontal)[0]->setRange(0, window - 1);
-      motifChart.axes(Qt::Vertical)[0]->setRange(min - 0.1 * (max - min), max
-          + 0.1 * (max - min));
+      motifChart.axes(Qt::Vertical)[0]->setRange(min, max);
     }
 
 
