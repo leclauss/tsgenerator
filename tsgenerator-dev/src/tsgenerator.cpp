@@ -650,14 +650,16 @@ namespace tsg {
     }
 
     //declaration stuff
-    int motifPos0, motifPos1;
     int pos0 = -1;
     int pos1 = -1;
     rseq motif;
-    rseq subsequence(window, 0.0);
+    rseq backup;
+    backup.resize(window);
     double d = std::numeric_limits<double>::max();
     double value;
     double min, max;
+    std::uniform_real_distribution<double> distStretch(1.0, 1.4);
+    double stretch = distStretch(randomEngine);
 
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
@@ -678,19 +680,23 @@ namespace tsg {
     mzNormMotif(motif);
 
     //compute first pair motif sequence
-    rseq first;
-
-    generateMatch(d, first);
+    generateMatch(d, motif);
 
     //update z-normalize motif
-    mzNormMotif(first);
+    mzNormMotif(motif);
+
+    //stretch sequence
+    for (auto &item : motif)
+      item *= stretch;
 
     //get new random position in the synthetic time series
-    motifPos0 = freePositions.calculateRandomPosition();
+    pos0 = freePositions.calculateRandomPosition();
     freePositions.removePosition();
 
     //inject sequence into the time series
-    value = timeSeries_out[motifPos0];
+    value = timeSeries_out[pos0] + timeSeries_out[pos0 + window - 1];
+    value /= 2.0;
+    value -= motif[0];
 
     //make sure we are in maxi when maxi can handle the motif height
     if (method > 3
@@ -700,47 +706,48 @@ namespace tsg {
       max = motif[0];
       min = max;
 
-      for (int i = 0; i < window; i++) {
+      for (auto &item : motif) {
 
-        if (first[i] < min)
-          min = motif[i];
+        if (item < min)
+          min = item;
 
-        if (first[i] > max)
-          max = motif[i];
+        if (item > max)
+          max = item;
       }
 
       if (value + max > maxi)
         value = maxi - max;
 
-      if (value - min < -maxi)
+      if (value + min < -maxi)
         value = -maxi - min;
     }
 
     for (int i = 0; i < window; i++)
-      timeSeries_out[i + motifPos0] = value + first[i] - first[0];
+      timeSeries_out[i + pos0] = value + motif[i];
 
     //compute running mean and std dev
     calcRunnings(timeSeries_out);
 
     //determine simlarity of the top motif pair in the random synthetic time
     //series
+    value = pos0;
     tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
     d = similarity(timeSeries_out, pos0, pos1, d);
+    pos0 = value;
 
     //compute second pair motif sequence
-    rseq second;
+    generateMatch(d, motif);
 
-    generateMatch(d, second);
+    stretch = distStretch(randomEngine);
 
-    motif_out[1] = second;
+    //stretch sequence
+    for (auto &item : motif)
+      item *= stretch;
 
-    rseq tmp;
-    tmp.resize(window);
+    motif_out[1] = motif;
 
     //get a random position for the second motif sequence
-    motifPos1 = freePositions.calculateRandomPosition();
-
-    double dTmp;
+    pos1 = freePositions.calculateRandomPosition();
 
     for(int i = 0; i <= length; i++) {
 
@@ -751,58 +758,58 @@ namespace tsg {
         throw(EXIT_FAILURE);
       }
 
+      for (int i = 0; i < window; i++)
+        backup[i] = timeSeries_out[i + pos1];
+
       //inject the second motif sequence
-      value = timeSeries_out[motifPos1];
+      value = backup[0] + backup.back();
+      value /= 2.0;
+      value -= motif[0];
 
       //make sure we are in maxi when maxi can handle the motif height
       if (method > 3
         && method < 8
         && abs(height) <= 2 * maxi) {
 
-        max = second[0];
+        max = motif[0];
         min = max;
 
-        for (int i = 0; i < window; i++) {
+        for (auto &item : motif) {
 
-          if (second[i] < min)
-            min = second[i];
+          if (item < min)
+            min = item;
 
-          if (second[i] > max)
-            max = second[i];
+          if (item > max)
+            max = item;
         }
 
         if (value + max > maxi)
           value = maxi - max;
 
-        if (value - min < -maxi)
+        if (value + min < -maxi)
           value = -maxi - min;
       }
 
-      for (int i = 0; i < window; i++) {
-
-        tmp[i] = timeSeries_out[i + motifPos1];
-        timeSeries_out[i + motifPos1] = value + second[i] - second[0];
-      }
+      for (int i = 0; i < window; i++)
+        timeSeries_out[i + pos1] = value + motif[i];
 
       //update the runnings
-      updateRunnings(timeSeries_out, motifPos1);
-
-      dTmp = similarity(timeSeries_out, motifPos0, motifPos1, d);
+      updateRunnings(timeSeries_out, pos1);
 
       //check for success
-      if(!smallerDistance(timeSeries_out, { motifPos0, motifPos1 },
-            dTmp))
+      if(!smallerDistance(timeSeries_out, { pos0, pos1 },
+            similarity(timeSeries_out, pos0, pos1, d)))
         break;
 
       //reset time series
       for (int i = 0; i < window; i++)
-        timeSeries_out[i + motifPos1] = tmp[i];
+        timeSeries_out[i + pos1] = backup[i];
 
       //update the runnings
-      updateRunnings(timeSeries_out, motifPos1);
+      updateRunnings(timeSeries_out, pos1);
 
       //get new random position for the second motif sequence
-      motifPos1 = freePositions.calculateRandomPosition();
+      pos1 = freePositions.calculateRandomPosition();
     }
   }
 
@@ -826,14 +833,14 @@ namespace tsg {
     }
 
     //declaration stuff
-    int positionOne = -1;
-    int positionTwo = -1;
+    int pos0 = -1;
+    int pos1 = -1;
     rseq motif;
-    rseq subsequence(window, 0.0);
+    rseq backup(window, 0.0);
     double d = std::numeric_limits<double>::max();
-    int position;
     double value;
     double min, max;
+    int retries = 20;
     std::uniform_real_distribution<double> distStretch(1.0, 1.4);
     double stretch = distStretch(randomEngine);
 
@@ -843,8 +850,8 @@ namespace tsg {
     //compute running mean and std dev
     calcRunnings(timeSeries_out);
 
-    tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
-    d = similarity(timeSeries_out, positionOne, positionTwo, d);
+    tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
+    d = similarity(timeSeries_out, pos0, pos1, d);
 
     //init a base motif sequence
     calculateSubsequence(motif, type, height);
@@ -859,18 +866,20 @@ namespace tsg {
     //update z-normalize motif
     mzNormMotif(motif);
 
-    //stretch and add noise
+    //stretch
     for (auto &item : motif)
       item *= stretch;
 
     //get new random position in the synthetic time series
-    position = freePositions.calculateRandomPosition();
+    pos0 = freePositions.calculateRandomPosition();
     freePositions.removePosition();
 
-    pos_out[0].push_back(position);
+    pos_out[0].push_back(pos0);
 
     //inject sequence into the time series
-    value = timeSeries_out[position];
+    value = timeSeries_out[pos0] + timeSeries_out[pos0 + window - 1];
+    value /= 2.0;
+    value -= motif[0];
 
     //make sure we are in maxi when maxi can handle the motif height
     if (method > 3
@@ -880,46 +889,43 @@ namespace tsg {
       max = motif[0];
       min = max;
 
-      for (int i = 0; i < window; i++) {
+      for (auto &item : motif) {
 
-        if (motif[i] < min)
-          min = motif[i];
+        if (item < min)
+          min = item;
 
-        if (motif[i] > max)
-          max = motif[i];
+        if (item > max)
+          max = item;
       }
 
       if (value + max > maxi)
         value = maxi - max;
 
-      if (value - min < -maxi)
+      if (value + min < -maxi)
         value = -maxi - min;
     }
 
     //inject sequence values
     for (int i = 0; i < window; i++)
-      timeSeries_out[i + position] = value + motif[i];
+      timeSeries_out[i + pos0] = value + motif[i];
 
     //update the running sum and sum of square
-    updateRunnings(timeSeries_out, position);
+    updateRunnings(timeSeries_out, pos0);
 
     //determine similarity of the top motif pair in the random synthetic time
     //series
-    tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
-    d = 0.9999999 * similarity(timeSeries_out, positionOne, positionTwo, d);
+    tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
+    d = 0.9999999 * similarity(timeSeries_out, pos0, pos1, d);
 
     d_out.push_back(d);
-
-    //declaration stuff
-    int retries = 20;
 
     //inject sequences into the time series
     for (int motifItr = 1; motifItr < size; motifItr++) {
 
       //compute the random position for the subsequence
-      position = freePositions.calculateRandomPosition();
+      pos0 = freePositions.calculateRandomPosition();
 
-      pos_out[0].push_back(position);
+      pos_out[0].push_back(pos0);
 
       //generate next match ...
       generateMatch(d, motif);
@@ -942,9 +948,11 @@ namespace tsg {
 
         //backup subsequence at position
         for (int i = 0; i < window; i++)
-          subsequence[i] = timeSeries_out[position + i];
+          backup[i] = timeSeries_out[pos0 + i];
 
-        value = subsequence[0];
+        value = backup[0] + backup.back();
+        value /= 2.0;
+        value -= motif[0];
 
         //make sure we are in maxi when maxi can handle the motif height
         if (method > 3
@@ -954,44 +962,44 @@ namespace tsg {
           max = motif[0];
           min = max;
 
-          for (int i = 0; i < window; i++) {
+          for (auto &item : motif) {
 
-            if (motif[i] < min)
-              min = motif[i];
+            if (item < min)
+              min = item;
 
-            if (motif[i] > max)
-              max = motif[i];
+            if (item > max)
+              max = item;
           }
 
           if (value + max > maxi)
             value = maxi - max;
 
-          if (value - min < -maxi)
+          if (value + min < -maxi)
             value = -maxi - min;
         }
 
         //inject sequence into the time series
         for (int i = 0; i < window; i++)
-          timeSeries_out[i + position] = value + motif[i];
+          timeSeries_out[i + pos0] = value + motif[i];
 
         //update the running sum and sum of square
-        updateRunnings(timeSeries_out, position);
+        updateRunnings(timeSeries_out, pos0);
 
-        if (largerMotifSet(timeSeries_out, position, pos_out[0].size(),
-              d) <= (int)pos_out[0].size())
+        if (largerMotifSet(timeSeries_out, pos0, pos_out[0].size(), d) <=
+            (int)pos_out[0].size())
           break;
 
         //restore old subsequence
         for (int i = 0; i < window; i++)
-          timeSeries_out[position + i] = subsequence[i];
+          timeSeries_out[pos0 + i] = backup[i];
 
         //update the running mean and variance
-        updateRunnings(timeSeries_out, position);
+        updateRunnings(timeSeries_out, pos0);
 
         //get new random position in the synthetic time series
-        position = freePositions.calculateRandomPosition();
+        pos0 = freePositions.calculateRandomPosition();
 
-        pos_out[0].back() = position;
+        pos_out[0].back() = pos0;
       }
 
       //remove the position from available positions
@@ -1007,9 +1015,9 @@ namespace tsg {
 
       do {
 
-        position = freePositions.calculateRandomPosition();
+        pos0 = freePositions.calculateRandomPosition();
 
-        secSize = largerMotifSet(timeSeries_out, position, size - 1, d);
+        secSize = largerMotifSet(timeSeries_out, pos0, size - 1, d);
 
         //there is already a smaller motif with this subseqeunce
       } while (secSize >= size);
@@ -1020,14 +1028,14 @@ namespace tsg {
       if (secSize == size - 1)
         continue;
 
-      for (int i = position; i < position + window; i++)
-        sec.push_back(timeSeries_out[i] - timeSeries_out[position]);
+      for (int i = pos0; i < pos0 + window; i++)
+        sec.push_back(timeSeries_out[i] - timeSeries_out[pos0]);
 
       //harden the time series by injecting smaller motif
       for (int motifItr = 1; motifItr < size - 1; motifItr++) {
 
         //compute the random position for the subsequence
-        position = freePositions.calculateRandomPosition();
+        pos0 = freePositions.calculateRandomPosition();
 
         //try to inject another sequence
         for (int retry = 0; retry <= retries; retry++) {
@@ -1041,19 +1049,20 @@ namespace tsg {
 
           //backup subsequence at position
           for (int i = 0; i < window; i++)
-            subsequence[i] = timeSeries_out[position + i];
+            backup[i] = timeSeries_out[pos0 + i];
 
-          value = subsequence.back() - subsequence[0];
-          value = subsequence[0] + value / 2.0;
+          value = backup[0] + backup.back();
+          value /= 2.0;
+          value -= sec[0];
 
           //inject sequence into the time series
           for (int i = 0; i < window; i++)
-            timeSeries_out[i + position] = value + sec[i];
+            timeSeries_out[i + pos0] = value + sec[i];
 
           //update the running sum and sum of square
-          updateRunnings(timeSeries_out, position);
+          updateRunnings(timeSeries_out, pos0);
 
-          secSize = largerMotifSet(timeSeries_out, position, size - 1, d);
+          secSize = largerMotifSet(timeSeries_out, pos0, size - 1, d);
 
           if (secSize < size) {
 
@@ -1065,13 +1074,13 @@ namespace tsg {
 
           //restore old subsequence
           for (int i = 0; i < window; i++)
-            timeSeries_out[position + i] = subsequence[i];
+            timeSeries_out[pos0 + i] = backup[i];
 
           //update the running mean and variance
-          updateRunnings(timeSeries_out, position);
+          updateRunnings(timeSeries_out, pos0);
 
           //get new random position in the synthetic time series
-          position = freePositions.calculateRandomPosition();
+          pos0 = freePositions.calculateRandomPosition();
         }
 
         //remove the position from available positions
@@ -1100,11 +1109,14 @@ namespace tsg {
     }
 
     //declaration stuff
-    int positionOne = -1;
-    int positionTwo = -1;
+    int pos0 = -1;
+    int pos1 = -1;
     rseq motif;
-    rseq subsequence(window, 0.0);
+    rseq backup(window, 0.0);
     double d = std::numeric_limits<double>::max();
+    double value;
+    double min, max;
+    int retries = 20;
     std::uniform_real_distribution<double> distStretch(1.0, 1.4);
     double stretch = distStretch(randomEngine);
 
@@ -1116,8 +1128,8 @@ namespace tsg {
 
     //determine similarity of the top motif pair in the random synthetic time
     //series
-    tpm(timeSeries_out, sums, sumSquares, positionOne, positionTwo, window);
-    d = 0.49999999 * similarity(timeSeries_out, positionOne, positionTwo, d);
+    tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
+    d = 0.49999999 * similarity(timeSeries_out, pos0, pos1, d);
 
     d_out.push_back(d);
 
@@ -1133,20 +1145,14 @@ namespace tsg {
 
     motif_out[0] = motif;
 
-    //declaration stuff
-    int position;
-    double value;
-    double min, max;
-    int retries = 20;
-
 
     //inject sequences into the time series
     for (int motifItr = 0; motifItr < size; motifItr++) {
 
       //compute the random position for the subsequence
-      position = freePositions.calculateRandomPosition();
+      pos0 = freePositions.calculateRandomPosition();
 
-      pos_out[0].push_back(position);
+      pos_out[0].push_back(pos0);
 
       //generate next match ...
       generateMatch(d, motif);
@@ -1169,9 +1175,11 @@ namespace tsg {
 
         //backup subsequence at position
         for (int i = 0; i < window; i++)
-          subsequence[i] = timeSeries_out[position + i];
+          backup[i] = timeSeries_out[pos0 + i];
 
-        value = subsequence[0];
+        value = backup[0] + backup.back();
+        value /= 2.0;
+        value -= motif[0];
 
         //make sure we are in maxi when maxi can handle the motif height
         if (method > 3
@@ -1181,44 +1189,44 @@ namespace tsg {
           max = motif[0];
           min = max;
 
-          for (int i = 0; i < window; i++) {
+          for (auto &item : motif) {
 
-            if (motif[i] < min)
-              min = motif[i];
+            if (item < min)
+              min = item;
 
-            if (motif[i] > max)
-              max = motif[i];
+            if (item > max)
+              max = item;
           }
 
           if (value + max > maxi)
             value = maxi - max;
 
-          if (value - min < -maxi)
+          if (value + min < -maxi)
             value = -maxi - min;
         }
 
         //inject sequence into the time series
         for (int i = 0; i < window; i++)
-          timeSeries_out[i + position] = value + motif[i];
+          timeSeries_out[i + pos0] = value + motif[i];
 
         //update the running sum and sum of square
-        updateRunnings(timeSeries_out, position);
+        updateRunnings(timeSeries_out, pos0);
 
-        if (largerMotifSet(timeSeries_out, position, pos_out[0].size(),
-              2.0 * d) <= (int)pos_out[0].size())
+        if (largerMotifSet(timeSeries_out, pos0, pos_out[0].size(), 2.0 * d) <=
+            (int)pos_out[0].size())
           break;
 
         //restore old subsequence
         for (int i = 0; i < window; i++)
-          timeSeries_out[position + i] = subsequence[i];
+          timeSeries_out[pos0 + i] = backup[i];
 
         //update the running mean and variance
-        updateRunnings(timeSeries_out, position);
+        updateRunnings(timeSeries_out, pos0);
 
         //get new random position in the synthetic time series
-        position = freePositions.calculateRandomPosition();
+        pos0 = freePositions.calculateRandomPosition();
 
-        pos_out[0].back() = position;
+        pos_out[0].back() = pos0;
       }
 
       //remove the position from available positions
@@ -1234,9 +1242,9 @@ namespace tsg {
 
       do {
 
-        position = freePositions.calculateRandomPosition();
+        pos0 = freePositions.calculateRandomPosition();
 
-        secSize = largerMotifSet(timeSeries_out, position, size - 1, 2.0 * d);
+        secSize = largerMotifSet(timeSeries_out, pos0, size - 1, 2.0 * d);
       } while (secSize >= size);
 
       //remove the position from available positions
@@ -1246,14 +1254,14 @@ namespace tsg {
       if (secSize == size - 1)
         continue;
 
-      for (int i = position; i < position + window; i++)
-        sec.push_back(timeSeries_out[i] - timeSeries_out[position]);
+      for (int i = pos0; i < pos0 + window; i++)
+        sec.push_back(timeSeries_out[i] - timeSeries_out[pos0]);
 
       //harden the time series by injecting smaller motif
       for (int motifItr = 1; motifItr < size - 1; motifItr++) {
 
         //compute the random position for the subsequence
-        position = freePositions.calculateRandomPosition();
+        pos0 = freePositions.calculateRandomPosition();
 
         //try to inject another sequence
         for (int retry = 0; retry <= retries; retry++) {
@@ -1267,19 +1275,20 @@ namespace tsg {
 
           //backup subsequence at position
           for (int i = 0; i < window; i++)
-            subsequence[i] = timeSeries_out[position + i];
+            backup[i] = timeSeries_out[pos0 + i];
 
-          value = subsequence.back() - subsequence[0];
-          value = subsequence[0] + value / 2.0;
+          value = backup[0] + backup.back();
+          value /= 2.0;
+          value -= sec[0];
 
           //inject sequence into the time series
           for (int i = 0; i < window; i++)
-            timeSeries_out[i + position] = value + sec[i];
+            timeSeries_out[i + pos0] = value + sec[i];
 
           //update the running sum and sum of square
-          updateRunnings(timeSeries_out, position);
+          updateRunnings(timeSeries_out, pos0);
 
-          secSize = largerMotifSet(timeSeries_out, position, size - 1, 2.0 * d);
+          secSize = largerMotifSet(timeSeries_out, pos0, size - 1, 2.0 * d);
 
           if (secSize < size) {
 
@@ -1292,13 +1301,13 @@ namespace tsg {
 
             //restore old subsequence
             for (int i = 0; i < window; i++)
-              timeSeries_out[position + i] = subsequence[i];
+              timeSeries_out[pos0 + i] = backup[i];
 
             //update the running mean and variance
-            updateRunnings(timeSeries_out, position);
+            updateRunnings(timeSeries_out, pos0);
 
             //get new random position in the synthetic time series
-            position = freePositions.calculateRandomPosition();
+            pos0 = freePositions.calculateRandomPosition();
           }
         }
 
