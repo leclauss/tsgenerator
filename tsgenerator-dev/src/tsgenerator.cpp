@@ -655,11 +655,10 @@ namespace tsg {
     rseq motif;
     rseq backup;
     backup.resize(window);
-    double d = std::numeric_limits<double>::max();
+    double d;
     double value;
     double min, max;
-    std::uniform_real_distribution<double> distStretch(1.0, 1.4);
-    double stretch = distStretch(randomEngine);
+    int retries = 20;
 
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
@@ -670,7 +669,7 @@ namespace tsg {
     //determine simlarity of the top motif pair in the random synthetic time
     //series
     tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
-    d = similarity(timeSeries_out, pos0, pos1, d);
+    d = similarity(timeSeries_out, pos0, pos1);
 
     //compute first pair motif sequence
     calculateSubsequence(motif, type, height);
@@ -684,10 +683,6 @@ namespace tsg {
 
     //update z-normalize motif
     mzNormMotif(motif);
-
-    //stretch sequence
-    for (auto &item : motif)
-      item *= stretch;
 
     //get new random position in the synthetic time series
     pos0 = freePositions.calculateRandomPosition();
@@ -728,28 +723,22 @@ namespace tsg {
     //compute running mean and std dev
     calcRunnings(timeSeries_out);
 
-    //determine simlarity of the top motif pair in the random synthetic time
+    //determine simlarity of the top pair motif in the random synthetic time
     //series
     value = pos0;
     tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
-    d = similarity(timeSeries_out, pos0, pos1, d);
+    d = similarity(timeSeries_out, pos0, pos1);
     pos0 = value;
 
     //compute second pair motif sequence
     generateMatch(d, motif);
-
-    stretch = distStretch(randomEngine);
-
-    //stretch sequence
-    for (auto &item : motif)
-      item *= stretch;
 
     motif_out[1] = motif;
 
     //get a random position for the second motif sequence
     pos1 = freePositions.calculateRandomPosition();
 
-    for(int i = 0; i <= length; i++) {
+    for(int i = 0; i <= retries; i++) {
 
       if(i == length) {
 
@@ -798,7 +787,7 @@ namespace tsg {
 
       //check for success
       if(!smallerDistance(timeSeries_out, { pos0, pos1 },
-            similarity(timeSeries_out, pos0, pos1, d)))
+            similarity(timeSeries_out, pos0, pos1)))
         break;
 
       //reset time series
@@ -837,12 +826,10 @@ namespace tsg {
     int pos1 = -1;
     rseq motif;
     rseq backup(window, 0.0);
-    double d = std::numeric_limits<double>::max();
+    double d;
     double value;
     double min, max;
     int retries = 20;
-    std::uniform_real_distribution<double> distStretch(1.0, 1.4);
-    double stretch = distStretch(randomEngine);
 
     //generate a base time series and get the top pair motif distance
     generateBaseTimeSeries(timeSeries_out);
@@ -851,7 +838,7 @@ namespace tsg {
     calcRunnings(timeSeries_out);
 
     tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
-    d = similarity(timeSeries_out, pos0, pos1, d);
+    d = similarity(timeSeries_out, pos0, pos1);
 
     //init a base motif sequence
     calculateSubsequence(motif, type, height);
@@ -865,10 +852,6 @@ namespace tsg {
 
     //update z-normalize motif
     mzNormMotif(motif);
-
-    //stretch
-    for (auto &item : motif)
-      item *= stretch;
 
     //get new random position in the synthetic time series
     pos0 = freePositions.calculateRandomPosition();
@@ -915,7 +898,7 @@ namespace tsg {
     //determine similarity of the top motif pair in the random synthetic time
     //series
     tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
-    d = 0.9999999 * similarity(timeSeries_out, pos0, pos1, d);
+    d = 0.9999999 * similarity(timeSeries_out, pos0, pos1);
 
     d_out.push_back(d);
 
@@ -929,12 +912,6 @@ namespace tsg {
 
       //generate next match ...
       generateMatch(d, motif);
-
-      //... and stretch
-      stretch = distStretch(randomEngine);
-
-      for (auto &item : motif)
-        item *= stretch;
 
       //try to inject another sequence
       for (int retry = 0; retry <= retries; retry++) {
@@ -1113,12 +1090,10 @@ namespace tsg {
     int pos1 = -1;
     rseq motif;
     rseq backup(window, 0.0);
-    double d = std::numeric_limits<double>::max();
+    double d;
     double value;
     double min, max;
     int retries = 20;
-    std::uniform_real_distribution<double> distStretch(1.0, 1.4);
-    double stretch = distStretch(randomEngine);
 
     //generate a base time series
     generateBaseTimeSeries(timeSeries_out);
@@ -1129,7 +1104,7 @@ namespace tsg {
     //determine similarity of the top motif pair in the random synthetic time
     //series
     tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
-    d = 0.49999999 * similarity(timeSeries_out, pos0, pos1, d);
+    d = 0.49999999 * similarity(timeSeries_out, pos0, pos1);
 
     d_out.push_back(d);
 
@@ -1137,14 +1112,10 @@ namespace tsg {
     //room of subsequence values
     calculateSubsequence(motif, type, height);
 
-    for (auto &item : motif)
-      item *= stretch;
-
     //update z-normalize motif
     mzNormMotif(motif);
 
     motif_out[0] = motif;
-
 
     //inject sequences into the time series
     for (int motifItr = 0; motifItr < size; motifItr++) {
@@ -1156,12 +1127,6 @@ namespace tsg {
 
       //generate next match ...
       generateMatch(d, motif);
-
-      //... and stretch
-      stretch = distStretch(randomEngine);
-
-      for (auto &item : motif)
-        item *= stretch;
 
       //try to inject another sequence
       for (int retry = 0; retry <= retries; retry++) {

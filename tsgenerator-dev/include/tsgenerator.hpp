@@ -249,7 +249,8 @@ namespace tsg
     ///computed. The return value is the similarity of the two z-normalized
     ///subsequences.
     double similarity(const rseq &sequence_in, const int pos0_in, const int
-        pos1_in, const double bestSoFar_in);
+        pos1_in, const double bestSoFar_in
+        = std::numeric_limits<double>::max());
 
     ///\brief Computes the mean and standard deviation of a sequence.
     ///
