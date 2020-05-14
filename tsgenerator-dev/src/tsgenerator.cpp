@@ -1115,7 +1115,13 @@ namespace tsg {
     //update z-normalize motif
     mzNormMotif(motif);
 
+    //compute the motif sequence
+    generateMatch(d, motif);
+
     motif_out[0] = motif;
+
+    //update z-normalize motif
+    mzNormMotif(motif);
 
     //inject sequences into the time series
     for (int motifItr = 0; motifItr < size; motifItr++) {
