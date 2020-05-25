@@ -107,7 +107,8 @@ add_executable(${PROJECT_NAME}
   src/global.cpp
   src/outputgenerator.cpp
   src/chartview.cpp
-  src/chart.cpp)
+  src/chart.cpp
+  src/canvas.cpp)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
   include src
