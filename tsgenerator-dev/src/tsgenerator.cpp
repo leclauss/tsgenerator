@@ -147,13 +147,6 @@ namespace tsg {
       throw(EXIT_FAILURE);
     }
 
-    // check if shape sequence is even
-    if (shape_in.size() % 2 != 0) {
-
-      std::cerr << "ERROR: The shape vector is not even" << std::endl;
-      throw(EXIT_FAILURE);
-    }
-
     // store the shape
     type = (int) motifTypes.size();
     shape = shape_in;
@@ -205,13 +198,6 @@ namespace tsg {
     if (shape_in.empty()) {
 
       std::cerr << "ERROR: Motif shape is empty" << std::endl;
-      throw(EXIT_FAILURE);
-    }
-
-    // check if shape sequence is even
-    if (shape_in.size() % 2 != 0) {
-
-      std::cerr << "ERROR: The shape vector is not even" << std::endl;
       throw(EXIT_FAILURE);
     }
 
