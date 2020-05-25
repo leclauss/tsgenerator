@@ -126,6 +126,137 @@ namespace tsg {
     }
   }
 
+  TSGenerator::TSGenerator(const int length_in, const int window_in, const
+      double delta_in, const double noise_in, const rseq &shape_in, const int
+      size_in, const double height_in, const double step_in, const int
+      times_in, const int method_in, const double maxi_in, const int gen_in,
+      const int smaller_in)
+    : length(abs(length_in)), window(window_in), delta(delta_in),
+    noise(noise_in), size(abs(size_in)), height(height_in),
+    step(abs(step_in)), times(abs(times_in)), method(abs(method_in)),
+    maxi(abs(maxi_in)), gen(abs(gen_in)), smaller(abs(smaller_in)),
+    freePositions(length, window), randomEngine(std::random_device().entropy()
+      ? std::random_device()()
+      : (unsigned
+        int)(std::chrono::system_clock::now().time_since_epoch().count())) {
+
+    // check if shape exists
+    if (shape_in.empty()) {
+
+      std::cerr << "ERROR: Motif shape is empty" << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    // check if shape sequence is even
+    if (shape_in.size() % 2 != 0) {
+
+      std::cerr << "ERROR: The shape vector is not even" << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    // store the shape
+    type = (int) motifTypes.size();
+    shape = shape_in;
+
+    //check if method exists
+    if (method >= (int) methods.size()) {
+
+      std::cerr << "ERROR: Unknown method: " << method_in << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    //check if the motif amount is set properly
+    if (size < 3) {
+
+      std::cerr << "ERROR: Wrong motif amount: " << size_in << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    //check if the generator type is set properly
+    if (gen > 2) {
+
+      std::cerr << "ERROR: Wrong generator type: " << gen_in << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    //check if the time series length can handle all motif subsequences
+    if (length < (2 * size - 1) * window) {
+
+      std::cerr << "ERROR: The sum of the subsequences length is to" <<
+        " large to fit into the time series!" << std::endl;
+      throw(EXIT_FAILURE);
+    }
+  }
+
+  TSGenerator::TSGenerator(const int length_in, const int window_in, const
+      double delta_in, const double noise_in, const rseq &shape_in, const int
+      size_in, const double height_in, const double step_in, const int
+      times_in, const word method_in, const double maxi_in, const word gen_in,
+      const int smaller_in)
+    : length(abs(length_in)), window(window_in), delta(delta_in),
+    noise(noise_in), size(abs(size_in)), height(height_in), step(abs(step_in)),
+    times(abs(times_in)), maxi(abs(maxi_in)), smaller(abs(smaller_in)),
+    freePositions(length, window), randomEngine(std::random_device().entropy()
+      ? std::random_device()()
+      : (unsigned
+        int)(std::chrono::system_clock::now().time_since_epoch().count())) {
+
+    // check if shape exists
+    if (shape_in.empty()) {
+
+      std::cerr << "ERROR: Motif shape is empty" << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    // check if shape sequence is even
+    if (shape_in.size() % 2 != 0) {
+
+      std::cerr << "ERROR: The shape vector is not even" << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    // store the shape
+    type = (int) motifTypes.size();
+    shape = shape_in;
+
+    // get the method
+    method = (int)(std::distance(methods.begin(),
+          std::find(methods.begin(), methods.end(), method_in)));
+
+    // check if method exists
+    if (method >= (int) methods.size()) {
+
+      std::cerr << "ERROR: Unknown method: " << method_in << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    // get the generator
+    gen = (int)(std::distance(gens.begin(), std::find(gens.begin(), gens.end(),
+            gen_in)));
+
+    // check if generator exists
+    if (gen >= (int) gens.size()) {
+
+      std::cerr << "ERROR: Unknown generator: " << gen_in << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    //check if the motif amount is set properly
+    if (size < 3) {
+
+      std::cerr << "ERROR: Wrong motif amount: " << size_in << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    //check if the time series length can handle all motif subsequences
+    if (length < (2 * size - 1) * window) {
+
+      std::cerr << "ERROR: The sum of the subsequences length is to" <<
+        " large to fit into the time series!" << std::endl;
+      throw(EXIT_FAILURE);
+    }
+  }
+
   TSGenerator::~TSGenerator() { }
 
   void TSGenerator::calcRunnings(const rseq &sequence_in) {
@@ -189,6 +320,66 @@ namespace tsg {
 
       sumSquares[i + 1] = sumSquares[i] + sequence_in[i + window]
         * sequence_in[i + window] - sequence_in[i] * sequence_in[i];
+    }
+  }
+
+  void TSGenerator::generateCustomMotif(rseq &subsequence_out) {
+
+    if (!subsequence_out.empty()) {
+
+      subsequence_out.clear();
+      subsequence_out.resize(0);
+    }
+
+    int maxY = shape[0];
+    int minY = shape[0];
+    int startX;
+    int endX;
+    double x;
+    double y;
+    double wRatio = (double) shape.size() / (double) window;
+    double hRatio;
+
+    for (size_t i = 1; i < shape.size(); i++) {
+
+      if (shape[i] > maxY)
+        maxY = shape[i];
+
+      if (shape[i] < minY)
+        minY = shape[i];
+    }
+
+    hRatio = height / (maxY - minY);
+
+    // length is already matching
+    if (window == (int) shape.size()) {
+
+      for (int i = 0; i < window; i++)
+        subsequence_out.push_back(hRatio * shape[i]);
+
+      return;
+    }
+
+    subsequence_out.push_back(hRatio * shape[0]);
+
+    // linear approximate values otherwise
+    for (int i = 1; i < window; i++) {
+
+      x = i * wRatio;
+
+      if (round(x) == x) {
+
+        y = hRatio * shape[(int)x];
+      } else {
+
+        startX = floor(x);
+        endX = ceil(x);
+
+        y = hRatio * ((x - (double)startX) * (shape[endX] - shape[startX])
+            + shape[startX]);
+      }
+
+      subsequence_out.push_back(y);
     }
   }
 
@@ -269,8 +460,7 @@ namespace tsg {
     stdDev_out = stdDev_out < 1.0 ? 1.0 : sqrt(stdDev_out);
   }
 
-  void TSGenerator::calculateSubsequence(rseq &subsequence_out, int type_in,
-      double height_in) {
+  void TSGenerator::calculateSubsequence(rseq &subsequence_out) {
 
     if (!subsequence_out.empty()) {
 
@@ -278,36 +468,37 @@ namespace tsg {
       subsequence_out.resize(0);
     }
 
-    switch (type_in) {
+    switch (type) {
 
       case 0:
-        generateBoxMotif(subsequence_out, 1.0, 1.0, window, height_in);
+        generateBoxMotif(subsequence_out, 1.0, 1.0, window, height);
         break;
       case 1:
-        generateTriangleMotif(subsequence_out, 1.0, 1.0, window, height_in);
+        generateTriangleMotif(subsequence_out, 1.0, 1.0, window, height);
         break;
       case 2:
-        generateSemicircleMotif(subsequence_out, 1.0, 1.0, window, height_in);
+        generateSemicircleMotif(subsequence_out, 1.0, 1.0, window, height);
         break;
       case 3:
-        generateTrapezoidMotif(subsequence_out, 1.0, 1.0, window, height_in);
+        generateTrapezoidMotif(subsequence_out, 1.0, 1.0, window, height);
         break;
       case 4:
-        generatePositiveFlankMotif(subsequence_out, 1.0, 1.0, window,
-            height_in);
+        generatePositiveFlankMotif(subsequence_out, 1.0, 1.0, window, height);
         break;
       case 5:
-        generateNegativeFlankMotif(subsequence_out, 1.0, 1.0, window,
-            height_in);
+        generateNegativeFlankMotif(subsequence_out, 1.0, 1.0, window, height);
         break;
       case 6:
-        generateSineMotif(subsequence_out, 1.0, 1.0, window, height_in);
+        generateSineMotif(subsequence_out, 1.0, 1.0, window, height);
         break;
       case 7:
-        generateCosineMotif(subsequence_out, 1.0, 1.0, window, height_in);
+        generateCosineMotif(subsequence_out, 1.0, 1.0, window, height);
+        break;
+      case 8:
+        generateCustomMotif(subsequence_out);
         break;
       default:
-        std::cerr << "ERROR: Unknown motif type: " << type_in << std::endl;
+        std::cerr << "ERROR: Unknown motif type: " << type << std::endl;
         throw(EXIT_FAILURE);
     }
   }
@@ -672,7 +863,7 @@ namespace tsg {
     d = similarity(timeSeries_out, pos0, pos1);
 
     //compute first pair motif sequence
-    calculateSubsequence(motif, type, height);
+    calculateSubsequence(motif);
     motif_out[0] = motif;
 
     //z-normalize motif
@@ -841,7 +1032,7 @@ namespace tsg {
     d = similarity(timeSeries_out, pos0, pos1);
 
     //init a base motif sequence
-    calculateSubsequence(motif, type, height);
+    calculateSubsequence(motif);
 
     mzNormMotif(motif);
 
@@ -1110,7 +1301,7 @@ namespace tsg {
 
     //calculate motif set center subsequence in the window size dimentional
     //room of subsequence values
-    calculateSubsequence(motif, type, height);
+    calculateSubsequence(motif);
 
     //update z-normalize motif
     mzNormMotif(motif);

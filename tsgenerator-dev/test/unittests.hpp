@@ -1584,10 +1584,9 @@ public:
   ///This function runs the calculate motif set subsequence function since the
   ///calculate raw motif set subsequence function is protected.
   // --------------------------------------------------------------------------
-  void testCalculateSubsequence(tsg::rseq &subsequence_out, int type_in,
-      double height_in) {
+  void testCalculateSubsequence(tsg::rseq &subsequence_out) {
 
-    calculateSubsequence(subsequence_out, type_in, height_in);
+    calculateSubsequence(subsequence_out);
   }
 };
 

@@ -11,6 +11,7 @@
 #include <global.hpp>
 #include <chart.hpp>
 #include <chartview.hpp>
+#include <canvas.hpp>
 #include <iostream>
 #include <vector>
 #include <map>
@@ -43,6 +44,8 @@
 #include <QHBoxLayout>
 #include <QGroupBox>
 #include <QVBoxLayout>
+#include <QDialog>
+#include <QDialogButtonBox>
 
 
 class TsgGui : public QApplication {
@@ -66,8 +69,10 @@ private:
   tsg::word method = tsg::defaultMethod;
   tsg::word gen = tsg::defaultGen;
 
+  //system variables
   bool running = false;
   std::map<tsg::word, tsg::iseqs> disc;
+  tsg::rseq customShape;
 
   //final product
   tsg::rseq timeSeries;
@@ -174,6 +179,12 @@ private:
   QLabel browseLabel;
   QLineEdit browseText;
   QPushButton browseButton;
+
+  //draw dialog box
+  QDialog customDia;
+  QVBoxLayout customLayout;
+  Canvas customCanvas;
+  QDialogButtonBox customDiaButtonBox;
 
 public:
 
@@ -293,5 +304,21 @@ public slots:
   ///
   ///This function opens a message box with a help text for the smaller option.
   void showSmallerHelp();
-};
 
+  ///\brief This function opens a drawing window.
+  ///
+  ///\param [in] index_in Hands over the index of the type drop down list.
+  ///
+  ///This function opens a box where the user may draw a custom motif shape.
+  void typeSelected(const int index_in);
+
+  ///\brief This function creates a custom shape from a drawing.
+  ///
+  ///This function creates a custom shape from the drawing of the user.
+  void createCustomShape();
+
+  ///\brief This function closes the drawing window.
+  ///
+  ///This function closes the box where the user may draw a custom motif shape.
+  void closeCustomDia();
+};

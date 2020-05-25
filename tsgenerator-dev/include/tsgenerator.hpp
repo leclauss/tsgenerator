@@ -182,6 +182,11 @@ namespace tsg
     ///series between the motif sets subsequences.
     FreePositions freePositions;
 
+    ///\brief This variable stores a custom shape.
+    ///
+    ///This variable stores the values of a custom shape defined by the user.
+    rseq shape;
+
     ///\brief This variable represents the motif.
     ///
     ///This variable stores the values of the motif shifted by the mean. It is
@@ -235,6 +240,14 @@ namespace tsg
     ///a specific location.
     void updateRunnings(const rseq &timeSeries_in, const int pos_in);
 
+    ///\brief Computes a custom sequence from the shape vector.
+    ///
+    ///\param [in] &sequence_out Hands over the sequence.
+    ///
+    ///This function computes a sequence from the shape vector. The sequence is
+    ///adjusted to the window size and base motif height.
+    void generateCustomMotif(rseq &subsequence_out);
+
     ///\brief Computes the similarity of two subsequences in a sequence.
     ///
     ///\param [in] &sequence_in Hands over the sequence.
@@ -265,14 +278,11 @@ namespace tsg
     ///\brief Computes a motif set subsequence.
     ///
     ///\param [out] subsequence_out Hands over the calculated raw subsequence.
-    ///\param [in] type_in Hands over the motif set type.
-    ///\param [in] height_in Hands over the height of the subsequence.
     ///
     ///This function computes a motif set subsequence according to the motif
     ///type, height and window size. Attention! The range is random and the
     ///subsequence is not added to the synthetic time series.
-    void calculateSubsequence(rseq &subsequence_out, int type_in, double
-        height_in);
+    void calculateSubsequence(rseq &subsequence_out);
 
     ///\brief Calculates a base time series.
     ///
@@ -428,6 +438,68 @@ namespace tsg
         = defaultMotifSize, const word method_in = defaultMethod, const double
         maxi_in = defaultMaxi, const word gen_in = defaultGen, const int
         smaller_in = defaultSmaller);
+
+    ///\brief The constructor initializes the TSGenerator.
+    ///
+    ///\param [in] length_in Hands over the time series length.
+    ///\param [in] window_in Hands over the window size.
+    ///\param [in] delta_in Hands over the maximum difference between two
+    ///consecutive values in the time series.
+    ///\param [in] noise_in Hands over the noise option, i.e., +-noise_in 2 will
+    ///be added to each value of the time series.
+    ///\param [in] &shape_in Hands over a custom motif shape.
+    ///\param [in] size_in Hands over the number of subsequences non-self matched
+    ///by the motif.
+    ///\param [in] height_in Hands over the maximum difference between two values
+    ///of the motif.
+    ///\param [in] times_in Hands over the times of steps.
+    ///\param [in] method_in Hands over the method for base time series
+    ///generation.
+    ///\param [in] max_in Hands over the maximum absolute value of the time
+    ///series.
+    ///\param [in] gen_in Hands over the motif generation type.
+    ///\param [in] smaller_in Hands over the number of smaller motifs to harden
+    ///time series.
+    ///
+    ///The constructor checks whether a true random engine is available and
+    ///stores the result in the trueRandomEngineAvailable variable.
+    TSGenerator(const int length_in, const int window_in, const double
+        delta_in, const double noise_in, const tsg::rseq &shape_in, const int
+        size_in, const double height_in, const double step_in = defaultStep,
+        const int times_in = defaultTimes, const int method_in = 5, const
+        double maxi_in = defaultMaxi, const int gen_in = 1, const int
+        smaller_in = defaultSmaller);
+
+    ///\brief The constructor initializes the TSGenerator.
+    ///
+    ///\param [in] length_in Hands over the time series length.
+    ///\param [in] window_in Hands over the window size.
+    ///\param [in] delta_in Hands over the maximum difference between two
+    ///consecutive values in the time series.
+    ///\param [in] noise_in Hands over the noise option, i.e., +-noise_in 2 will
+    ///be added to each value of the time series.
+    ///\param [in] &shape_in Hands over a custom motif shape.
+    ///\param [in] size_in Hands over the number of subsequences non-self matched
+    ///by the motif.
+    ///\param [in] height_in Hands over the maximum difference between two values
+    ///of the motif.
+    ///\param [in] times_in Hands over the times of steps.
+    ///\param [in] method_in Hands over the method for base time series
+    ///generation.
+    ///\param [in] maxi_in Hands over the maximum absolute value of the time
+    ///series.
+    ///\param [in] gen_in Hands over the motif generation type.
+    ///\param [in] smaller_in Hands over the number of smaller motifs to harden
+    ///time series.
+    ///
+    ///The constructor checks whether a true random engine is available and
+    ///stores the result in the trueRandomEngineAvailable variable.
+    TSGenerator(const int length_in, const int window_in, const double
+        delta_in, const double noise_in, const rseq &shape_in, const int
+        size_in, const double height_in, const double step_in = 1.0, const int
+        times_in = defaultMotifSize, const word method_in = defaultMethod,
+        const double maxi_in = defaultMaxi, const word gen_in = defaultGen,
+        const int smaller_in = defaultSmaller);
 
     ///\brief Frees the memory allocated by the TSGenerator.
     ///

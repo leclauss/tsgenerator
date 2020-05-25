@@ -16,7 +16,7 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv),
   //set initialize widgets
   fileMenu.setTitle("File");
   openAct.setText("open");
-  openFileDialog.setWindowTitle("open file");
+  openFileDialog.setWindowTitle("Open File");
   openFileDialog.setFileMode(QFileDialog::Directory);
   openFileDialog.setOption(QFileDialog::ShowDirsOnly, true);
   openFileDialog.setDirectory(".");
@@ -24,7 +24,7 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv),
   saveAct.setText("save");
   infoMenu.setTitle("Info");
   copywriteAct.setText("license");
-  copywriteMes.setWindowTitle("license");
+  copywriteMes.setWindowTitle("License");
   copywriteMes.setText("MIT License\n\n"
       "Copyright (c) 2018 Rafael Moczalla\n\n"
       "Permission is hereby granted, free of charge, to any person obtaining "
@@ -45,57 +45,58 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv),
       "SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.");
   helpMenu.setTitle("Help");
   genAct.setText("generator");
-  genMes.setWindowTitle("generator option");
+  genMes.setWindowTitle("Generator Option");
   genMes.setText("The generator option specifies the method for injecting "
       "sequences into the time series matching the synthetic motif.");
   typeAct.setText("type");
-  typeMes.setWindowTitle("type option");
+  typeMes.setWindowTitle("Type Option");
   typeMes.setText("The type option specifies the shape of the injected motif "
       "and the inserted sequences.");
   methodAct.setText("method");
-  methodMes.setWindowTitle("method option");
+  methodMes.setWindowTitle("Method Option");
   methodMes.setText("The method option sets the method for generating the "
       "base time series.");
   lengthAct.setText("length");
-  lengthMes.setWindowTitle("length option");
+  lengthMes.setWindowTitle("Length Option");
   lengthMes.setText("The length option specifies the length of the time "
       "series. The length is the number of values in the time series.");
   windowAct.setText("window");
-  windowMes.setWindowTitle("window option");
+  windowMes.setWindowTitle("Window Option");
   windowMes.setText("The window option sets the sequence size of the "
       "sequences injected into the time series non-self matching the motif.");
   sizeAct.setText("size");
-  sizeMes.setWindowTitle("size option");
+  sizeMes.setWindowTitle("Size Option");
   sizeMes.setText("The size option sets the number of subsequences matching "
       "the motif sequence.");
   noiseAct.setText("noise");
-  noiseMes.setWindowTitle("noise option");
+  noiseMes.setWindowTitle("Noise Option");
   noiseMes.setText("The noise option option is the value added to the base "
       "time series and the injected sequences.");
   deltaAct.setText("delta");
-  deltaMes.setWindowTitle("delta option");
+  deltaMes.setWindowTitle("Delta Option");
   deltaMes.setText("The delta option is the difference between two "
       "consecutive values in the time series.");
   heightAct.setText("height");
-  heightMes.setWindowTitle("height option");
+  heightMes.setWindowTitle("Height Option");
   heightMes.setText("The height option sets the height of the motif, i.e. the "
       "maximum difference between two values of the base motif.");
   stepAct.setText("step");
-  stepMes.setWindowTitle("step option");
+  stepMes.setWindowTitle("Step Option");
   stepMes.setText("The step option sets the maximum step size from two "
       "consecutive values when creating a splined base time series.");
   timesAct.setText("times");
-  timesMes.setWindowTitle("times option");
+  timesMes.setWindowTitle("Times Option");
   timesMes.setText("The times option sets the number of values of the "
       "repeating pattern when a splined base time series is generated");
   maxiAct.setText("maxi");
-  maxiMes.setWindowTitle("maxi option");
+  maxiMes.setWindowTitle("Maxi Option");
   maxiMes.setText("The maxi option sets the maximum absolute value of the "
       "base time series.");
   smallerAct.setText("smaller");
-  smallerMes.setWindowTitle("smaller option");
+  smallerMes.setWindowTitle("Smaller Option");
   smallerMes.setText("The smaller option sets the number of smaller motifs "
       "injected into the time series after injecting the top motif.");
+  customDia.setWindowTitle("Custom Motif Shape");
   startButton.setText("start");
   lengthLabel.setText("length:");
   lengthText.setPlaceholderText(std::to_string(length).c_str());
@@ -168,11 +169,29 @@ TsgGui::TsgGui(int &argc, char *argv[]) : QApplication(argc, argv),
 
   gui.setMenuBar(&menuBar);
 
+  //create draw window for custom motif shape
+  customLayout.addWidget(&customCanvas);
+
+  customDiaButtonBox.setStandardButtons(QDialogButtonBox::Ok
+      | QDialogButtonBox::Cancel);
+
+  connect(&customDiaButtonBox, SIGNAL(accepted()), this, SLOT(createCustomShape()));
+  connect(&customDiaButtonBox, SIGNAL(rejected()), this, SLOT(closeCustomDia()));
+
+  customLayout.addWidget(&customDiaButtonBox);
+
+  customDia.setLayout(&customLayout);
+  customDia.setModal(true);
+
   //add the types
   for (auto &item : tsg::motifTypes)
     types.append(item.c_str());
 
   typeDrop.addItems(types);
+
+  //add type for custom shape
+  connect(&typeDrop, SIGNAL(activated(int)), this, SLOT(typeSelected(int)));
+  typeDrop.addItem("custom");
 
   //add the methods
   for (auto &item : tsg::methods)
@@ -641,9 +660,18 @@ void TsgGui::generateTS() {
     try {
 
       //generate the time series
-      tsg::TSGenerator tSGenerator(length, window, delta, noise, type,
-          motifSize, height, step, times, method, maxi, gen, smaller);
-      tSGenerator.run(timeSeries, motif, dVector, motifPositions);
+      if (type.compare("custom")) {
+
+        tsg::TSGenerator tSGenerator(length, window, delta, noise, type,
+            motifSize, height, step, times, method, maxi, gen, smaller);
+        tSGenerator.run(timeSeries, motif, dVector, motifPositions);
+      }
+      else {
+
+        tsg::TSGenerator tSGenerator(length, window, delta, noise, customShape,
+            motifSize, height, step, times, method, maxi, gen, smaller);
+        tSGenerator.run(timeSeries, motif, dVector, motifPositions);
+      }
 
       success = true;
     }
@@ -1354,3 +1382,20 @@ void TsgGui::showSmallerHelp() {
   smallerMes.show();
 }
 
+void TsgGui::typeSelected(const int index_in) {
+
+  if (index_in == 8)
+    customDia.show();
+}
+
+void TsgGui::createCustomShape() {
+
+  customCanvas.getShape(customShape);
+
+  customDia.close();
+}
+
+void TsgGui::closeCustomDia() {
+
+  customDia.close();
+}
