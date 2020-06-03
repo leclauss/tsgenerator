@@ -446,6 +446,44 @@ namespace tsg {
     stdDev_out = stdDev_out < 1.0 ? 1.0 : sqrt(stdDev_out);
   }
 
+  double TSGenerator::similarityWithMotif(const rseq &timeSeries_in, const int
+      pos_in, const double bestSoFar_in) {
+
+    if (timeSeries_in.empty()) {
+
+      std::cerr << "ERROR: Time series is empty!" << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    if (pos_in + window > length || pos_in < 0) {
+
+      std::cerr << "ERROR: Position of the subsequence " <<
+        pos_in << " in similarity function is wrong!" << std::endl;
+      throw(EXIT_FAILURE);
+    }
+
+    double rWindow = 1.0 / window;
+
+    double mean = sums[pos_in] * rWindow;
+    double stdDev = sumSquares[pos_in] * rWindow  - mean * mean;
+    stdDev = stdDev < 1.0 ? 1.0 : sqrt(stdDev);
+
+    //calculate the similarity
+    double sumOfSquares = 0.0;
+    double bestSoFar = bestSoFar_in * bestSoFar_in;
+    double norm;
+    double diff;
+
+    for (int i = 0; i < window && sumOfSquares < bestSoFar; i++) {
+
+      norm = (timeSeries_in[pos_in + i] - mean) / stdDev;
+      diff = norm - zMotif[i];
+      sumOfSquares += diff * diff;
+    }
+
+    return sqrt(sumOfSquares);
+  }
+
   void TSGenerator::calculateSubsequence(rseq &subsequence_out) {
 
     if (!subsequence_out.empty()) {
@@ -1077,8 +1115,6 @@ namespace tsg {
     tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
     d = 0.9999999 * similarity(timeSeries_out, pos0, pos1);
 
-    d_out.push_back(d);
-
     //inject sequences into the time series
     for (int motifItr = 1; motifItr < size; motifItr++) {
 
@@ -1159,6 +1195,19 @@ namespace tsg {
       //remove the position from available positions
       freePositions.removePosition();
     }
+
+    pos0 = pos_out[0][0];
+    value = d;
+
+    for (int i = 1; i < (int)pos_out[0].size(); i++) {
+
+      value = similarity(timeSeries_out, pos0, pos_out[0][i], d);
+
+      if (value < d)
+        d = value;
+    }
+
+    d_out.push_back(d);
 
     //inject smaller set motif to harden the algorithm
     for (int small = 0; small < smaller; small++) {
@@ -1283,8 +1332,6 @@ namespace tsg {
     tpm(timeSeries_out, sums, sumSquares, pos0, pos1, window);
     d = 0.49999999 * similarity(timeSeries_out, pos0, pos1);
 
-    d_out.push_back(d);
-
     //calculate motif set center subsequence in the window size dimentional
     //room of subsequence values
     calculateSubsequence(motif);
@@ -1380,6 +1427,18 @@ namespace tsg {
       //remove the position from available positions
       freePositions.removePosition();
     }
+
+    value = d;
+
+    for (int i = 0; i < (int)pos_out[0].size(); i++) {
+
+      value = similarityWithMotif(timeSeries_out, pos_out[0][i], d);
+
+      if (value < d)
+        d = value;
+    }
+
+    d_out.push_back(d);
 
     //inject smaller set motif to harden the algorithm
     for (int small = 0; small < smaller; small++) {

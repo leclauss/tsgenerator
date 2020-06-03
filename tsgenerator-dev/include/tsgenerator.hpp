@@ -275,6 +275,23 @@ namespace tsg
     void meanStdDev(const rseq &sequence_in, double &mean_out, double
         &variance_out);
 
+    ///\brief Computes the similarity of a sequence and subsequences in
+    ///a time series.
+    ///
+    ///\param [in] &timeSeries_in Hands over the time series.
+    ///\param [in] pos_in Hands over the position of the subsequence.
+    ///\param [in] bestSoFar_in Hands over the best similarity so far.
+    ///
+    ///\return The z-normalized similarity.
+    ///
+    ///This function computes the similarity of a sequence, not necessarily
+    ///a subsequence of the time series, and a subsequence. Therefore, the
+    ///sequence and subsequence are first z-normalized and the Euclidean
+    ///Distance is computed. The return value is the similarity of the
+    ///z-normalized sequences.
+    double similarityWithMotif(const rseq &timeSeries_in, const int pos_in,
+        const double bestSoFar_in);
+
     ///\brief Computes a motif set subsequence.
     ///
     ///\param [out] subsequence_out Hands over the calculated raw subsequence.
