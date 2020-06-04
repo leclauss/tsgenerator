@@ -1197,17 +1197,23 @@ namespace tsg {
     }
 
     pos0 = pos_out[0][0];
+
     d = similarityWithMotif(timeSeries_out, pos_out[0][1], d);
+    double dMin = d;
 
     for (int i = 2; i < (int)pos_out[0].size(); i++) {
 
       value = similarity(timeSeries_out, pos0, pos_out[0][i], d);
 
-      if (value < d)
+      if (value > d)
         d = value;
+
+      if (value < dMin)
+        dMin = value;
     }
 
     d_out.push_back(d);
+    d = dMin;
 
     //inject smaller set motif to harden the algorithm
     for (int small = 0; small < smaller; small++) {
@@ -1429,6 +1435,7 @@ namespace tsg {
     }
 
     d = similarityWithMotif(timeSeries_out, pos_out[0][0], d);
+    double dMin = d;
 
     for (int i = 1; i < (int)pos_out[0].size(); i++) {
 
@@ -1436,9 +1443,13 @@ namespace tsg {
 
       if (value > d)
         d = value;
+
+      if (value < dMin)
+        dMin = value;
     }
 
     d_out.push_back(d);
+    d = dMin;
 
     //inject smaller set motif to harden the algorithm
     for (int small = 0; small < smaller; small++) {
