@@ -1197,9 +1197,9 @@ namespace tsg {
     }
 
     pos0 = pos_out[0][0];
-    value = d;
+    d = similarityWithMotif(timeSeries_out, pos_out[0][1], d);
 
-    for (int i = 1; i < (int)pos_out[0].size(); i++) {
+    for (int i = 2; i < (int)pos_out[0].size(); i++) {
 
       value = similarity(timeSeries_out, pos0, pos_out[0][i], d);
 
@@ -1428,13 +1428,13 @@ namespace tsg {
       freePositions.removePosition();
     }
 
-    value = d;
+    d = similarityWithMotif(timeSeries_out, pos_out[0][0], d);
 
-    for (int i = 0; i < (int)pos_out[0].size(); i++) {
+    for (int i = 1; i < (int)pos_out[0].size(); i++) {
 
       value = similarityWithMotif(timeSeries_out, pos_out[0][i], d);
 
-      if (value < d)
+      if (value > d)
         d = value;
     }
 
