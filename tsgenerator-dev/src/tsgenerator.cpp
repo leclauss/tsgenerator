@@ -1208,6 +1208,7 @@ namespace tsg {
         d = value;
     }
 
+    d += std::numeric_limits<double>::min();
     d_out.push_back(d);
 
     //inject smaller set motif to harden the algorithm
@@ -1439,6 +1440,7 @@ namespace tsg {
         d = value;
     }
 
+    d += std::numeric_limits<double>::min();
     d_out.push_back(d);
 
     //inject smaller set motif to harden the algorithm
