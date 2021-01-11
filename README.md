@@ -178,7 +178,16 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
  make
  ```
 
-3. Create the documentation by executing the **doc** target with GNU Make. The documentation is located in the subfolder **build/doc/**.
+3. Optionally: Create debian install package.
+ ```
+ make package
+ ```
+ The package can now be installed with Ubuntus package manager.
+ ```
+ sudo apt install ./tsgenerator-dev-3.0.0.deb
+ ```
+
+4. Optionally: Create the documentation by executing the **doc** target with GNU Make. The documentation is located in the subfolder **build/doc/**.
  ```bash
  make doc
  ```
@@ -237,16 +246,7 @@ To generate the tsgenerator binary repeat the steps in the directory **tsgenerat
  make
  ```
 
-4. Optionally: Create debian install package.
- ```
- make package
- ```
- The package can now be installed with Ubuntus package manager.
- ```
- sudo apt install ./tsgenerator-dev-3.0.0.deb
- ```
-
-5. Optionally: Create the documentation by executing the **doc** target with make. The documentation is located in the subfolder **build/doc/**.
+4. Optionally: Create the documentation by executing the **doc** target with make. The documentation is located in the subfolder **build/doc/**.
  ```bash
  make doc
  ```
