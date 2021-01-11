@@ -186,6 +186,10 @@ The installation guide is divided into instructions for Linux, Windows and Mac.
  ```
  sudo apt install ./tsgenerator-dev-3.0.0.deb
  ```
+ After you installed the package make sure to run
+ ```
+ sudo ldconfig
+ ```
 
 4. Optionally: Create the documentation by executing the **doc** target with GNU Make. The documentation is located in the subfolder **build/doc/**.
  ```bash
