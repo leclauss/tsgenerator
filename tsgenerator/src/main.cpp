@@ -341,32 +341,39 @@ int main(int argc, char *argv[]) {
           outputFile.printTimeSeriesVertical(timeSeries);
         }
 
+        outputFile.printMetaLine((tsg::iseq){ window }, "window");
+
         if (gen == "set motif") {
 
-          outputFile.printMetaLine((tsg::iseq){ window }, "window");
           outputFile.printMetaLine((tsg::iseq){ motifPositions[0][0] },
               "set motif");
-          outputFile.printMetaLine(motifPositions[0], "matchings");
-          outputFile.printMetaLine((tsg::rseq){ dVector[0] }, "range");
-          outputFile.printMetaLine(motifPositions[1], "pair motif");
-          outputFile.printMetaLine((tsg::rseq){ dVector[1] }, "pair "
-              "motif distance");
         }
         else if (gen == "latent motif") {
 
-          outputFile.printMetaLine((tsg::iseq){ window }, "window");
           outputFile.printMetaLine(motif[0], "latent motif");
-          outputFile.printMetaLine(motifPositions[0], "matchings");
-          outputFile.printMetaLine((tsg::rseq){ dVector[0] }, "range");
-          outputFile.printMetaLine(motifPositions[1], "pair motif");
-          outputFile.printMetaLine((tsg::rseq){ dVector[1] }, "pair "
-              "motif distance");
         }
         else {
 
-          outputFile.printMetaLine((tsg::iseq){ window }, "window");
           outputFile.printMetaLine(motifPositions[0], "pair motif");
           outputFile.printMetaLine(dVector, "distance");
+        }
+
+        if (gen == "set motif" || gen == "latent motif") {
+          outputFile.printMetaLine(motifPositions[0], "matchings");
+          outputFile.printMetaLine((tsg::rseq){ dVector[0] }, "range");
+          outputFile.printMetaLine(motifPositions[1], "pair motif");
+          outputFile.printMetaLine((tsg::rseq){ dVector[1] }, "pair motif distance");
+          outputFile.printMetaLine((tsg::iseq){ length }, "length");
+          outputFile.printMetaLine((tsg::rseq){ delta }, "delta");
+          outputFile.printMetaLine((tsg::rseq){ noise }, "noise");
+          outputFile.printMetaLine((tsg::par){ type }, "type");
+          outputFile.printMetaLine((tsg::iseq){ size }, "size");
+          outputFile.printMetaLine((tsg::rseq){ height }, "height");
+          outputFile.printMetaLine((tsg::rseq){ step }, "step");
+          outputFile.printMetaLine((tsg::iseq){ times }, "times");
+          outputFile.printMetaLine((tsg::par){ method }, "method");
+          outputFile.printMetaLine((tsg::rseq){ maxi }, "maximum");
+          outputFile.printMetaLine((tsg::iseq){ smaller }, "smaller");
         }
 
         outputFile.close();
